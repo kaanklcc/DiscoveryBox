@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "764790962175",
+    "project_id": "discoverybox-5bedd",
+    "storage_bucket": "discoverybox-5bedd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:764790962175:android:7cc5b70872d6bbe695d9ca",
+        "android_client_info": {
+          "package_name": "com.kaankilic.discoverybox"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWQTrLufvdxLnkawZohwfRu_aRYClfVAg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
