@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.kaankilic.discoverybox.entitiy.Hikaye
 import com.kaankilic.discoverybox.ui.theme.DiscoveryBoxTheme
 import com.kaankilic.discoverybox.view.Anasayfa
+import com.kaankilic.discoverybox.view.AppScreen
 import com.kaankilic.discoverybox.view.Bilim
 import com.kaankilic.discoverybox.view.Diger
 import com.kaankilic.discoverybox.view.Dil
@@ -27,6 +28,7 @@ import com.kaankilic.discoverybox.view.GuncelHayat
 import com.kaankilic.discoverybox.view.Hikaye
 import com.kaankilic.discoverybox.view.KayitSayfa
 import com.kaankilic.discoverybox.view.MatchGameScreen
+
 import com.kaankilic.discoverybox.view.SaveSayfa
 import com.kaankilic.discoverybox.view.SayfaGecisleri
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
@@ -60,7 +62,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DiscoveryBoxTheme {
                 //val navController = rememberNavController()
-                auth = FirebaseAuth.getInstance()
+               auth = FirebaseAuth.getInstance()
                 val navController = rememberNavController()
 
                 LaunchedEffect(Unit) {
@@ -90,7 +92,9 @@ class MainActivity : ComponentActivity() {
                 //GuncelHayat()
                 //Bilim()
                 //Diger()*/
-                //MatchGameScreen(cardSayfaViewModel = cardSayfaViewModel, isEnglish = isEnglish )
+              //MatchGameScreen(cardSayfaViewModel = cardSayfaViewModel, isEnglish = isEnglish )
+               AppScreen()
+
 
             }
         }

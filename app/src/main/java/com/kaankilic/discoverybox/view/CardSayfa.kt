@@ -1,6 +1,7 @@
 package com.kaankilic.discoverybox.view
 
-import androidx.compose.animation.AnimatedVisibility
+import android.speech.tts.TextToSpeech
+import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -9,49 +10,54 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Scaffold
-import androidx.compose.material.TopAppBar
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Word
 import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,8 +72,34 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
     val currentGroupIndex = remember { mutableStateOf(0) }
     val matchedItem = remember { mutableStateOf<String?>(null) }
     val showCelebration = remember { mutableStateOf(false) }
+    var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
+    val context = LocalContext.current
+    var isPlaying by remember { mutableStateOf(false) }
+    val isGameOver = remember { mutableStateOf(false) }
 
-    // Animasyon ayarları
+
+
+
+    DisposableEffect(key1 = context) {
+
+        textToSpeech = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                // Türkçe dilini ayarla
+                val result = textToSpeech?.setLanguage(Locale("eng", "ENG"))
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Log.e("TextToSpeech", "Dil desteklenmiyor.")
+                }
+            } else {
+                Log.e("TextToSpeech", "Başlatma başarısız.")
+            }
+        }
+
+        onDispose {
+            textToSpeech?.shutdown()
+        }
+    }
+
+
     val infiniteTransition = rememberInfiniteTransition()
     val animatedAlpha = infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -77,183 +109,342 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
             repeatMode = RepeatMode.Reverse
         )
     )
-    val gradientBackground = Brush.linearGradient(
-        colors = listOf(
 
-            Color(0xFF9575CD),
-            Color(0xFFFFFFFF),
-            Color(0xFFFFFFFF),
-            Color(0xFFFFFFFF),
-            Color(0xFFFFFFFF),
-            Color(0xFFFFFFFF),
-            Color(0xFFFFFFFF),
-            Color(0xFFFFFFFF),
+    val gradientBackground = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFF34909a),
+            Color(0xFF34909a),
         ),
-        start = Offset(0f, 0f),
-        end = Offset.Infinite
+        startY = 0f,
+        endY = 1800f
     )
 
-    // Grup boyutu
-    val groupSize = 4
-    val currentWords = shuffledWords.drop(currentGroupIndex.value * groupSize).take(groupSize)
-    val currentImages = shuffledImages.drop(currentGroupIndex.value * groupSize).take(groupSize)
+    val groupSize = 3
+    val currentWords = shuffledWords.drop(currentGroupIndex.value * (groupSize/3)).take(groupSize/3)
+    val currentImages = shuffledImages.drop(currentGroupIndex.value * groupSize ).take(groupSize )
 
     Scaffold(
         topBar = {
             androidx.compose.material3.TopAppBar(
-                title = { Text(text = "Matching Game", fontSize = 35.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center) },
-                modifier = Modifier.background(gradientBackground),
+                title = {
+                    Text(
+                        text = "MATCHING GAME",
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                },
+                modifier = Modifier.background(Color.Transparent),
                 colors = TopAppBarColors(
-                    Color(0xFF9575CD),
-                    Color(0xFF9575CD),
-                    Color(0xFF9575CD),
+                    Color(0xFF34909a),
+                    Color(0xFF34909a),
+                    Color(0xFF34909a),
                     Color.White,
                     Color.White
                 )
             )
         },
-
+        containerColor = Color.DarkGray,
         modifier = Modifier.background(gradientBackground)
-    ) {paddingValues ->
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)
-            .background(gradientBackground)
+    ) { paddingValues ->
+
+        if (isGameOver.value) {
+            Log.d("isgameover girildi", "isgameovergirildi")
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.7f)),
+                contentAlignment = Alignment.Center
             ) {
-            if (showCelebration.value) {
-                CelebrationAnimation {
-                    showCelebration.value = false
-                    currentGroupIndex.value++ // Sonraki gruba geç
-                }
-            } else {
-                Row(modifier = Modifier.fillMaxSize()) {
-                    // Kelimeleri Göster
-                    LazyColumn(
+                Text(
+                    text = "Tebrikler, oyun bitti!",
+                    color = Color.White,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        } else {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.cimen),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+
+                    )
+
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (showCelebration.value) {
+                        CelebrationAnimation(
+                            onAnimationEnd = {
+                                showCelebration.value = false
+                                Log.d("CelebrationAnimation", "Celebration animation started")
+                                // Sonraki gruba geç
+                                cardSayfaViewModel.loadNextGroup(currentGroupIndex.value, 3,isGameOver)
+                                Log.d("CelebrationAnimation", "Next group loaded and celebration ended")
+                            },
+                            cardSayfaViewModel = cardSayfaViewModel, // Burada view model'i geçiriyoruz
+                            currentGroupIndex = currentGroupIndex,
+                            isGameOver = isGameOver
+                        )
+                    }
+                    Column(
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 2.dp, top = 100.dp),
-                        verticalArrangement = Arrangement.spacedBy(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        items(currentWords) { word ->
-                            if (word.isVisible) {
-                                Text(
-                                    text = if (isEnglish) word.nameEn else word.nameTr,
-                                    modifier = Modifier
-                                        .padding(10.dp)
-                                        .background(
-                                            color = if (selectedWord.value == word.nameEn || selectedWord.value == word.nameTr)
-                                                Color(0xFF9575CD) else Color.Transparent
-                                        )
-                                        .clickable {
-                                            selectedWord.value =
-                                                if (isEnglish) word.nameEn else word.nameTr
-                                            checkMatch(
-                                                selectedWord.value,
-                                                selectedImage.value,
-                                                words,
-                                                isMatch,
-                                                matchedItem,
-                                                cardSayfaViewModel,
-                                                currentGroupIndex,
-                                                showCelebration
-                                            )
-                                        },
-                                    fontSize = 40.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (selectedWord.value == word.nameEn || selectedWord.value == word.nameTr)
-                                        Color.White else Color.Black
+                            .fillMaxSize()
+                            .background(Color.Transparent),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top
+                    ){
+                        Box(
+                            modifier = Modifier.fillMaxWidth().height(200.dp)
+                        ){
+                            Row(modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+
+                                Image(
+                                    painter = painterResource(id = R.drawable.pars),
+                                    contentDescription = "pars",
+                                    modifier = Modifier.size(200.dp)
+                                        .align(Alignment.CenterVertically)
+
                                 )
+
+                                Box(
+                                    modifier = Modifier.offset(y=(-45).dp, x = (-30).dp)
+
+                                        .background(
+                                            color = Color.LightGray,
+                                            shape = RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(16.dp)
+                                        .align(Alignment.CenterVertically)
+                                )
+                                {
+                                    androidx.compose.material.Text(
+                                        text =  "Welcome again!. " +
+                                                "Let's match the words",
+                                        style = TextStyle(
+                                            color = Color.Black,
+                                            fontSize = 20.sp
+                                        )
+                                    )
+                                }
+
+
+                            }
+
+
+                        }
+
+                        if (showCelebration.value) {
+                            CelebrationAnimation(
+                                onAnimationEnd = {
+                                    showCelebration.value = false
+                                    Log.d("CelebrationAnimation", "Celebration animation started")
+                                    // Sonraki gruba geç
+                                    cardSayfaViewModel.loadNextGroup(currentGroupIndex.value, 3,isGameOver)
+                                    Log.d("CelebrationAnimation", "Next group loaded and celebration ended")
+                                },
+                                cardSayfaViewModel = cardSayfaViewModel, // Burada view model'i geçiriyoruz
+                                currentGroupIndex = currentGroupIndex,
+                                isGameOver = isGameOver
+                            )
+                        }
+                        else {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.SpaceEvenly,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+
+                                // Kelimeleri Göster
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxWidth().offset(y=(-110).dp),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    items(currentWords) { word ->
+
+                                        Box(
+                                            modifier = Modifier
+                                                .size(400.dp, 400.dp)
+                                                .padding(paddingValues)
+                                                .background(Color.LightGray.copy(alpha = 0.55f), shape = RectangleShape)
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .size(450.dp, 250.dp)
+                                                    .padding(2.dp)
+                                                    .padding(6.dp),
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally
+                                            ) {
+
+                                                Text(
+                                                    text = word.nameEn,
+                                                    color = Color.White,
+                                                    fontSize = 90.sp,
+                                                    fontStyle = FontStyle.Italic
+                                                )
+
+                                                Spacer(modifier = Modifier.height(16.dp))
+
+                                                Image(
+                                                    painter = painterResource(id = R.drawable.greenvoice),
+                                                    contentDescription = "hizlandir icon",
+                                                    modifier = Modifier
+                                                        .size(100.dp)
+                                                        .clip(CircleShape)
+                                                        .background(Color.LightGray)
+                                                        .clickable {
+                                                            textToSpeech?.speak(word.nameEn, TextToSpeech.QUEUE_FLUSH, null, null)
+                                                        }
+                                                )
+                                            }
+
+                                        }
+                                    }
+                                }
+
+                                // Görselleri Göster
+                                LazyRow(
+                                    modifier = Modifier.offset(y = (-79).dp)
+                                        .padding(bottom = 80.dp)
+                                        .fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    items(currentImages) { image ->
+                                        Image(
+                                            painter = rememberAsyncImagePainter(image.imageUrl),
+                                            contentDescription = image.nameTr,
+                                            modifier = Modifier
+                                                .clip(CircleShape)
+                                                .background(Color.White)
+                                                .size(120.dp)
+                                                .clickable {
+                                                    selectedImage.value = image.imageUrl
+                                                    checkMatch(
+                                                        selectedImage.value,
+                                                        words,
+                                                        isMatch,
+                                                        matchedItem,
+                                                        cardSayfaViewModel,
+                                                        currentGroupIndex,
+                                                        showCelebration,
+                                                        isGameOver
+
+
+                                                    )
+                                                }
+                                        )
+                                    }
+                                }
+
                             }
                         }
+
+
+
                     }
 
-                    // Görselleri Göster
-                    LazyColumn(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 25.dp, top = 60.dp),
-                        verticalArrangement = Arrangement.spacedBy(15.dp),
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        items(currentImages) { word ->
-                            if (word.isVisible) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(word.imageUrl),
-                                    contentDescription = word.nameTr,
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .background(Color.White)
-                                        .size(100.dp)
-                                        .clickable {
-                                            selectedImage.value = word.imageUrl
-                                            checkMatch(
-                                                selectedWord.value,
-                                                selectedImage.value,
-                                                words,
-                                                isMatch,
-                                                matchedItem,
-                                                cardSayfaViewModel,
-                                                currentGroupIndex,
-                                                showCelebration
-                                            )
-                                        }
-                                        .let {
-                                            if (matchedItem.value == word.nameTr || matchedItem.value == word.nameEn) {
-                                                it.alpha(animatedAlpha.value)
-                                            } else it
-                                        }
-                                )
-                            }
-                        }
-                    }
                 }
             }
+
+            // Diğer oyun içeriği burada
         }
+
+
+
     }
-
-
-
-
 }
 
-
-// Kutlama Animasyonu için Composable
 @Composable
-fun CelebrationAnimation(onAnimationEnd: () -> Unit) {
-    // Basit bir kutlama animasyonu, burada animasyonun tamamlanması sonrası `onAnimationEnd` çağrılır
-    Text(
-        text = "Tebrikler! Grup Tamamlandı!",
-        fontSize = 36.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.Green,
+fun CelebrationAnimation(
+    onAnimationEnd: () -> Unit,
+    cardSayfaViewModel: CardSayfaViewModel,
+    currentGroupIndex: MutableState<Int>,
+    isGameOver: MutableState<Boolean>// MutableState<Int> alıyoruz
+) {
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(32.dp)
-            .wrapContentWidth(Alignment.CenterHorizontally)
-    )
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.7f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Congratulations!",
+                color = Color.White,
+                fontSize = 50.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Image(
+                painter = painterResource(id = R.drawable.pars),
+                contentDescription = "pars",
+                modifier = Modifier.size(400.dp)
+
+
+            )
+
+        }
+
+
+    }
 
     // Animasyon süresi boyunca gösterim
     LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(2000)
+        kotlinx.coroutines.delay(3000) // 3 saniye gösterim
+        onAnimationEnd() // Animasyon bitince çağır
+        if (!isGameOver.value) { // Eğer oyun bitmemişse
+            onAnimationEnd()
+            cardSayfaViewModel.loadNextGroup(currentGroupIndex.value, 3,isGameOver)
+        }
         onAnimationEnd()
     }
 }
 
-// Doğru eşleşme durumunda kutlama animasyonunu tetikleyen `checkMatch` fonksiyonu
 fun checkMatch(
-    selectedWord: String, selectedImage: String, words: List<Word>,
-    isMatch: MutableState<Boolean>, matchedItem: MutableState<String?>,
-    cardSayfaViewModel: CardSayfaViewModel, currentGroupIndex: MutableState<Int>,
-    showCelebration: MutableState<Boolean>
+    selectedImage: String,
+    words: List<Word>,
+    isMatch: MutableState<Boolean>,
+    matchedItem: MutableState<String?>,
+    cardSayfaViewModel: CardSayfaViewModel,
+    currentGroupIndex: MutableState<Int>,
+    showCelebration: MutableState<Boolean>,
+    isGameOver: MutableState<Boolean>
 ) {
-    val matchedWord = words.find { it.imageUrl == selectedImage && (it.nameTr == selectedWord || it.nameEn == selectedWord) }
+    val matchedWord = words.find { it.imageUrl == selectedImage }
     isMatch.value = matchedWord != null
 
     if (isMatch.value) {
-        matchedItem.value = selectedWord
+        matchedItem.value = matchedWord?.nameEn
         matchedWord?.let { cardSayfaViewModel.removeWord(it) }
-        if (cardSayfaViewModel.shuffledWords.none { it.isVisible && it in words.drop(currentGroupIndex.value * 4).take(4) }) {
-            // Grup tamamlandı, kutlama animasyonu göster
-            showCelebration.value = true
+
+        if (cardSayfaViewModel.shuffledWords.none { it.isVisible }) {
+           showCelebration.value=true
+            cardSayfaViewModel.loadNextGroup(currentGroupIndex.value,3,isGameOver)
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
