@@ -31,10 +31,11 @@ class CardSayfaViewModel : ViewModel() {
             .addOnSuccessListener { documents ->
                 words.clear()
                 for (document in documents) {
+                    val colour = document.getString("colour") ?: ""
                     val nameTr = document.getString("isim_en") ?: ""
                     val nameEn = document.getString("isim_tr") ?: ""
                     val imageUrl = document.getString("gorsel_url") ?: ""
-                    words.add(Word(nameTr, nameEn, imageUrl))
+                    words.add(Word(colour,nameTr, nameEn, imageUrl))
                 }
                 prepareShuffledData()
             }

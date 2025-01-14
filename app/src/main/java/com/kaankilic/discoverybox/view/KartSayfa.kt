@@ -63,7 +63,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MeyveKartSıralı(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val wordList = remember { viewModel.words } // Tüm kelimeler
     var currentIndex by remember { mutableStateOf(0) } // Şu anki kartın indeksi
     var isFlipped by remember { mutableStateOf(false) } // Kartın dönme durumu
@@ -349,9 +349,11 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
 
 }
 
+
+
 @Composable
 fun AppScreen() {
-    MeyveKartSıralı()
+    MeyveKartSirali()
 }
 
 

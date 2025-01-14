@@ -55,7 +55,7 @@ class HikayeViewModel : ViewModel() {
 
     fun getStoryById(hikayeId: String?) {
         hikayeId?.let {
-            Log.d("Hikaye", "getStoryById çağrıldı: $hikayeId") // Burada log ekledik
+            Log.d("Hikaye", "getStoryById çağrıldı: $hikayeId")
             dbRepo.getStoryById(it) { retrievedHikaye ->
                 hikaye.value = retrievedHikaye
                 Log.d("Hikaye", "Başlık: ${retrievedHikaye.title}, İçerik: ${retrievedHikaye.content}")

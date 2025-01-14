@@ -76,8 +76,9 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "KAYDEDİLENLER", fontSize = 35.sp)}
-            ,)
+            TopAppBar(title = { Text(text = "KAYDEDİLENLER", fontSize = 35.sp)},
+                colors = TopAppBarColors( Color(0xFF2A3E52), Color(0xFF2A3E52), Color(0xFF2A3E52), Color.White, Color.White)
+            )
 
         }
     ) { paddingValues ->

@@ -21,8 +21,10 @@ import com.kaankilic.discoverybox.ui.theme.DiscoveryBoxTheme
 import com.kaankilic.discoverybox.view.Anasayfa
 import com.kaankilic.discoverybox.view.AppScreen
 import com.kaankilic.discoverybox.view.Bilim
+
 import com.kaankilic.discoverybox.view.Diger
 import com.kaankilic.discoverybox.view.Dil
+import com.kaankilic.discoverybox.view.GameApp
 import com.kaankilic.discoverybox.view.GirisSayfa
 import com.kaankilic.discoverybox.view.GuncelHayat
 import com.kaankilic.discoverybox.view.Hikaye
@@ -31,6 +33,7 @@ import com.kaankilic.discoverybox.view.MatchGameScreen
 
 import com.kaankilic.discoverybox.view.SaveSayfa
 import com.kaankilic.discoverybox.view.SayfaGecisleri
+
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.DilViewModel
@@ -50,6 +53,7 @@ class MainActivity : ComponentActivity() {
     val kayitSayfaViewModel : KayitSayfaViewModel by viewModels()
     val saveSayfaViewModel : SaveSayfaViewModel by viewModels()
     val cardSayfaViewModel:CardSayfaViewModel by viewModels()
+    //val colorGameViewModel : ColorGameViewModel by viewModels()
     private lateinit var auth: FirebaseAuth
     val isEnglish = true
 
@@ -60,9 +64,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            DiscoveryBoxTheme {
+           DiscoveryBoxTheme {
                 //val navController = rememberNavController()
-               auth = FirebaseAuth.getInstance()
+             /* auth = FirebaseAuth.getInstance()
                 val navController = rememberNavController()
 
                 LaunchedEffect(Unit) {
@@ -82,7 +86,7 @@ class MainActivity : ComponentActivity() {
                     girisSayfaViewModel,
                     kayitSayfaViewModel,
                    saveSayfaViewModel,
-                )
+                )*/
                // SaveSayfa(navController = rememberNavController() , saveSayfaViewModel =saveSayfaViewModel )
                 //GirisSayfa()
                 //KayitSayfa()
@@ -92,8 +96,9 @@ class MainActivity : ComponentActivity() {
                 //GuncelHayat()
                 //Bilim()
                 //Diger()*/
-              //MatchGameScreen(cardSayfaViewModel = cardSayfaViewModel, isEnglish = isEnglish )
-               AppScreen()
+             //MatchGameScreen(cardSayfaViewModel = cardSayfaViewModel, isEnglish = isEnglish )
+             //AppScreen()
+             GameApp()
 
 
             }

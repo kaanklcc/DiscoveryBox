@@ -66,12 +66,12 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
 
 
 
-    // Gradient brush with a smooth transition from black to dark purple
+
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
             Color.Black,
             Color(0xFF4B0082)
-           // Color.White
+
         )
     )
 
@@ -84,8 +84,8 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
             )
         },
 
-        containerColor = Color.DarkGray, // Transparent to show gradient background
-        modifier = Modifier.background(gradientBrush) // Apply gradient to entire Scaffold
+        containerColor = Color.DarkGray,
+        modifier = Modifier.background(gradientBrush)
     ) { paddingValues ->
 
         Column(
