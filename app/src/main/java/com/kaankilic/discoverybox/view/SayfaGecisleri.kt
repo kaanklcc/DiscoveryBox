@@ -12,7 +12,9 @@ import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.kaankilic.discoverybox.entitiy.Hikaye
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
+import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.DilViewModel
+import com.kaankilic.discoverybox.viewmodel.GameViewModel
 import com.kaankilic.discoverybox.viewmodel.GirisSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.KayitSayfaViewModel
@@ -29,6 +31,8 @@ fun SayfaGecisleri(
     girisSayfaViewModel: GirisSayfaViewModel,
     kayitSayfaViewModel: KayitSayfaViewModel,
     saveSayfaViewModel: SaveSayfaViewModel,
+    cardSayfaViewModel: CardSayfaViewModel,
+
 
     ) {
    // val navController = rememberNavController()
@@ -36,7 +40,7 @@ fun SayfaGecisleri(
         composable("anasayfa"){
             Anasayfa(navController = navController, anasayfaViewModel = anasayfaViewModel)
         }
-        composable("bilim"){
+        /*composable("bilim"){
             Bilim(navController = navController)
         }
         composable("diger"){
@@ -47,6 +51,22 @@ fun SayfaGecisleri(
         }
         composable("guncelHayat"){
             GuncelHayat(navController = navController)
+        }*/
+        composable("gameMain"){
+            GameMain(navController,anasayfaViewModel)
+        }
+        composable("wordGame"){
+            MeyveKartSirali(cardSayfaViewModel)
+        }
+        composable("matchingGame"){
+            MatchGameScreen(cardSayfaViewModel,false)
+        }
+        composable("colorGame"){
+            GameApp()
+
+        }
+        composable("hikayeGecis"){
+            HikayeGecis(navController)
         }
         composable("hikaye"){
             Hikaye(navController = navController,hikayeViewModel,metinViewModel)

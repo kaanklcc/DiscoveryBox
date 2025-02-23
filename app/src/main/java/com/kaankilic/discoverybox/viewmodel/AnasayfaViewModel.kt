@@ -21,9 +21,8 @@ class AnasayfaViewModel : ViewModel() {
 
     fun konulariYukle(){
         CoroutineScope(Dispatchers.Main).launch {
-            konular.value= dbRepo.getAllStory()
+            konular.value= dbRepo.getAllGame()
         }
-
 
 
     }

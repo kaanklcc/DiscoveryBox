@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +52,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -179,7 +181,8 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
 
                 Column(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                  // verticalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     if (showCelebration.value) {
@@ -201,7 +204,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                             .fillMaxSize()
                             .background(Color.Transparent),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
+                        verticalArrangement = Arrangement.SpaceAround
                     ){
                         Box(
                             modifier = Modifier.fillMaxWidth().height(200.dp)
@@ -215,7 +218,6 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                     contentDescription = "pars",
                                     modifier = Modifier.size(200.dp)
                                         .align(Alignment.CenterVertically)
-
                                 )
 
                                 Box(
@@ -244,6 +246,8 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
 
 
                         }
+                        Spacer(modifier = Modifier.height(10.dp))
+
 
                         if (showCelebration.value) {
                             CelebrationAnimation(
@@ -276,13 +280,14 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
 
                                         Box(
                                             modifier = Modifier
-                                                .size(400.dp, 400.dp)
+                                                .size(350.dp, 350.dp)
                                                 .padding(paddingValues)
-                                                .background(Color.LightGray.copy(alpha = 0.55f), shape = RectangleShape)
+                                                .background(Color.LightGray.copy(alpha = 0.55f), shape = RectangleShape),
+                                            contentAlignment = Alignment.Center,
                                         ) {
                                             Column(
                                                 modifier = Modifier
-                                                    .size(450.dp, 250.dp)
+                                                   // .size(300.dp, 300.dp)
                                                     .padding(2.dp)
                                                     .padding(6.dp),
                                                 verticalArrangement = Arrangement.Center,
@@ -292,22 +297,25 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                                 Text(
                                                     text = word.nameEn,
                                                     color = Color.White,
-                                                    fontSize = 90.sp,
-                                                    fontStyle = FontStyle.Italic
+                                                    fontSize = 70.sp,
+                                                    fontStyle = FontStyle.Italic,
+                                                    textAlign = TextAlign.Center
                                                 )
 
-                                                Spacer(modifier = Modifier.height(16.dp))
+                                                Spacer(modifier = Modifier.height(5.dp))
 
                                                 Image(
                                                     painter = painterResource(id = R.drawable.greenvoice),
-                                                    contentDescription = "hizlandir icon",
+                                                    contentDescription = "voice image",
                                                     modifier = Modifier
                                                         .size(100.dp)
                                                         .clip(CircleShape)
-                                                        .background(Color.LightGray)
+                                                        //.background(Color.LightGray)
                                                         .clickable {
                                                             textToSpeech?.speak(word.nameEn, TextToSpeech.QUEUE_FLUSH, null, null)
                                                         }
+                                                        .aspectRatio(1f),
+                                                    contentScale = ContentScale.Fit
                                                 )
                                             }
 
@@ -318,19 +326,20 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                 // Görselleri Göster
                                 LazyRow(
                                     modifier = Modifier.offset(y = (-79).dp)
-                                        .padding(bottom = 80.dp)
+                                        .padding(bottom = 10.dp)
                                         .fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                    horizontalArrangement = Arrangement.SpaceAround
                                 ) {
                                     items(currentImages) { image ->
                                         Image(
                                             painter = rememberAsyncImagePainter(image.imageUrl),
                                             contentDescription = image.nameTr,
                                             modifier = Modifier
-                                                .clip(CircleShape)
-                                                .background(Color.White)
-                                                .size(120.dp)
+                                                .size(110.dp) // Genel boyutu belirle
+                                                .aspectRatio(1f) // Kare orana yakın tutar
+                                                .clip(CircleShape) // Eğer yuvarlak istiyorsan
+                                                .background(Color.Transparent)
                                                 .clickable {
                                                     selectedImage.value = image.imageUrl
                                                     checkMatch(
@@ -345,7 +354,8 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
 
 
                                                     )
-                                                }
+                                                },    contentScale = ContentScale.Crop // Resmi kırpmadan büyütmek için
+
                                         )
                                     }
                                 }
@@ -385,7 +395,7 @@ fun CelebrationAnimation(
             Text(
                 text = "Congratulations!",
                 color = Color.White,
-                fontSize = 50.sp,
+                fontSize = 40.sp,
                 fontWeight = FontWeight.Bold
             )
             Image(

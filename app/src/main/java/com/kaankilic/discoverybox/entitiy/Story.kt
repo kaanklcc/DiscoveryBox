@@ -17,9 +17,15 @@ fun getAllStory(): List<Story>{
        Story("diger", R.drawable.other,"diger"),
        Story("saveSayfa", R.drawable.save,"saveSayfa")
 
-
-
-
-
    )
+}
+
+fun getAllGames(): List<Story>{
+    return listOf<Story>(
+        Story("wordGame", R.drawable.words,"wordGame"),
+        Story("matchingGame", R.drawable.matching,"matchingGame"),
+        Story("colorGame", R.drawable.colour,"colorGame"),
+        Story("rakam", R.drawable.numbers,"guncelHayat"),
+        Story("duyuOrgan", R.drawable.sense,"diger"),
+    )
 }

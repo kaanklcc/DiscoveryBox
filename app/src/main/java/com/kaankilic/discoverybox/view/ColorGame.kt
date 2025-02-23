@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberImagePainter
 import com.kaankilic.discoverybox.R
-
 import com.kaankilic.discoverybox.viewmodel.GameViewModel
 
 import java.util.Locale
@@ -87,7 +86,7 @@ fun GameScreen(viewModel: GameViewModel) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(text = "COLOR MATCHING GAME", fontSize = 35.sp, textAlign = TextAlign.Center) },
+                    title = { Text(text = "COLOR MATCHINGG GAME", fontSize = 35.sp, textAlign = TextAlign.Center) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = getColorFromName(currentColour), // Dinamik renk burada
                         titleContentColor = Color.White, // Başlık rengi

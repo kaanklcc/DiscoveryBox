@@ -23,7 +23,7 @@ class DiscoveryBoxRepository {
     private val firestore = FirebaseFirestore.getInstance()
 
 
-    suspend fun getAllStory() : List<Story> = dbds.GetAllStory()
+    suspend fun getAllGame() : List<Story> = dbds.GetAllGame()
 
     suspend fun generateStory(prompt: String): String = dbds.generateStory(prompt)
 

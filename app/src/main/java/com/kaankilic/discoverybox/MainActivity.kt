@@ -1,5 +1,6 @@
 package com.kaankilic.discoverybox
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,12 +25,17 @@ import com.kaankilic.discoverybox.view.Bilim
 
 import com.kaankilic.discoverybox.view.Diger
 import com.kaankilic.discoverybox.view.Dil
+import com.kaankilic.discoverybox.view.DragAndDropGameScreen
+
 import com.kaankilic.discoverybox.view.GameApp
+import com.kaankilic.discoverybox.view.GameScreen
 import com.kaankilic.discoverybox.view.GirisSayfa
 import com.kaankilic.discoverybox.view.GuncelHayat
 import com.kaankilic.discoverybox.view.Hikaye
 import com.kaankilic.discoverybox.view.KayitSayfa
 import com.kaankilic.discoverybox.view.MatchGameScreen
+
+
 
 import com.kaankilic.discoverybox.view.SaveSayfa
 import com.kaankilic.discoverybox.view.SayfaGecisleri
@@ -37,10 +43,12 @@ import com.kaankilic.discoverybox.view.SayfaGecisleri
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.DilViewModel
+import com.kaankilic.discoverybox.viewmodel.GameViewModel
 import com.kaankilic.discoverybox.viewmodel.GirisSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.KayitSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
+import com.kaankilic.discoverybox.viewmodel.NumberGameViewModel
 import com.kaankilic.discoverybox.viewmodel.SaveSayfaViewModel
 
 class MainActivity : ComponentActivity() {
@@ -53,7 +61,12 @@ class MainActivity : ComponentActivity() {
     val kayitSayfaViewModel : KayitSayfaViewModel by viewModels()
     val saveSayfaViewModel : SaveSayfaViewModel by viewModels()
     val cardSayfaViewModel:CardSayfaViewModel by viewModels()
+    val get:NumberGameViewModel by viewModels()
+    val gameViewModel : GameViewModel by viewModels()
+
+
     //val colorGameViewModel : ColorGameViewModel by viewModels()
+
     private lateinit var auth: FirebaseAuth
     val isEnglish = true
 
@@ -66,7 +79,7 @@ class MainActivity : ComponentActivity() {
         setContent {
            DiscoveryBoxTheme {
                 //val navController = rememberNavController()
-             /* auth = FirebaseAuth.getInstance()
+             auth = FirebaseAuth.getInstance()
                 val navController = rememberNavController()
 
                 LaunchedEffect(Unit) {
@@ -86,7 +99,9 @@ class MainActivity : ComponentActivity() {
                     girisSayfaViewModel,
                     kayitSayfaViewModel,
                    saveSayfaViewModel,
-                )*/
+                   cardSayfaViewModel,
+
+                )
                // SaveSayfa(navController = rememberNavController() , saveSayfaViewModel =saveSayfaViewModel )
                 //GirisSayfa()
                 //KayitSayfa()
@@ -98,7 +113,10 @@ class MainActivity : ComponentActivity() {
                 //Diger()*/
              //MatchGameScreen(cardSayfaViewModel = cardSayfaViewModel, isEnglish = isEnglish )
              //AppScreen()
-             GameApp()
+            //GameApp()
+
+
+
 
 
             }

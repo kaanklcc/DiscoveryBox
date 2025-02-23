@@ -15,6 +15,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Hikaye
 import com.kaankilic.discoverybox.entitiy.Story
+import com.kaankilic.discoverybox.entitiy.getAllGames
 import com.kaankilic.discoverybox.entitiy.getAllStory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -28,8 +29,8 @@ import java.io.IOException
 class DiscoveryBoxDataSource {
     val firestore = FirebaseFirestore.getInstance()
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    suspend fun GetAllStory(): List<Story> = withContext(Dispatchers.IO){
-        return@withContext getAllStory()
+    suspend fun GetAllGame(): List<Story> = withContext(Dispatchers.IO){
+        return@withContext getAllGames()
     }
 
     private val generativeModel = GenerativeModel(

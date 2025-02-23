@@ -1,5 +1,6 @@
 package com.kaankilic.discoverybox.view
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +48,7 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinViewModel: MetinViewModel) {
@@ -62,17 +65,28 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
     var generatedStory by remember { mutableStateOf("") }
     var imageGenerate by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState= remember { SnackbarHostState() }
 
 
 
 
 
-    val gradientBrush = Brush.linearGradient(
+    /*val gradientBrush = Brush.linearGradient(
         colors = listOf(
             Color.Black,
             Color(0xFF4B0082)
 
         )
+    )*/
+    val gradientBrush = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFF21324A),
+            Color(0xFF6BB7C0), // Üstteki renk
+            // Alttaki renk
+        ),
+        startY = 0f,
+        endY = 3000f// eğeri ekran yüksekliğine göre ayarlayabilirsiniz.
     )
 
     Scaffold(
@@ -82,6 +96,9 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 modifier = Modifier.background(gradientBrush),
                 colors = TopAppBarColors(Color.Black,Color.DarkGray,Color.Gray,Color.White,Color.White)// Apply gradient to top bar
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         },
 
         containerColor = Color.DarkGray,
@@ -309,6 +326,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
             Button(
                 colors = ButtonDefaults.buttonColors(Color.DarkGray),
                 modifier = Modifier.padding(bottom = 22.dp),
+                enabled = konu.text.isNotEmpty() && mekan.text.isNotEmpty(),
 
                 onClick = {
                     MainScope().launch {
@@ -322,14 +340,10 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                                 "Yan karakterler: $yanKarakterlerText,teması $temaText, uzunlugu $uzunlukText."
                         imageGenerate= "Draw me a picture.. let the subject be ${konu.text} and the place be ${mekan.text}. let the theme be $temaText. "
 
-                        hikayeViewModel.generateStory(generatedStory)
-                        metinViewModel.queryTextToImage(imageGenerate,context)
 
-
-
-
-
-                        navController.navigate("metin/${konu.text}")
+                            hikayeViewModel.generateStory(generatedStory)
+                            metinViewModel.queryTextToImage(imageGenerate,context)
+                            navController.navigate("metin/${konu.text}")
 
                     }
 

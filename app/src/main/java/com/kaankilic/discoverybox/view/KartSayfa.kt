@@ -13,12 +13,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -116,7 +121,8 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                     Color(0xFF386195),
                     Color.White,
                     Color.White
-                )
+                ),
+
             )
         },
         modifier = Modifier.background(gradientBackground)
@@ -125,19 +131,23 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+
         ) {
             // Arka planda çimen görseli
             Image(
                 painter = painterResource(id = R.drawable.sky),
-                contentDescription = "Çimen arka planı",
+                contentDescription = "sky",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop // Görselin ekranı tamamen doldurması için
             )
 
 
             Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxSize()
+                   // .padding(paddingValues)
+                    .fillMaxSize(),
+                  // .padding(WindowInsets.systemBars.asPaddingValues()),
+                verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if (wordList.isNotEmpty()) {
@@ -148,7 +158,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                             .fillMaxSize()
                             .background(Color.Transparent),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Top
+                        verticalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Box(
                             modifier = Modifier.fillMaxWidth().height(200.dp)
@@ -161,7 +171,9 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                     painter = painterResource(id = R.drawable.pars),
                                     contentDescription = "pars",
                                     modifier = Modifier.size(200.dp)
-                                        .align(Alignment.CenterVertically)
+                                        .aspectRatio(1f)
+                                        .align(Alignment.CenterVertically),
+                                    contentScale = ContentScale.Fit // Orijinal oranı koruyarak sığdırır
 
                                 )
 
@@ -172,7 +184,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                             color = Color.LightGray,
                                             shape = RoundedCornerShape(8.dp)
                                         )
-                                        .padding(16.dp)
+                                        .padding(14.dp)
                                         .align(Alignment.CenterVertically)
                                 )
                                 {
@@ -181,7 +193,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                                 "Let's learn the words",
                                         style = TextStyle(
                                             color = Color.Black,
-                                            fontSize = 20.sp
+                                            fontSize = 18.sp
                                         )
                                     )
                                 }
@@ -192,7 +204,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
 
                         }
 
-                        Spacer(modifier = Modifier.height(40.dp))
+                       // Spacer(modifier = Modifier.height(20.dp))
 
                         // Kart Animasyonu
                         val rotation by animateFloatAsState(
@@ -202,7 +214,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
 
                         Box(
                             modifier = Modifier
-                                .size(350.dp)
+                                .size(250.dp)
                                 .graphicsLayer {
                                     rotationY = rotation
                                     cameraDistance = 12 * density
@@ -219,11 +231,12 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                       // Spacer(modifier = Modifier.height(10.dp))
 
                         // "Sonraki" Butonu
                         Button(
-                            modifier = Modifier.size(height = 52.dp, width = 120.dp),
+                            modifier = Modifier.size(height = 52.dp, width = 120.dp)
+                                .offset(y = (-20).dp),
                             colors = ButtonDefaults.buttonColors(Color(0xFFf6d162)),
                             onClick = {
                                 isFlipped = false
@@ -256,7 +269,8 @@ fun FrontCardContent(word: Word) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .offset(y = (-20).dp)
+            //.background(Color.White)
             .padding(3.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -265,7 +279,9 @@ fun FrontCardContent(word: Word) {
             contentDescription = word.nameTr,
             modifier = Modifier.fillMaxSize()
                 .clip(CircleShape)
-
+                .size(250.dp)
+                .aspectRatio(1f),
+                    contentScale = ContentScale.Fit
         )
     }
 }
@@ -302,7 +318,7 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
 
          Image(
              painter = painterResource(id = R.drawable.sky),
-             contentDescription = "Çimen arka planı",
+             contentDescription = "sky",
              modifier = Modifier.fillMaxSize(),
              contentScale = ContentScale.Crop,
              alpha = (0.25f)
@@ -324,7 +340,7 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
         Text(
             text = word.nameEn,
             color = Color.White,
-            fontSize = 70.sp,
+            fontSize = 60.sp,
             fontStyle = FontStyle.Italic,
             fontWeight = FontWeight.Bold
 
