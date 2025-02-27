@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.firebase.Firebase
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,6 +16,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Hikaye
 import com.kaankilic.discoverybox.entitiy.Story
+import com.kaankilic.discoverybox.entitiy.Word
 import com.kaankilic.discoverybox.entitiy.getAllGames
 import com.kaankilic.discoverybox.entitiy.getAllStory
 import kotlinx.coroutines.Dispatchers
@@ -203,5 +205,37 @@ class DiscoveryBoxDataSource {
                 onResult(emptyList())
             }
     }
+
+   suspend fun signOut() = withContext(Dispatchers.IO){
+       auth.signOut()
+   }
+
+    suspend fun deleteStory(userId: String, storyId: String, onResult: (Boolean, String?) -> Unit) = withContext(Dispatchers.IO){
+        firestore.collection("users")
+            .document(userId) // Kullanıcı ID'si
+            .collection("hikayeler") // Hikayeler koleksiyonu
+            .document(storyId) // Silinecek hikaye ID'si
+            .delete()
+            .addOnSuccessListener {
+                onResult(true, "Hikaye başarıyla silindi")
+            }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
+
+    }
+
+    suspend fun reauthenticateUser(password: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) = withContext(Dispatchers.IO){
+
+        val user = FirebaseAuth.getInstance().currentUser
+        val credential = EmailAuthProvider.getCredential(user?.email ?: "", password)
+
+        user?.reauthenticate(credential)
+            ?.addOnSuccessListener { onSuccess() }
+            ?.addOnFailureListener { onFailure(it) }
+
+    }
+
+
 
 }

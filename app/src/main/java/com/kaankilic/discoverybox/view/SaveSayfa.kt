@@ -6,19 +6,30 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
@@ -28,13 +39,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -76,7 +90,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "KAYDEDİLENLER", fontSize = 35.sp)},
+            CenterAlignedTopAppBar(title = { Text(text = "Saved Stories", fontSize = 35.sp, textAlign = TextAlign.Center)},
                 colors = TopAppBarColors( Color(0xFF2A3E52), Color(0xFF2A3E52), Color(0xFF2A3E52), Color.White, Color.White)
             )
 
@@ -100,37 +114,69 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                     hikayeViewModel = hikayeViewModel
                 )
             }
+
         }
     }
 }
 
 @Composable
 fun StoryItem(hikaye: Hikaye, navController: NavController, saveSayfaViewModel: SaveSayfaViewModel,hikayeViewModel: HikayeViewModel) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
 
-                navController.navigate("metin/${hikaye.id}")
-            }, colors = CardDefaults.cardColors(Color(0xFFcfcfcf))
+                .padding(8.dp)
+                .clickable {
+                    navController.navigate("metin/${hikaye.id}")
+                }, colors = CardDefaults.cardColors(Color(0xFFcfcfcf))
 
-    ) {
-        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            AsyncImage(
-                model = hikaye.imageUrl,
-                contentDescription = "Hikaye Resmi",
-                modifier = Modifier
-                    .size(120.dp)
-                   // .clip(CircleShape)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(text = hikaye.title, fontSize = 25.sp, fontWeight = FontWeight.Bold)
-                Text(text = hikaye.content.take(100) + "...")
+        ) {
+            Row(modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround) {
+                AsyncImage(
+                    model = hikaye.imageUrl,
+                    contentDescription = "Hikaye Resmi",
+                    modifier = Modifier
+                        .size(120.dp)
+                        .aspectRatio(1f),
+                    //.align(Alignment.CenterVertically),
+                    contentScale = ContentScale.Crop // Orijinal oranı koruyarak sığdırır
+
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally) {
+
+                    Text(text = hikaye.title, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
+                    Text(text = hikaye.content.take(100) + "...")
+                    IconButton(
+                        modifier = Modifier.align(Alignment.End),
+                        onClick = {
+                            val userId = FirebaseAuth.getInstance().currentUser?.uid
+                            if (userId != null) {
+                                saveSayfaViewModel.deleteStory(userId, hikaye.id)
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Hikayeyi Sil",
+                            tint = Color.Red,
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
+                }
             }
         }
+
+
     }
-}
+
+
+
+
+
+
+
 
 

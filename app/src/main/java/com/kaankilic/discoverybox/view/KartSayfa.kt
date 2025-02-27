@@ -34,6 +34,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
@@ -55,6 +56,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -90,7 +92,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("tr", "TR"))
+                val result = textToSpeech?.setLanguage(Locale("en", "US"))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }
@@ -106,12 +108,13 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
 
     Scaffold(
         topBar = {
-            androidx.compose.material3.TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     androidx.compose.material3.Text(
                         text = "Word Quiz",
                         fontSize = 45.sp,
                         fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
                     )
                 },
                 modifier = Modifier.background(Color.Transparent),
@@ -297,7 +300,7 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("eng", "ENG"))
+                val result = textToSpeech?.setLanguage(Locale("en", "US"))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }

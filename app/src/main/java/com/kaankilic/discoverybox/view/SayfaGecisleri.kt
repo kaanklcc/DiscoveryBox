@@ -36,7 +36,7 @@ fun SayfaGecisleri(
 
     ) {
    // val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "girisSayfa" ){
+    NavHost(navController = navController, startDestination = "splashScreen1" ){
         composable("anasayfa"){
             Anasayfa(navController = navController, anasayfaViewModel = anasayfaViewModel)
         }
@@ -84,6 +84,22 @@ fun SayfaGecisleri(
         }
         composable("saveSayfa"){
             SaveSayfa(navController = navController,saveSayfaViewModel,hikayeViewModel)
+        }
+        composable("splashScreen1"){
+            SplashScreen1(navController)
+
+        }
+        composable("splashScreen2"){
+            SplashScreen2(navController)
+
+        }
+        composable("splashScreen3"){
+            SplashScreen3(navController)
+
+        }
+        composable("loginSplash"){
+            LoginSplashScreen(navController)
+
         }
 
     }

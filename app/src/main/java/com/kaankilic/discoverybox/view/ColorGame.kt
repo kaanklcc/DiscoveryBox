@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -65,7 +66,7 @@ fun GameScreen(viewModel: GameViewModel) {
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("eng", "ENG"))
+                val result = textToSpeech?.setLanguage(Locale("en", "US"))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }
@@ -85,11 +86,11 @@ fun GameScreen(viewModel: GameViewModel) {
 
         Scaffold(
             topBar = {
-                TopAppBar(
+                CenterAlignedTopAppBar(
                     title = { Text(text = "COLOR MATCHINGG GAME", fontSize = 35.sp, textAlign = TextAlign.Center) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = getColorFromName(currentColour), // Dinamik renk burada
-                        titleContentColor = Color.White, // Başlık rengi
+                        titleContentColor = Color.Black, // Başlık rengi
                         actionIconContentColor = Color.White // İkon rengi (varsa)
                     )
                 )
@@ -212,9 +213,6 @@ fun GameScreen(viewModel: GameViewModel) {
 
     }
 }
-
-
-
 fun getColorFromName(colorName: String): Color {
     return when (colorName.lowercase()) {
         "red" -> Color.Red

@@ -60,8 +60,6 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
     val context = LocalContext.current
     val hikaye by remember { mutableStateOf(Hikaye()) }
     val kaan by hikayeViewModel.hikaye.observeAsState(Hikaye())
-
-
     val generatedImage by metinViewModel.imageBitmap.observeAsState(null)
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     var audioVisible by remember { mutableStateOf(false) }
@@ -95,7 +93,7 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("tr", "TR"))
+                val result = textToSpeech?.setLanguage(Locale("en", "US"))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }
@@ -111,10 +109,11 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(text = "HİKAYENİZ", fontSize = 40.sp, fontWeight = FontWeight.Bold, fontFamily = delbold) },
+            CenterAlignedTopAppBar(
+                title = { Text(text = "HİKAYENİZ", fontSize = 40.sp, fontWeight = FontWeight.Bold, fontFamily = delbold, textAlign = TextAlign.Center) },
                modifier = Modifier.background(Color.Transparent),
-                colors= TopAppBarColors(Color(0xFF6BB7C0),Color(0xFF6BB7C0),Color(0xFF6BB7C0),Color.White,Color.White)
+                colors= TopAppBarColors(Color(0xFF6BB7C0),Color(0xFF6BB7C0),Color(0xFF6BB7C0),Color.White,Color.White),
+
             ) },
         containerColor = Color.DarkGray,
        modifier = Modifier.background(gradientBackground)
@@ -208,7 +207,7 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
                 Button(onClick = {
                     navController.navigate("saveSayfa")
                 }, colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)), modifier = Modifier.padding(bottom = 13.dp)) {
-                    Text(text = "Hikayelerim",fontSize = 22.sp, fontFamily = zen)
+                    Text(text = "My Stories",fontSize = 22.sp, fontFamily = zen)
 
                 }
                 //bitiş
@@ -246,21 +245,26 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
                                         bitmap = scaledBitmap.asImageBitmap(),
                                         contentDescription = "Generated Image",
                                         modifier = Modifier
-                                            .size(512.dp)
-                                            .padding(2.dp)
+                                            .fillMaxWidth()
+                                            .aspectRatio(1f)
+                                            .padding(24.dp)
+                                            .clip(RoundedCornerShape(6.dp))
                                     )
                                 }
 
-
-                                Image(painter = painterResource(id = R.drawable.voice), contentDescription = "", alignment = Alignment.TopEnd,modifier = Modifier
-                                    .clickable {
-                                        // textToSpeech?.speak(hikayeyiOlustur, TextToSpeech.QUEUE_FLUSH, null, null)
-                                        audioVisible = true
-                                    }
-                                    .clip(CircleShape) // Yuvarlak yapmak için CircleShape kullanılır
-                                    .background(Color.LightGray) // İsteğe bağlı arka plan rengi
-                                    .border(3.dp, Color.Gray, CircleShape)
-                                    .size(60.dp))
+                                Image(
+                                    painter = painterResource(id = R.drawable.mavidenemeee),
+                                    contentDescription = "",
+                                    alignment = Alignment.TopEnd,
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .clickable {
+                                            audioVisible = true
+                                        }
+                                        .clip(CircleShape)
+                                        .size(95.dp)
+                                        .padding(end = 10.dp)
+                                )
                             }
 
                         }
@@ -269,6 +273,7 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
                     Image(
                         painter = painterResource(id = R.drawable.baseline_bookmark_border_24),
                         contentDescription = "Kaydet",
+
                         modifier = Modifier.clickable {
                             val userId = getCurrentUserId()
 
@@ -303,22 +308,29 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
                         }
                     )
 
-
-
-
-                    Text(text = hikayeyiOlustur, modifier = Modifier.padding(3.dp), color = Color.White)
+                    Text(text = hikayeyiOlustur,
+                        modifier = Modifier.padding(
+                        start = 9.dp,
+                        end = 4.dp,
+                        top = 4.dp,
+                        bottom = 4.dp
+                    ),
+                        color = Color.White,
+                        textAlign = TextAlign.Justify,
+                        fontSize = 19.sp,
+                        fontFamily = itim)
                     Button(onClick = {
                         val prompt = hikayeViewModel.getCurrentPrompt()
                         hikayeViewModel.generateStory(prompt)
 
-                    }, colors = ButtonDefaults.buttonColors(Color.DarkGray)) {
-                        Text(text = "Yeniden Oluştur")
+                    },colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)))  {
+                        Text(text = "Rebuild",fontSize = 22.sp, fontFamily = zen,)
                     }
 
                     Button(onClick = {
                         navController.navigate("saveSayfa")
-                    }) {
-                        Text(text = "save geç")
+                    },colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0))) {
+                        Text(text = "My Stories",fontSize = 22.sp, fontFamily = zen,)
                     }
                 }
 
@@ -406,7 +418,7 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("tr", "TR"))
+                val result = textToSpeech?.setLanguage(Locale("en", "US"))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }
@@ -568,7 +580,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("tr", "TR"))
+                val result = textToSpeech?.setLanguage(Locale("en", "US"))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }

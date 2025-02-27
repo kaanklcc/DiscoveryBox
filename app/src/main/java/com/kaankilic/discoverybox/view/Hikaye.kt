@@ -21,11 +21,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,26 +61,17 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
     var anaKarakterOzellik by remember { mutableStateOf(TextFieldValue("")) }
     val (yanKarakterler, setTextFields) = remember { mutableStateOf(listOf("")) }
     val (selectedChip, setSelectedChip) = remember { mutableStateOf("") }
-    val chipOptions = listOf("Macera", "Sevgi", "Dostluk", "Aile", "Aksiyon")
+    val chipOptions = listOf("Adventure", "Love", "Friendship", "Family", "Action")
     val(secilenChip , ayarSecilenChip) = remember { mutableStateOf("") }
-    var chipAyar = listOf("Kısa","Orta","Uzun")
+    var chipAyar = listOf("Short","Medium","Long")
     var generatedStory by remember { mutableStateOf("") }
     var imageGenerate by remember { mutableStateOf("") }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState= remember { SnackbarHostState() }
+    var focusState by remember { mutableStateOf(false) }
 
 
-
-
-
-    /*val gradientBrush = Brush.linearGradient(
-        colors = listOf(
-            Color.Black,
-            Color(0xFF4B0082)
-
-        )
-    )*/
     val gradientBrush = Brush.verticalGradient(
         colors = listOf(
             Color(0xFF21324A),
@@ -86,15 +79,15 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
             // Alttaki renk
         ),
         startY = 0f,
-        endY = 3000f// eğeri ekran yüksekliğine göre ayarlayabilirsiniz.
+        endY = 3500f// eğeri ekran yüksekliğine göre ayarlayabilirsiniz.
     )
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(text = "Hikaye", fontSize = 35.sp) },
+            CenterAlignedTopAppBar(
+                title = { Text(text = "Story", fontSize = 42.sp, textAlign = TextAlign.Center) },
                 modifier = Modifier.background(gradientBrush),
-                colors = TopAppBarColors(Color.Black,Color.DarkGray,Color.Gray,Color.White,Color.White)// Apply gradient to top bar
+                colors = TopAppBarColors(Color(0xFF21324A),Color.DarkGray,Color.Gray,Color.White,Color.White)// Apply gradient to top bar
             )
         },
         snackbarHost = {
@@ -116,7 +109,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
 
 
             Text(
-                text = "Konu",
+                text = "Subject",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 25.dp, start = 15.dp),
@@ -132,18 +125,21 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     focusedIndicatorColor = Color.White,
                     unfocusedIndicatorColor = Color.White,
                     focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
+                    unfocusedTextColor = Color.White,
+                    focusedLabelColor =  Color(0xFF21324A),
+                    unfocusedLabelColor = Color.White
 
 
 
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp),
-                label = { Text(text = "Örn: Uzay Yolculuğu, Arkadaşlığın önemi", fontSize = 15.sp, color = Color.White) }
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
+                    .onFocusChanged { focusState = it.isFocused },
+                label = { Text(text = "Örn: Space Travel, importance of friendship", fontSize = 15.sp) }
             )
             Text(
-                text = "Mekan",
+                text = "Location",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -154,22 +150,26 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 value = mekan,
                 onValueChange = { mekan = it },
                 colors = TextFieldDefaults.textFieldColors(
-                   cursorColor = Color.White,
+                    cursorColor = Color.White,
                     containerColor = Color.Black,
                     focusedIndicatorColor = Color.White,
                     unfocusedIndicatorColor = Color.White,
                     focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
+                    unfocusedTextColor = Color.White,
+                    focusedLabelColor =  Color(0xFF21324A),
+                    unfocusedLabelColor = Color.White
+
 
 
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp),
-                label = { Text(text = "Örn: Orman, Sınıf, Uzay", fontSize = 15.sp, color = Color.White) }
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
+                    .onFocusChanged { focusState = it.isFocused },
+                label = { Text(text = "Örn: Desert, School, Forest", fontSize = 15.sp) }
             )
             Text(
-                text = "Ana Karakter",
+                text = "Main Character",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -185,17 +185,21 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     focusedIndicatorColor = Color.White,
                     unfocusedIndicatorColor = Color.White,
                     focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White
+                    unfocusedTextColor = Color.White,
+                    focusedLabelColor =  Color(0xFF21324A),
+                    unfocusedLabelColor = Color.White
+
 
 
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp),
-                label = { Text(text = "Örn: Kaan, Pamuk Prenses, Sindirella", fontSize = 15.sp,color = Color.White) }
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
+                    .onFocusChanged { focusState = it.isFocused },
+                label = { Text(text = "Örn: Cınderella, James , Emily", fontSize = 15.sp) }
             )
             Text(
-                text = "Yan Karakterler",
+                text = "Minor Character",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -223,14 +227,18 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                                 focusedIndicatorColor = Color.White,
                                 unfocusedIndicatorColor = Color.White,
                                 focusedTextColor = Color.White,
-                                unfocusedTextColor = Color.White
+                                unfocusedTextColor = Color.White,
+                                focusedLabelColor =  Color(0xFF21324A),
+                                unfocusedLabelColor = Color.White
+
 
 
                             ),
                             modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp),
-                            label = { Text(text = "Örn: Ayşe, Gargamel, Sindirella",color = Color.White) }
+                                .fillMaxWidth()
+                                .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
+                                .onFocusChanged { focusState = it.isFocused },
+                            label = { Text(text = "Örn: Shrek, Liam, Kylie", fontSize = 15.sp) }
                         )
 
                         Icon(
@@ -247,7 +255,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
             }
 
             Text(
-                text = "Ana Karakter Özellik",
+                text = "Main Character Characteristic",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -262,17 +270,22 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     containerColor = Color.Black,
                     focusedIndicatorColor = Color.White,
                     unfocusedIndicatorColor = Color.White,
-                    focusedTextColor = Color.White
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedLabelColor =  Color(0xFF21324A),
+                    unfocusedLabelColor = Color.White
+
 
 
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp),
-                label = { Text(text = "Örn: Cesur, Arkadaş Canlısı", fontSize = 15.sp, color = Color.White) }
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
+                    .onFocusChanged { focusState = it.isFocused },
+                label = { Text(text = "Örn: Naughty, Lovable, Honest", fontSize = 15.sp) }
             )
             Text(
-                text = "Hikaye Uzunluğu",
+                text = "Story Length",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -288,9 +301,16 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
             ) {
                 chipAyar.forEach { option ->
                     FilterChip(
+
                         selected = secilenChip == option,
                         onClick = { ayarSecilenChip(option) },
                         label = { Text(text = option, color = Color.White) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            containerColor = Color.Black, // Varsayılan arka plan rengi
+                            selectedContainerColor = Color(0xFF21324A), // Seçili olduğunda arka plan rengi
+                            labelColor = Color.Black, // Varsayılan yazı rengi
+                            selectedLabelColor = Color.Black // Seçili olduğunda yazı rengi
+                        ),
                         modifier = Modifier
                             .clickable {}
                             .padding(bottom = 10.dp)
@@ -298,7 +318,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 }
             }
             Text(
-                text = "Tema",
+                text = "Theme",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -315,8 +335,15 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     FilterChip(
                         selected = selectedChip == option,
                         onClick = { setSelectedChip(option) },
-                        label = { Text(text = option, color = Color.White) },
+                        label = { Text(text = option, color = Color.White, fontSize = 12.sp) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            containerColor = Color.Black, // Varsayılan arka plan rengi
+                            selectedContainerColor = Color(0xFF21324A),
+                            labelColor = Color.Black, // Varsayılan yazı rengi
+                            selectedLabelColor = Color.Black // Seçili olduğunda yazı rengi
+                        ),
                         modifier = Modifier
+                            .weight(1f)
                             .clickable {}
                             .padding(bottom = 30.dp)
                     )
@@ -335,9 +362,18 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                         val temaText = if (selectedChip.isNotEmpty()) "Tema: $selectedChip" else ""
                         val uzunlukText = if (secilenChip.isNotEmpty()) "Uzunluk: $secilenChip" else ""
 
-                        generatedStory = "bana bir hikaye yaz. Konusu: ${konu.text}, Mekanı: ${mekan.text}, " +
+                       /* generatedStory = "bana bir hikaye yaz. Konusu: ${konu.text}, Mekanı: ${mekan.text}, " +
                                 "Ana karakteri: ${anaKarakter.text}, Ana karakter özelliği: ${anaKarakterOzellik.text}, " +
-                                "Yan karakterler: $yanKarakterlerText,teması $temaText, uzunlugu $uzunlukText."
+                                "Yan karakterler: $yanKarakterlerText,teması $temaText, uzunlugu $uzunlukText."*/
+                        generatedStory = "Write me a story. " +
+                                "Topic: ${konu.text}," +
+                                " Location: ${mekan.text}," +
+                                " Main character: ${anaKarakter.text}," +
+                                " Main character trait: ${anaKarakterOzellik.text}," +
+                                " Supporting characters: ${yanKarakterlerText}, " +
+                                "Theme: ${temaText}," +
+                                " Length: ${uzunlukText}."
+
                         imageGenerate= "Draw me a picture.. let the subject be ${konu.text} and the place be ${mekan.text}. let the theme be $temaText. "
 
 
@@ -350,7 +386,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 },
 
             ) {
-                Text(text = "Hikayeyi Oluştur")
+                Text(text = "Create the Story")
             }
 
 

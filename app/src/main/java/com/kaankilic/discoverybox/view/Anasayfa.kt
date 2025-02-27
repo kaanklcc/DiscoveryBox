@@ -1,6 +1,7 @@
 package com.kaankilic.discoverybox.view
 
-import android.graphics.drawable.shapes.Shape
+
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,16 +21,30 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -39,17 +54,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Story
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
+import kotlinx.coroutines.launch
+
+@SuppressLint("RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel) {
     val konular by anasayfaViewModel.konular.observeAsState(emptyList()) // Boş bir liste ile başlatıyoruz
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember {SnackbarHostState()}
+    var showDialog by remember { mutableStateOf(false) }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -60,9 +85,40 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     )
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
         topBar = {
-            TopAppBar(title = { Text(text = "DISCOVERY BOX", fontSize = 35.sp) }
-            ,colors = TopAppBarColors( Color(0xFF64B5F6), Color(0xFF64B5F6), Color(0xFF64B5F6), Color.White, Color.White))
+
+            CenterAlignedTopAppBar(title = { Text(text = "DISCOVERY BOX", fontSize = 35.sp, textAlign = TextAlign.Center) }
+            ,colors = TopAppBarColors( Color(0xFF64B5F6), Color(0xFF64B5F6), Color(0xFF64B5F6), Color.White, Color.White),
+
+                actions = {
+                    IconButton(onClick = {
+                        scope.launch {
+                            val sb = snackbarHostState
+                                .showSnackbar(message = "Do you want to log out?", actionLabel = "Yes")
+                            if (sb == SnackbarResult.ActionPerformed){
+                                snackbarHostState.showSnackbar(message = "exited the application")
+                                anasayfaViewModel.signOut()
+                                navController.navigate("girisSayfa")
+
+                            }
+                        }
+
+
+
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ExitToApp,
+                            contentDescription = "Logout",
+                            tint = Color.White,
+                            modifier = Modifier.size(35.dp)
+                        )
+                    }
+                }
+            )
+
 
         }
     ) { paddingValues ->
@@ -83,9 +139,12 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                     .weight(1f)
                     .fillMaxHeight()
                     .clickable {
-                        navController.navigate("hikayeGecis")
+                        showDialog = true
+                        //navController.navigate("hikayeGecis")
                     }
                     .padding(9.dp)){
+
+
 
                     Image(
                         painter = painterResource(R.drawable.parent),
@@ -131,6 +190,45 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             .offset(y = (30).dp)
                     )
 
+                }
+
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        title = { Text("Şifre Girin") },
+                        text = {
+                            Column {
+                                TextField(
+                                    value = password,
+                                    onValueChange = { password = it },
+                                    label = { Text("Şifre") },
+                                    visualTransformation = PasswordVisualTransformation()
+                                )
+                                errorMessage?.let { Text(it, color = Color.Red) }
+                            }
+                        },
+                        confirmButton = {
+                            Button(onClick = {
+                                anasayfaViewModel.reauthenticateUser(password,
+                                    onSuccess = {
+                                        showDialog = false
+                                       // onSuccess()
+                                        navController.navigate("hikayeGecis")
+                                    },
+                                    onFailure = {
+                                        errorMessage = "Şifre yanlış!"
+                                    }
+                                )
+                            }) {
+                                Text("Doğrula")
+                            }
+                        },
+                        dismissButton = {
+                            Button(onClick = { showDialog = false }) {
+                                Text("İptal")
+                            }
+                        }
+                    )
                 }
 
                 Box (modifier = Modifier

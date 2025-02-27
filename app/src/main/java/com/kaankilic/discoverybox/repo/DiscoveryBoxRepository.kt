@@ -40,6 +40,7 @@ class DiscoveryBoxRepository {
     fun saveUserData(userId: String, ad: String, soyad: String, email: String, onResult: (Boolean, String?) -> Unit)=dbds.saveUserData(userId,ad,soyad,email,onResult)
 
     fun getUserStories(userId: String, onResult: (List<Hikaye>) -> Unit) = dbds.getUserStories(userId,onResult)
+
     fun getStoryById(storyId: String, onResult: (Hikaye) -> Unit) {
         val auth: FirebaseAuth = FirebaseAuth.getInstance()
         firestore.collection("users")
@@ -62,6 +63,20 @@ class DiscoveryBoxRepository {
                 onResult(Hikaye()) // Boş bir Hikaye döndür
             }
     }
+
+    suspend fun signOut() = dbds.signOut()
+
+    suspend fun deleteStory(userId: String, storyId: String, onResult: (Boolean, String?) -> Unit) = dbds.deleteStory(userId,storyId,onResult)
+    suspend fun reauthenticateUser(password: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) = dbds.reauthenticateUser(password,onSuccess,onFailure)
+
+
+
+
+
+
+
+
+
 
 
 

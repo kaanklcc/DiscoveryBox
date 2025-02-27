@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -30,7 +32,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,11 +46,26 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.viewmodel.GirisSayfaViewModel
 import kotlinx.coroutines.withContext
 
+@Composable
+fun GradientBackgroundd(colors:List<Color>,modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = colors, // Açık mavi → Açık pembe
+                    startY = 0f,
+                    endY = Float.POSITIVE_INFINITY
+                )
+            )
+    )
+}
 @Composable
 fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewModel) {
 
@@ -55,104 +74,149 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
     val context = LocalContext.current
     val loginResult by GirisSayfaViewModel.loginResult.observeAsState()
 
+    Scaffold(
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black),
-    ) {
+    ) { paddingValues ->
 
-        Text(
-            text = " DISCOVERY BOX",
+
+        Box(
             modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 100.dp, start = 5.dp, end = 5.dp),
-            textAlign = TextAlign.Center, // Metni ortalamak
-            fontSize = 50.sp, // Yazı boyutu
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 200.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .fillMaxSize().padding(paddingValues)
         ) {
+            GradientBackgroundd(listOf( Color(0xFFFDEAF2),Color(0xFFD6F8FA)))
 
-            Image(
-                painter = painterResource(id = R.drawable.geminikutu),
-                contentDescription = "",
+            Column(
                 modifier = Modifier
-                    .size(200.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
-                    .border(2.dp, Color.Gray, CircleShape)
-            )
+                    .fillMaxSize()
+                    .padding(top = 60.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(150.dp) // Dairenin boyutu
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(Color.White), // Beyaz arka plan
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.logoyapay),
+                        contentDescription = "Profile Image",
+                        contentScale = ContentScale.Crop, // Görseli kırpmadan ortalar
+                        modifier = Modifier
+                            .size(300.dp) // Görselin boyutu (çerçeve içinde)
 
-            Spacer(modifier = Modifier.height(20.dp))
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    "Discovery Box",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 30.sp,
+                    color = Color.DarkGray
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Text("Welcome To Magic World", fontWeight = FontWeight.Normal, fontSize = 24.sp)
+                Spacer(modifier = Modifier.height(40.dp))
 
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text(text = "Email", textAlign = Start)},
-            )
+                Box(
+                    modifier = Modifier
+                        .padding(start = 10.dp, end = 10.dp)
+                        .size(300.dp,250.dp) // Dairenin boyutu
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color.White), // Beyaz arka plan
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceEvenly,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        TextField(
+                            modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                                .clip(RoundedCornerShape(20.dp)),
+                            value = email,
+                            onValueChange = { email = it },
+                            label = { Text(text = "Email", textAlign = Start) },
+                        )
+                        TextField(
+                            modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                                .clip(RoundedCornerShape(20.dp)),
+                            value = password,
+                            onValueChange = { password = it },
+                            label = { Text(text = "Password") },
+                            visualTransformation = PasswordVisualTransformation() // Şifreyi gizlemek için
+                        )
+                        Button(
+                            modifier = Modifier.fillMaxWidth()
+                                .clip(RoundedCornerShape(10.dp))
+                                .padding(start = 20.dp, end = 20.dp),
+                            onClick = {
+                                GirisSayfaViewModel.signInWithEmail(email, password)
 
-            Spacer(modifier = Modifier.height(30.dp))
+                                loginResult?.let { (success, message) ->
+                                    if (success) {
+                                        Toast.makeText(
+                                            context,
+                                            "Giriş başarılı",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        navController.navigate("anasayfa")
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "Giriş başarısız: $message",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
 
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text(text = "Password") },
-                visualTransformation = PasswordVisualTransformation() // Şifreyi gizlemek için
-            )
 
-            Spacer(modifier = Modifier.height(15.dp))
+                            },
 
-            Button(onClick = {
-                GirisSayfaViewModel.signInWithEmail(email,password)
+                            colors = ButtonDefaults.buttonColors(Color(0xFFE0BACD))//9148fc
 
-                loginResult?.let { (success, message) ->
-                    if (success) {
-                        Toast.makeText(context, "Giriş başarılı", Toast.LENGTH_SHORT).show()
-                        navController.navigate("anasayfa")
-                    } else {
-                        Toast.makeText(context, "Giriş başarısız: $message", Toast.LENGTH_SHORT).show()
+                        ) {
+                            Text(text = "Sign in", color = Color.White, fontWeight = FontWeight.ExtraBold
+                            , fontSize = 20.sp)
+                        }
+
+
                     }
+
+                }
+                Spacer(Modifier.height(5.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "New To DiscoveryBox?", color = Color.DarkGray)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(text = "Sign Up",
+                        modifier = Modifier.clickable {
+                            navController.navigate("kayitSayfa")
+
+                        }, color = Color(0xFFE0BACD), fontWeight = FontWeight.ExtraBold
+                    )
                 }
 
-
-            },
-
-                colors = ButtonDefaults.buttonColors(Color.LightGray)
-
-                ) {
-                Text(text = "Giris Yap", color = Color.Black)
             }
-
-
-
-
-            Spacer(modifier = Modifier.height(30.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ){
-                Text(text = "Don't you have account?", color = Color.White)
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(text = "Sign Up",
-                    modifier = Modifier.clickable {
-                        navController.navigate("kayitSayfa")
-
-                    }, color = Color.White)
-            }
-
-
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewGirisSayfa() {
+    val fakeNavController = rememberNavController() // Fake NavController oluştur
+    val fakeViewModel = GirisSayfaViewModel() // Eğer içinde canlı veri yoksa direkt oluşturulabilir
+
+    GirisSayfa(navController = fakeNavController, GirisSayfaViewModel = fakeViewModel)
+}
+
+
+
 
 
 

@@ -9,10 +9,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kaankilic.discoverybox.entitiy.Word
+import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
 import kotlinx.coroutines.launch
 
 
 class CardSayfaViewModel : ViewModel() {
+    var dbRepo= DiscoveryBoxRepository()
     private val firestore = FirebaseFirestore.getInstance()
     val words = mutableStateListOf<Word>()
 
@@ -20,12 +22,12 @@ class CardSayfaViewModel : ViewModel() {
     val shuffledWords = mutableStateListOf<Word>()
     val shuffledImages = mutableStateListOf<Word>()
 
-
     init {
         loadWords()
     }
 
-    fun loadWords() = viewModelScope.launch {
+    fun loadWords() =
+        viewModelScope.launch {
         firestore.collection("kelimeler")
             .get()
             .addOnSuccessListener { documents ->
@@ -86,10 +88,6 @@ class CardSayfaViewModel : ViewModel() {
 
         }
     }
-
-
-
-
 
 }
 

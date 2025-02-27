@@ -6,40 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.kaankilic.discoverybox.entitiy.Hikaye
 import com.kaankilic.discoverybox.ui.theme.DiscoveryBoxTheme
-import com.kaankilic.discoverybox.view.Anasayfa
-import com.kaankilic.discoverybox.view.AppScreen
-import com.kaankilic.discoverybox.view.Bilim
-
-import com.kaankilic.discoverybox.view.Diger
-import com.kaankilic.discoverybox.view.Dil
-import com.kaankilic.discoverybox.view.DragAndDropGameScreen
-
-import com.kaankilic.discoverybox.view.GameApp
-import com.kaankilic.discoverybox.view.GameScreen
-import com.kaankilic.discoverybox.view.GirisSayfa
-import com.kaankilic.discoverybox.view.GuncelHayat
-import com.kaankilic.discoverybox.view.Hikaye
-import com.kaankilic.discoverybox.view.KayitSayfa
-import com.kaankilic.discoverybox.view.MatchGameScreen
-
-
-
-import com.kaankilic.discoverybox.view.SaveSayfa
 import com.kaankilic.discoverybox.view.SayfaGecisleri
-
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.DilViewModel
@@ -82,10 +53,11 @@ class MainActivity : ComponentActivity() {
              auth = FirebaseAuth.getInstance()
                 val navController = rememberNavController()
 
-                LaunchedEffect(Unit) {
+               LaunchedEffect(Unit) {
                     if (auth.currentUser != null) {
                         // Kullanıcı giriş yapmışsa, anasayfaya yönlendir
-                        navController.navigate("anasayfa") {
+                        //navController.navigate("anasayfa")
+                        navController.navigate("loginSplash") {
                             popUpTo("girisSayfa") { inclusive = true }
                         }
                     }

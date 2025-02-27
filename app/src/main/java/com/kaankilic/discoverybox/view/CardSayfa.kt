@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -87,7 +88,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("eng", "ENG"))
+                val result = textToSpeech?.setLanguage(Locale("en", "US"))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }
@@ -127,7 +128,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
 
     Scaffold(
         topBar = {
-            androidx.compose.material3.TopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
                     Text(
                         text = "MATCHING GAME",
