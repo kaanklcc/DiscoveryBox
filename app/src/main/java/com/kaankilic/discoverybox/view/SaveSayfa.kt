@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,6 +58,7 @@ import coil.compose.AsyncImage
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Hikaye
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
@@ -90,7 +92,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = "Saved Stories", fontSize = 35.sp, textAlign = TextAlign.Center)},
+            CenterAlignedTopAppBar(title = { Text(text = /*"YOUR STORIES"*/stringResource(R.string.YOURSTORY), fontSize = 35.sp, textAlign = TextAlign.Center)},
                 colors = TopAppBarColors( Color(0xFF2A3E52), Color(0xFF2A3E52), Color(0xFF2A3E52), Color.White, Color.White)
             )
 

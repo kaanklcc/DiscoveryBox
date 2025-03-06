@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -131,7 +132,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "MATCHING GAME",
+                        text = /*"MATCHING GAME"*/stringResource(R.string.MATCHINGGAME),
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -159,7 +160,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Tebrikler, oyun bitti!",
+                    text =/* "Congratulations, Game is Over!"*/stringResource(R.string.CongratulationsGameisOver),
                     color = Color.White,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold
@@ -233,8 +234,8 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                 )
                                 {
                                     androidx.compose.material.Text(
-                                        text =  "Welcome again!. " +
-                                                "Let's match the words",
+                                        text = /* "Welcome again!. " +
+                                                "Let's match the words",*/stringResource(R.string.matchWelcomeMessage),
                                         style = TextStyle(
                                             color = Color.Black,
                                             fontSize = 20.sp
@@ -394,7 +395,7 @@ fun CelebrationAnimation(
     ) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Congratulations!",
+                text = /*"Congratulations!"*/stringResource(R.string.Congratulations),
                 color = Color.White,
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold

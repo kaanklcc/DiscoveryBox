@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -75,6 +76,10 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     var showDialog by remember { mutableStateOf(false) }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    val message = stringResource(R.string.logOutMessage)
+    val actionLabel = stringResource(R.string.Yes)
+    val exitedApp = stringResource(R.string.exitMessage)
+    val wrongPassword = stringResource(R.string.WrongPassword)
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -90,16 +95,16 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
         },
         topBar = {
 
-            CenterAlignedTopAppBar(title = { Text(text = "DISCOVERY BOX", fontSize = 35.sp, textAlign = TextAlign.Center) }
+            CenterAlignedTopAppBar(title = { Text(text = /*"DISCOVERY BOX"*/ stringResource(R.string.DiscoveryBox), fontSize = 35.sp, textAlign = TextAlign.Center) }
             ,colors = TopAppBarColors( Color(0xFF64B5F6), Color(0xFF64B5F6), Color(0xFF64B5F6), Color.White, Color.White),
 
                 actions = {
                     IconButton(onClick = {
                         scope.launch {
                             val sb = snackbarHostState
-                                .showSnackbar(message = "Do you want to log out?", actionLabel = "Yes")
+                                .showSnackbar(message = /*"Do you want to log out?"*/message, actionLabel = /*"Yes"*/actionLabel)
                             if (sb == SnackbarResult.ActionPerformed){
-                                snackbarHostState.showSnackbar(message = "exited the application")
+                                snackbarHostState.showSnackbar(message = /*"exited the application"*/exitedApp)
                                 anasayfaViewModel.signOut()
                                 navController.navigate("girisSayfa")
 
@@ -124,7 +129,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     ) { paddingValues ->
         if (konular.isEmpty()) {
             Text(
-                text = "Gösterilecek hikaye yok",
+                text = /*"There is no story to show"*/stringResource(R.string.NoStoryMessage),
                 modifier = Modifier.padding(paddingValues).fillMaxSize(),
                 textAlign = TextAlign.Center
             )
@@ -168,7 +173,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                     )
 
                     Text(
-                        text = "Story",
+                        text = /*"Story"*/stringResource(R.string.Story),
                         color = Color.Black,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
@@ -179,7 +184,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             .offset(y = (10).dp)
                     )
                     Text(
-                        text = "Mode",
+                        text = /*"Mode"*/stringResource(R.string.Mode),
                         color = Color.Black,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
@@ -195,13 +200,13 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                 if (showDialog) {
                     AlertDialog(
                         onDismissRequest = { showDialog = false },
-                        title = { Text("Şifre Girin") },
+                        title = { Text(/*"Enter Password"*/stringResource(R.string.EnterPassword)) },
                         text = {
                             Column {
                                 TextField(
                                     value = password,
                                     onValueChange = { password = it },
-                                    label = { Text("Şifre") },
+                                    label = { Text(/*"Password"*/stringResource(R.string.Password)) },
                                     visualTransformation = PasswordVisualTransformation()
                                 )
                                 errorMessage?.let { Text(it, color = Color.Red) }
@@ -216,16 +221,16 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                                         navController.navigate("hikayeGecis")
                                     },
                                     onFailure = {
-                                        errorMessage = "Şifre yanlış!"
+                                        errorMessage = /*"Wrong Password"*/wrongPassword
                                     }
                                 )
                             }) {
-                                Text("Doğrula")
+                                Text(/*"Verify"*/stringResource(R.string.Verify))
                             }
                         },
                         dismissButton = {
                             Button(onClick = { showDialog = false }) {
-                                Text("İptal")
+                                Text(/*"Cancel"*/stringResource(R.string.Cancel))
                             }
                         }
                     )
@@ -261,7 +266,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                     )
 
                     Text(
-                        text = "Game",
+                        text = /*"Game"*/stringResource(R.string.Game),
                         color = Color.Black,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
@@ -272,7 +277,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             .offset(y = (10).dp)
                     )
                     Text(
-                        text = "Mode",
+                        text = /*"Mode"*/stringResource(R.string.Mode),
                         color = Color.Black,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,

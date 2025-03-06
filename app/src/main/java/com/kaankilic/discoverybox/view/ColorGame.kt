@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -58,6 +59,8 @@ import java.util.Locale
 fun GameScreen(viewModel: GameViewModel) {
     val context = LocalContext.current
     val currentData by viewModel.currentData.collectAsState()
+    val right = stringResource(R.string.Right)
+    val wrong = stringResource(R.string.Wrong)
 
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
 
@@ -87,7 +90,7 @@ fun GameScreen(viewModel: GameViewModel) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text(text = "COLOR MATCHINGG GAME", fontSize = 35.sp, textAlign = TextAlign.Center) },
+                    title = { Text(text = /*"COLOR MATCHINGG GAME"*/stringResource(R.string.COLORMATCHINGGAME), fontSize = 35.sp, textAlign = TextAlign.Center) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = getColorFromName(currentColour), // Dinamik renk burada
                         titleContentColor = Color.Black, // Başlık rengi
@@ -138,8 +141,8 @@ fun GameScreen(viewModel: GameViewModel) {
                             )
                             {
                                 androidx.compose.material.Text(
-                                    text =  "Welcome again!." +
-                                            "Let's find the right colors",
+                                    text = /* "Welcome again!." +
+                                            "Let's find the right colors"*/stringResource(R.string.ColorWelcomeMessage),
                                     style = TextStyle(
                                         color = Color.Black,
                                         fontSize = 15.sp
@@ -188,14 +191,14 @@ fun GameScreen(viewModel: GameViewModel) {
                                         if (word.colour == currentColour) {
                                             Toast.makeText(
                                                 context, // Burada context kullanıyoruz
-                                                "Doğru!",
+                                                /*"Right!"*/right,
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                             viewModel.loadNewData()
                                         } else {
                                             Toast.makeText(
                                                 context,
-                                                "Yanlış!",
+                                                /*"Wrong!"*/wrong,
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         }

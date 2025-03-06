@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -59,6 +60,8 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
     val signUpResult by kayitSayfaViewModel.signUpResult.observeAsState()
     val context = LocalContext.current
+    val regSuc = stringResource(R.string.Registrationsuccessful)
+    val regFail = stringResource(R.string.Registrationfailed)
 
     fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
@@ -104,13 +107,13 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    "WELCOME TO ",
+                    /*"WELCOME TO "*/stringResource(R.string.WELCOMETO),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
                     color = Color.DarkGray
                 )
                 Text(
-                    "Discovery Box",
+                    /*"Discovery Box"*/stringResource(R.string.DiscoveryBox),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
                     color = Color.DarkGray
@@ -136,14 +139,14 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                                 .clip(RoundedCornerShape(20.dp)),
                             value = ad,
                             onValueChange = { ad = it },
-                            label = { Text(text = "Ad", textAlign = Start) },
+                            label = { Text(text = /*"Name"*/stringResource(R.string.Name), textAlign = Start) },
                         )
                         TextField(
                             modifier = Modifier.padding(start = 20.dp, end = 20.dp)
                                 .clip(RoundedCornerShape(20.dp)),
                             value = soyad,
                             onValueChange = { soyad = it },
-                            label = { Text(text = "Soyad", textAlign = Start) },
+                            label = { Text(text = /*"Surname"*/stringResource(R.string.Surname), textAlign = Start) },
                         )
 
 
@@ -182,13 +185,13 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                                         navController.navigate("anasayfa")
                                         Toast.makeText(
                                             context,
-                                            "Kayıt başarılı",
+                                            /*"Registration successful"*/regSuc,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     } else {
                                         Toast.makeText(
                                             context,
-                                            "Kayıt başarısız: $message",
+                                            "Registration failed: $message",
                                             Toast.LENGTH_SHORT
                                         ).show()
 
@@ -197,7 +200,7 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                             },
                             colors = ButtonDefaults.buttonColors(Color(0xFFE0BACD))//9148fc
                         ) {
-                            Text(text = "Kayıt ol", color = Color.White, fontWeight = FontWeight.ExtraBold
+                            Text(text = /*"Sign Up"*/stringResource(R.string.SignUp), color = Color.White, fontWeight = FontWeight.ExtraBold
                                 , fontSize = 20.sp)
                         }
 

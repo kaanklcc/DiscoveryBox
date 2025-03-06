@@ -1,3 +1,98 @@
 <resources>
     <string name="app_name">DiscoveryBox</string>
+    <string name="logOutMessage">Do you want to log out?</string>
+    <string name="exitMessage">exited the application</string>
+    <string name="Yes">Yes</string>
+    <string name="NoStoryMessage">There is no story to show</string>
+    <string name="Story">Story</string>
+    <string name="Mode">Mode</string>
+    <string name="EnterPassword">Enter Password</string>
+    <string name="Password">Password</string>
+    <string name="WrongPassword">Wrong Password</string>
+    <string name="Verify">Verify</string>
+    <string name="Cancel">Cancel</string>
+    <string name="Game">Game</string>
+
+
+    <string name="MATCHINGGAME">MATCHING GAME</string>
+    <string name="CongratulationsGameisOver">Congratulations, Game is Over!</string>
+    <string name="matchWelcomeMessage">"Welcome again!.Let's match the words</string>
+    <string name="Congratulations">Congratulations</string>
+
+    <string name="COLORMATCHINGGAME">COLOR MATCHINGG GAME</string>
+    <string name="ColorWelcomeMessage">"Welcome again!.Let's find the right colors"</string>
+    <string name="Right">Right!</string>
+    <string name="Wrong">Wrong!</string>
+    <string name="SignIn">Sign In</string>
+
+
+    <string name="GameScreen">Game Screen</string>
+
+    <string name="WelcomeToMagicWorld">Welcome To Magic World</string>
+    <string name="Email">Email</string>
+    <string name="LoginSuccesful">Login Succesful</string>
+    <string name="LoginFailed">Login Failed:</string>
+    <string name="NewToDiscoveryBox">New To DiscoveryBox?</string>
+    <string name="SignUp">Sign Up</string>
+
+
+
+
+    <string name="Subject">Subject </string>
+    <string name="SubjectExp">Exp: Space Travel, importance of friendship</string>
+    <string name="Location">Location</string>
+    <string name="LocationExp">Exp: Desert, School, Forest</string>
+    <string name="MainCharacter">Main Character</string>
+    <string name="MainCharacterExp">Exp: Cınderella, James , Emily</string>
+    <string name="MinorCharacter">Minor Character</string>
+    <string name="MinorCharacterExp">Exp: Shrek, Liam, Kylie</string>
+    <string name="MainCharacterCharacteristic">Main Character Characteristic</string>
+    <string name="MainCharacterCharacteristicExp">Exp: Naughty, Lovable, Honest</string>
+    <string name="StoryLength">Story Length</string>
+    <string name="Theme">Theme</string>
+    <string name="CreatetheStory">Create the Story</string>
+    <string name="Adventure">Adventure</string>
+    <string name="Action">Action</string>
+    <string name="Love">Love</string>
+    <string name="Friendship">Friendship</string>
+    <string name="Family">Family</string>
+    <string name="Short">Short</string>
+    <string name="Medium">Medium</string>
+    <string name="Long">Long</string>
+
+
+
+    <string name="MYSTORIES">MY STORIES</string>
+
+
+    <string name="WordQuiz">Word Quiz</string>
+    <string name="WordLearnWelcomeMessage">"Welcome !.Let's learn the words"</string>
+    <string name="Next">Next</string>
+    <string name="CardsAreLoading...">Cards Are Loading...</string>
+
+
+
+
+    <string name="WELCOMETO">WELCOME TO</string>
+    <string name="DiscoveryBox">Discovery Box</string>
+    <string name="Name">Name</string>
+    <string name="Surname">Surname</string>
+
+
+    <string name="Registrationsuccessful">Registration successful</string>
+    <string name="Registrationfailed">Registration failed:</string>
+
+
+
+    <string name="YOURSTORY">YOUR STORY</string>
+    <string name="Storyisbeingcreated...">Story is being created...</string>
+    <string name="Imageisbeingcreated..">Image is being created..</string>
+    <string name="Convertedtosound...">Converted to sound...</string>
+    <string name="Couldnotgetimageurl">Could not get image url</string>
+    <string name="Imagecouldnotbesaved">Image could not be saved</string>
+    <string name="Storyandimagesavedsuccessfully">Story and image saved successfully</string>
+    <string name="UserSessionMessage">User session not available or image not available!</string>
+    <string name="Rebuild">Rebuild</string>
+
+
 </resources>

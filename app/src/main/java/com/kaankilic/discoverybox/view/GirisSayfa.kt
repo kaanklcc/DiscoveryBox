@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -73,6 +74,8 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
     var password by remember { mutableStateOf(("")) }
     val context = LocalContext.current
     val loginResult by GirisSayfaViewModel.loginResult.observeAsState()
+    val logsuc = stringResource(R.string.LoginSuccesful)
+    val logfail = stringResource(R.string.LoginFailed)
 
     Scaffold(
 
@@ -110,13 +113,13 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                 }
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
-                    "Discovery Box",
+                    /*"Discovery Box"*/stringResource(R.string.DiscoveryBox),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
                     color = Color.DarkGray
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Text("Welcome To Magic World", fontWeight = FontWeight.Normal, fontSize = 24.sp)
+                Text(/*"Welcome To Magic World"*/stringResource(R.string.WelcomeToMagicWorld), fontWeight = FontWeight.Normal, fontSize = 24.sp)
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Box(
@@ -158,14 +161,14 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                                     if (success) {
                                         Toast.makeText(
                                             context,
-                                            "Giriş başarılı",
+                                            /*"Login Succesful"*/logsuc,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         navController.navigate("anasayfa")
                                     } else {
                                         Toast.makeText(
                                             context,
-                                            "Giriş başarısız: $message",
+                                            /*"Login Failed:*/ "logfail $message",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
@@ -177,7 +180,7 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                             colors = ButtonDefaults.buttonColors(Color(0xFFE0BACD))//9148fc
 
                         ) {
-                            Text(text = "Sign in", color = Color.White, fontWeight = FontWeight.ExtraBold
+                            Text(text = /*"Sign in"*/stringResource(R.string.SignIn), color = Color.White, fontWeight = FontWeight.ExtraBold
                             , fontSize = 20.sp)
                         }
 
@@ -191,9 +194,9 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "New To DiscoveryBox?", color = Color.DarkGray)
+                    Text(text = /*"New To DiscoveryBox?"*/stringResource(R.string.NewToDiscoveryBox), color = Color.DarkGray)
                     Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "Sign Up",
+                    Text(text = /*"Sign Up"*/stringResource(R.string.SignUp),
                         modifier = Modifier.clickable {
                             navController.navigate("kayitSayfa")
 

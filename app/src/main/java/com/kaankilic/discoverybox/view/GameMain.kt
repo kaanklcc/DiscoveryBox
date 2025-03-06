@@ -26,10 +26,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Story
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 
@@ -39,11 +41,11 @@ fun GameMain(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     val konular by anasayfaViewModel.konular.observeAsState(emptyList()) // Boş bir liste ile başlatıyoruz
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Game Screen", fontSize = 35.sp) })
+            TopAppBar(title = { Text(text = /*"Game Screen"*/stringResource(R.string.GameScreen), fontSize = 35.sp) })
         }
     ) { paddingValues ->
         if (konular.isEmpty()){
-            Text(text = "Gösterilecek hilkaye yok")
+            Text(text = /*"There is no story to show"*/stringResource(R.string.NoStoryMessage))
         } else{
             LazyVerticalGrid(
                 modifier = Modifier

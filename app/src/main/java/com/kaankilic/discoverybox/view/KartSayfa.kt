@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -111,7 +112,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
             CenterAlignedTopAppBar(
                 title = {
                     androidx.compose.material3.Text(
-                        text = "Word Quiz",
+                        text = /*"Word Quiz"*/stringResource(R.string.WordQuiz),
                         fontSize = 45.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
@@ -192,8 +193,8 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                 )
                                 {
                                     Text(
-                                        text =  "Welcome !. " +
-                                                "Let's learn the words",
+                                        text = /* "Welcome !. " +
+                                                "Let's learn the words"*/stringResource(R.string.WordLearnWelcomeMessage),
                                         style = TextStyle(
                                             color = Color.Black,
                                             fontSize = 18.sp
@@ -257,7 +258,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                             .background(Color.White),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "Kartlar yükleniyor...")
+                        Text(text = /*"Cards Are Loading..."*/stringResource(R.string.CardsAreLoading___))
                     }
                 }
             }

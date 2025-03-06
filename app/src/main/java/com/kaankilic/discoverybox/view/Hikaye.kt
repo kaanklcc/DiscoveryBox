@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +36,7 @@ import androidx.navigation.NavController
 
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.firebase.auth.FirebaseAuth
+import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Hikaye
 import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
@@ -61,9 +63,9 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
     var anaKarakterOzellik by remember { mutableStateOf(TextFieldValue("")) }
     val (yanKarakterler, setTextFields) = remember { mutableStateOf(listOf("")) }
     val (selectedChip, setSelectedChip) = remember { mutableStateOf("") }
-    val chipOptions = listOf("Adventure", "Love", "Friendship", "Family", "Action")
+    val chipOptions = listOf(/*"Adventure", "Love", "Friendship", "Family", "Action"*/stringResource(R.string.Adventure),stringResource(R.string.Love),stringResource(R.string.Friendship),stringResource(R.string.Family),stringResource(R.string.Action))
     val(secilenChip , ayarSecilenChip) = remember { mutableStateOf("") }
-    var chipAyar = listOf("Short","Medium","Long")
+    var chipAyar = listOf(/*"Short","Medium","Long"*/stringResource(R.string.Short),stringResource(R.string.Medium),stringResource(R.string.Long))
     var generatedStory by remember { mutableStateOf("") }
     var imageGenerate by remember { mutableStateOf("") }
     val context = LocalContext.current
@@ -85,7 +87,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "Story", fontSize = 42.sp, textAlign = TextAlign.Center) },
+                title = { Text(text = /*"Story"*/stringResource(R.string.Story), fontSize = 42.sp, textAlign = TextAlign.Center) },
                 modifier = Modifier.background(gradientBrush),
                 colors = TopAppBarColors(Color(0xFF21324A),Color.DarkGray,Color.Gray,Color.White,Color.White)// Apply gradient to top bar
             )
@@ -109,7 +111,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
 
 
             Text(
-                text = "Subject",
+                text = /*"Subject"*/stringResource(R.string.Subject),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 25.dp, start = 15.dp),
@@ -136,10 +138,10 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = "Örn: Space Travel, importance of friendship", fontSize = 15.sp) }
+                label = { Text(text = /*"Exp: Space Travel, importance of friendship"*/stringResource(R.string.SubjectExp), fontSize = 15.sp) }
             )
             Text(
-                text = "Location",
+                text = /*"Location"*/stringResource(R.string.Location),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -166,10 +168,10 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = "Örn: Desert, School, Forest", fontSize = 15.sp) }
+                label = { Text(text = /*"Exp: Desert, School, Forest"*/stringResource(R.string.LocationExp), fontSize = 15.sp) }
             )
             Text(
-                text = "Main Character",
+                text = /*"Main Character"*/stringResource(R.string.MainCharacter),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -196,10 +198,10 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = "Örn: Cınderella, James , Emily", fontSize = 15.sp) }
+                label = { Text(text = /*"Exp: Cınderella, James , Emily"*/stringResource(R.string.MainCharacterExp), fontSize = 15.sp) }
             )
             Text(
-                text = "Minor Character",
+                text = /*"Minor Character"*/stringResource(R.string.MinorCharacter),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -238,7 +240,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                                 .fillMaxWidth()
                                 .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                                 .onFocusChanged { focusState = it.isFocused },
-                            label = { Text(text = "Örn: Shrek, Liam, Kylie", fontSize = 15.sp) }
+                            label = { Text(text = /*"Exp: Shrek, Liam, Kylie"*/stringResource(R.string.MinorCharacterExp), fontSize = 15.sp) }
                         )
 
                         Icon(
@@ -255,7 +257,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
             }
 
             Text(
-                text = "Main Character Characteristic",
+                text = /*"Main Character Characteristic"*/stringResource(R.string.MainCharacterCharacteristic),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -282,7 +284,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = "Örn: Naughty, Lovable, Honest", fontSize = 15.sp) }
+                label = { Text(text = /*"Exp: Naughty, Lovable, Honest"*/stringResource(R.string.MainCharacterCharacteristicExp), fontSize = 15.sp) }
             )
             Text(
                 text = "Story Length",
@@ -318,7 +320,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 }
             }
             Text(
-                text = "Theme",
+                text = /*"Theme"*/stringResource(R.string.Theme),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -335,7 +337,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     FilterChip(
                         selected = selectedChip == option,
                         onClick = { setSelectedChip(option) },
-                        label = { Text(text = option, color = Color.White, fontSize = 12.sp) },
+                        label = { Text(text = option, color = Color.White, fontSize = 10.sp, textAlign = TextAlign.Center) },
                         colors = FilterChipDefaults.filterChipColors(
                             containerColor = Color.Black, // Varsayılan arka plan rengi
                             selectedContainerColor = Color(0xFF21324A),
@@ -386,7 +388,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 },
 
             ) {
-                Text(text = "Create the Story")
+                Text(text = /*"Create the Story"*/stringResource(R.string.CreatetheStory))
             }
 
 

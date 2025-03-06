@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,7 +51,7 @@ fun HikayeGecis(navController: NavController) {
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = "STORY", fontSize = 35.sp, textAlign = TextAlign.Center) }
+            CenterAlignedTopAppBar(title = { Text(text = /*"STORY"*/stringResource(R.string.Story), fontSize = 35.sp, textAlign = TextAlign.Center) }
                 ,colors = TopAppBarColors( Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF81D4FA), Color.White, Color.White))
 
         }
@@ -90,7 +91,7 @@ fun HikayeGecis(navController: NavController) {
                         }
                 )
                 Text(
-                    text = "CREATE A STORY",
+                    text = /*"CREATE A STORY"*/stringResource(R.string.CreatetheStory),
                     color = Color.White,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
@@ -127,7 +128,7 @@ fun HikayeGecis(navController: NavController) {
                         }
                 )
                 Text(
-                    text = "SAVE STORY",
+                    text = /*"MY STORIES"*/stringResource(R.string.MYSTORIES),
                     color = Color.White,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,

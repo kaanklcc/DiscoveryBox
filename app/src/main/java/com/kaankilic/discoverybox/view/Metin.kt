@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +70,8 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
     val zen= FontFamily(Font(R.font.zen))
     val delreg= FontFamily(Font(R.font.delreg))
     val delbold= FontFamily(Font(R.font.delbold))
+    val saveMessage = stringResource(R.string.Storyandimagesavedsuccessfully)
+    val saveFail = stringResource(R.string.UserSessionMessage)
 
     fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
@@ -110,7 +113,7 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "HİKAYENİZ", fontSize = 40.sp, fontWeight = FontWeight.Bold, fontFamily = delbold, textAlign = TextAlign.Center) },
+                title = { Text(text = /*"YOUR STORY"*/stringResource(R.string.YOURSTORY), fontSize = 40.sp, fontWeight = FontWeight.Bold, fontFamily = delbold, textAlign = TextAlign.Center) },
                modifier = Modifier.background(Color.Transparent),
                 colors= TopAppBarColors(Color(0xFF6BB7C0),Color(0xFF6BB7C0),Color(0xFF6BB7C0),Color.White,Color.White),
 
@@ -207,28 +210,28 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
                 Button(onClick = {
                     navController.navigate("saveSayfa")
                 }, colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)), modifier = Modifier.padding(bottom = 13.dp)) {
-                    Text(text = "My Stories",fontSize = 22.sp, fontFamily = zen)
+                    Text(text = /*"My Stories"*/stringResource(R.string.MYSTORIES),fontSize = 22.sp, fontFamily = zen)
 
                 }
                 //bitiş
             }else{
                     if (hikayeyiOlustur.isEmpty()) {
                         Text(
-                            text = "Hikaye oluşturuluyor...",
+                            text = /*"Story is being created..."*/stringResource(R.string.Storyisbeingcreated___),
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             fontSize = 22.sp,
                             color = Color.White
                         )
                         Text(
-                            text = "Görsel oluşturuluyor...",
+                            text = /*"Image is being created..."*/stringResource(R.string.Imageisbeingcreated__),
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             fontSize = 22.sp,
                             color = Color.White
                         )
                         Text(
-                            text = "Sese Dönüştürülüyor...",
+                            text = /*"Converted to sound..."*/stringResource(R.string.Convertedtosound___),
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             fontSize = 22.sp,
@@ -287,23 +290,23 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
                                             if (imageUrl != null) {
                                                 metinViewModel.saveStoryForUser( title = hikayeId!!, story = hikayeyiOlustur, imageUrl = imageUrl, userId = userId)
                                             } else {
-                                                Toast.makeText(context, "Görsel URL'si alınamadı", Toast.LENGTH_LONG).show()
+                                                Toast.makeText(context, "Could not get image url", Toast.LENGTH_LONG).show()
                                             }
                                         }
                                     } else {
-                                        Toast.makeText(context, "Görsel kaydedilemedi", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context, "Image could not be saved", Toast.LENGTH_LONG).show()
                                     }
                                 }
 
                                 metinViewModel.storySaved.observe(context as LifecycleOwner) { success ->
                                     if (success) {
-                                        Toast.makeText(context, "Hikaye ve görsel başarıyla kaydedildi", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, /*"Story and image saved successfully"*/saveMessage, Toast.LENGTH_SHORT).show()
                                     } else {
-                                        Toast.makeText(context, "Hikaye kaydedilemedi", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "Image could not be saved", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             } else {
-                                Toast.makeText(context, "Kullanıcı oturumu yok veya görsel mevcut değil!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, /*"User session not available or image not available!"*/saveFail, Toast.LENGTH_SHORT).show()
                             }
                         }
                     )
@@ -324,13 +327,13 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
                         hikayeViewModel.generateStory(prompt)
 
                     },colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)))  {
-                        Text(text = "Rebuild",fontSize = 22.sp, fontFamily = zen,)
+                        Text(text = /*"Rebuild"*/stringResource(R.string.Rebuild),fontSize = 22.sp, fontFamily = zen,)
                     }
 
                     Button(onClick = {
                         navController.navigate("saveSayfa")
                     },colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0))) {
-                        Text(text = "My Stories",fontSize = 22.sp, fontFamily = zen,)
+                        Text(text = /*"My Stories"*/stringResource(R.string.MYSTORIES),fontSize = 22.sp, fontFamily = zen,)
                     }
                 }
 
