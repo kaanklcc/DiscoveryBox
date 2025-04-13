@@ -1,0 +1,102 @@
+<resources>
+    <string name="app_name">DiscoveryBox</string>
+    <string name="logOutMessage">Çıkış Yapmak İstediğine emin misin?</string>
+    <string name="exitMessage">Uygulamadan Çıkıldı</string>
+    <string name="Yes">Evet</string>
+    <string name="NoStoryMessage">Gösterilecek Hikaye Yok</string>
+    <string name="Story">Hikaye</string>
+    <string name="Mode">Modu</string>
+    <string name="EnterPassword">Şifreyi Girin</string>
+    <string name="Password">Şifre</string>
+    <string name="WrongPassword">Yanlış Şifre</string>
+    <string name="Verify">Doğrulama</string>
+    <string name="Cancel">İptal</string>
+    <string name="Game">Oyun</string>
+
+
+    <string name="Adventure">Macera</string>
+    <string name="Action">Aksiyon</string>
+    <string name="Love">Sevgi</string>
+    <string name="Friendship">Arkadaşlık</string>
+    <string name="Family">Aile</string>
+    <string name="Short">Kısa</string>
+    <string name="Medium">Orta</string>
+    <string name="Long">Uzun</string>
+
+
+    <string name="MATCHINGGAME">EŞLEŞTİRME OYUNU</string>
+    <string name="CongratulationsGameisOver">Tebrikler, Oyun Bitti!</string>
+    <string name="matchWelcomeMessage">"Hoşgeldin!Haydi Kelimeleri Eşleştirelim</string>
+    <string name="Congratulations">TEbrikler</string>
+
+    <string name="COLORMATCHINGGAME">RENK EŞELŞTİRME OYUNUE</string>
+    <string name="ColorWelcomeMessage">"Hoşgeldin!Haydi Doğru Renkleri Bulalım"</string>
+    <string name="Right">Doğru!</string>
+    <string name="Wrong">Yanlış!</string>
+
+    <string name="GameScreen">Oyun Ekranı</string>
+
+    <string name="WelcomeToMagicWorld">Sihir Dünyasına Hoşgeldin</string>
+    <string name="Email">Email</string>
+    <string name="LoginSuccesful">Giriş Başarılı</string>
+    <string name="LoginFailed">Giriş Başarısız:</string>
+    <string name="NewToDiscoveryBox">DiscoveryBoxta yeni misin?</string>
+    <string name="SignUp">Kayıt Ol</string>
+
+
+
+    <string name="Subject">Konu</string>
+    <string name="SubjectExp">Örn: Uzay Yolculuğu, arkadaşlığın önemi</string>
+    <string name="Location">Konum</string>
+    <string name="LocationExp">Örn: Çöl, Okul, Orman</string>
+    <string name="MainCharacter">Ana Karakter</string>
+    <string name="MainCharacterExp">Örn: Sindirella, Kaan , Ayşe</string>
+    <string name="MinorCharacter">Yan Karakterler</string>
+    <string name="MinorCharacterExp">Örn: Shrek, Anıl, Zeynep</string>
+    <string name="MainCharacterCharacteristic">Ana Karakter Özellik</string>
+    <string name="MainCharacterCharacteristicExp">Örn: Yaramaz, Sevimli, Dürüst</string>
+    <string name="StoryLength">Hikaye Uzunluğu</string>
+    <string name="Theme">Tema</string>
+    <string name="CreatetheStory">Hikaye Yarat</string>
+
+
+    <string name="SignIn">Giriş Yap</string>
+
+    <string name="MYSTORIES">HİKAYELERİM</string>
+
+    <string name="WordQuiz">Kelime Testi</string>
+    <string name="WordLearnWelcomeMessage">"Hoşgeldiniz !.Haydi kelimeleri öğrenelim"</string>
+    <string name="Next">İleri</string>
+    <string name="CardsAreLoading...">Kartlar Yükleniyor...</string>
+
+    <string name="WELCOMETO">HOŞGELDİNİZ</string>
+    <string name="DiscoveryBox">Discovery Box</string>
+    <string name="Name">İsim</string>
+    <string name="Surname">Soyisim</string>
+
+    <string name="Registrationsuccessful">Kayıt Başarılı</string>
+    <string name="Registrationfailed">Kayıt Başarılı:</string>
+
+
+
+    <string name="YOURSTORY">HİKAYELERİN</string>
+    <string name="Storyisbeingcreated...">Hikaye Yaratılıyor...</string>
+    <string name="Imageisbeingcreated..">Görsel Üretiliyor..</string>
+    <string name="Convertedtosound...">Sese Dönüştürülüyor...</string>
+    <string name="Couldnotgetimageurl">Görsel Urlsi alınamadı</string>
+    <string name="Imagecouldnotbesaved">Görsel kaydedilemedi</string>
+    <string name="Storyandimagesavedsuccessfully">Görsel ve hikaye başarıyla kaydedildi</string>
+    <string name="UserSessionMessage">User session not available or image not available!</string>
+    <string name="Rebuild">Yeniden Üret</string>
+
+
+    <string name="MakeStory"> "bana bir hikaye yaz. Konusu: ${konu.text}, Mekanı: ${mekan.text}, " +
+                                "Ana karakteri: ${anaKarakter.text}, Ana karakter özelliği: ${anaKarakterOzellik.text}, " +
+                                "Yan karakterler: $yanKarakterlerText,teması $temaText, uzunlugu $uzunlukText."</string>
+
+    <string name="makeImage">"Bana bir resim çiz. Konu ${konu.text}, mekan ${mekan.text} olsun. Tema ise ${temaText} olsun. "</string>
+
+    <string name="language">tr</string>
+    <string name="country">TR</string>
+
+</resources>
