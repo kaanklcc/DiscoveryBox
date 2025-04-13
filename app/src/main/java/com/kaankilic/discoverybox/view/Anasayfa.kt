@@ -2,30 +2,40 @@ package com.kaankilic.discoverybox.view
 
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.DropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +48,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -49,11 +60,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -65,8 +81,9 @@ import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Story
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import kotlinx.coroutines.launch
+import java.util.Locale
 
-@SuppressLint("RememberReturnType")
+/*@SuppressLint("RememberReturnType")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel) {
@@ -80,6 +97,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     val actionLabel = stringResource(R.string.Yes)
     val exitedApp = stringResource(R.string.exitMessage)
     val wrongPassword = stringResource(R.string.WrongPassword)
+    val context = LocalContext.current
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -95,7 +113,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
         },
         topBar = {
 
-            CenterAlignedTopAppBar(title = { Text(text = /*"DISCOVERY BOX"*/ stringResource(R.string.DiscoveryBox), fontSize = 35.sp, textAlign = TextAlign.Center) }
+            CenterAlignedTopAppBar(title = { Text(text =stringResource(R.string.DiscoveryBox), fontSize = 35.sp, textAlign = TextAlign.Center) }
             ,colors = TopAppBarColors( Color(0xFF64B5F6), Color(0xFF64B5F6), Color(0xFF64B5F6), Color.White, Color.White),
 
                 actions = {
@@ -120,6 +138,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             tint = Color.White,
                             modifier = Modifier.size(35.dp)
                         )
+
                     }
                 }
             )
@@ -134,6 +153,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                 textAlign = TextAlign.Center
             )
         } else {
+
             Row(
                 modifier = Modifier
                     .fillMaxSize()
@@ -148,8 +168,6 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         //navController.navigate("hikayeGecis")
                     }
                     .padding(9.dp)){
-
-
 
                     Image(
                         painter = painterResource(R.drawable.parent),
@@ -171,6 +189,8 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                                 navController.navigate("hikayeGecis")
                             }*/
                     )
+
+
 
                     Text(
                         text = /*"Story"*/stringResource(R.string.Story),
@@ -295,38 +315,293 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
             }
         }
     }
+}*/
+
+@SuppressLint("RememberReturnType")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel) {
+    val konular by anasayfaViewModel.konular.observeAsState(emptyList()) // Boş bir liste ile başlatıyoruz
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var showDialog by remember { mutableStateOf(false) }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val message = stringResource(R.string.logOutMessage)
+    val actionLabel = stringResource(R.string.Yes)
+    val exitedApp = stringResource(R.string.exitMessage)
+    val wrongPassword = stringResource(R.string.WrongPassword)
+    val delbold= FontFamily(Font(R.font.delbold))
+    val context = LocalContext.current
+
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFFCD7D7), // Sarı
+            Color(0xFFB0D2FD), // Açık Mavi
+            // Color(0xFFFF8A80)  // Pembe
+        )
+    )
+    val gradientBrush2 = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFC5FCC6), // Sarı
+            Color(0xFFFCC1FC), // Açık Mavi
+            //Color(0xFF353BA4)  // Pembe
+        )
+    )
+
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.DiscoveryBox),
+                        fontSize = 32.sp,
+                        textAlign = TextAlign.Center,
+                        fontFamily = delbold
+                    )
+                },
+                colors = TopAppBarColors( Color(0xFFE2EFFC), Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF353BA4),  Color(0xFF353BA4)),
+
+
+                actions = {
+                    IconButton(onClick = {
+                        scope.launch {
+                            val sb = snackbarHostState
+                                .showSnackbar(
+                                    message = /*"Do you want to log out?"*/message,
+                                    actionLabel = /*"Yes"*/actionLabel
+                                )
+                            if (sb == SnackbarResult.ActionPerformed) {
+                                snackbarHostState.showSnackbar(message = /*"exited the application"*/exitedApp)
+                                anasayfaViewModel.signOut()
+                                navController.navigate("girisSayfa")
+
+                            }
+                        }
+
+
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ExitToApp,
+                            contentDescription = "Logout",
+                            tint =Color(0xFF353BA4) ,
+                            modifier = Modifier.size(60.dp),
+
+                        )
+
+                    }
+                }
+            )
+
+
+        }
+    ) { paddingValues ->
+
+        if (konular.isEmpty()) {
+            Text(
+                text = stringResource(R.string.NoStoryMessage),
+                modifier = Modifier.fillMaxSize(),
+                textAlign = TextAlign.Center
+            )
+        } else {
+            Column(modifier = Modifier.fillMaxSize()
+                .padding(paddingValues).
+                background(Color(0xFFE2EFFC)
+            ),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(17.dp)
+                        .clip(RoundedCornerShape(25.dp))
+                        .background(gradientBrush)
+                        .wrapContentSize()
+                        .clickable {
+                            navController.navigate("gameMain")
+                        }
+
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(), // Tüm genişliği kaplasın ki TextAlign.Left etkili olsun
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalAlignment = Alignment.Start // Sola hizalama sağlandı
+                    ) {
+                        Text(
+                            "Educational Games",
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Left,
+                            fontSize = 24.sp
+                            , fontFamily = delbold,
+
+                            color =  Color(0xFFF454a94),
+                            modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
+                        )
+                        Text(
+                            "Learn while playing!",
+                            textAlign = TextAlign.Left,
+                            fontSize = 16.sp, fontFamily = delbold,
+                            modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
+                        )
+                        Image(
+                            painter = painterResource(R.drawable.child),
+                            contentDescription = "Kaan Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                                .graphicsLayer {
+                                    shadowElevation = 8.dp.toPx()
+                                    shape = RoundedCornerShape(10.dp)
+                                    clip = true
+                                }
+                                .drawWithContent {
+                                    drawContent()
+                                    drawRect(
+                                        color = Color.Black.copy(alpha = 0.1f),
+                                        size = size
+                                    )
+                                }
+                        )
+
+                    }
+                }
+
+
+
+                Image(
+                    painter = painterResource(R.drawable.robot),
+                    contentDescription = "Kaan Image",
+                    contentScale = ContentScale.Crop,
+
+                    )
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(17.dp)
+                        .clip(RoundedCornerShape(25.dp))
+                        .background(gradientBrush2)
+                        .wrapContentSize()
+                        .clickable {
+                            showDialog = true
+                            //navController.navigate("hikayeGecis")
+                        }
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(), // Tüm genişliği kaplasın ki TextAlign.Left etkili olsun
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalAlignment = Alignment.Start // Sola hizalama sağlandı
+                    ) {
+                        Text(
+                            "Create Stories with AI",
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Left,
+                            fontSize = 24.sp, fontFamily = delbold,
+                            color =  Color(0xFFF454a94),
+                            modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
+                        )
+                        Text(
+                            "Let your imagination fly!",
+                            textAlign = TextAlign.Left,
+                            fontSize = 16.sp, fontFamily = delbold,
+                            modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
+                        )
+                        Image(
+                            painter = painterResource(R.drawable.parent),
+                            contentDescription = "Kaan Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                                .graphicsLayer {
+                                    shadowElevation = 8.dp.toPx()
+                                    shape = RoundedCornerShape(10.dp)
+                                    clip = true
+                                }
+                                .drawWithContent {
+                                    drawContent()
+                                    drawRect(
+                                        color = Color.Black.copy(alpha = 0.1f),
+                                        size = size
+                                    )
+                                }
+                        )
+
+                    }
+                }
+
+                if (showDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDialog = false },
+                        title = { Text(/*"Enter Password"*/stringResource(R.string.EnterPassword)) },
+                        text = {
+                            Column {
+                                TextField(
+                                    value = password,
+                                    onValueChange = { password = it },
+                                    label = { Text(/*"Password"*/stringResource(R.string.Password)) },
+                                    visualTransformation = PasswordVisualTransformation()
+                                )
+                                errorMessage?.let { Text(it, color = Color.Red) }
+                            }
+                        },
+                        confirmButton = {
+                            Button(onClick = {
+                                anasayfaViewModel.reauthenticateUser(password,
+                                    onSuccess = {
+                                        showDialog = false
+                                        // onSuccess()
+                                        navController.navigate("hikayeGecis")
+                                    },
+                                    onFailure = {
+                                        errorMessage = /*"Wrong Password"*/wrongPassword
+                                    }
+                                )
+                            }) {
+                                Text(stringResource(R.string.Verify))
+                            }
+                        },
+                        dismissButton = {
+                            Button(onClick = { showDialog = false }) {
+                                Text(stringResource(R.string.Cancel))
+                            }
+                        }
+                    )
+                }
+
+                Row(modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Absolute.Center)
+                {
+                    Image(
+                        painter = painterResource(R.drawable.img),
+                        contentDescription = "Kaan Image",
+                        contentScale = ContentScale.Crop,
+
+                        )
+                    Spacer(Modifier.width(3.dp))
+                    Text("Safe for Kids", fontFamily = delbold)
+                }
+
+
+            }
+        }
+
+    }
 }
 
-/*@Composable
-fun StoryItem(story: Story, navController: NavController) {
-    // Hikaye öğesinin görünümü
-    Column(
-        modifier = Modifier
-            .padding(6.dp)
-            .background(MaterialTheme.colorScheme.surface)
-            .clickable {
-                when (story.category) {
-                    "bilim" -> navController.navigate("bilim")
-                    "diger" -> navController.navigate("diger")
-                    "dil" -> navController.navigate("dil")
-                    "guncelHayat" -> navController.navigate("guncelHayat")
-                    "hikaye" -> navController.navigate("hikaye")
-                    "saveSayfa" -> navController.navigate("saveSayfa")// Eğer hikaye sayfası var ise
-                    else -> {} // Diğer kategoriler için bir şey yapılmaz
-                }
-            },
-            //.padding(6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(painter = painterResource(id = story.imageRes), contentDescription = null,
-            modifier = Modifier.size(250.dp).clip(RoundedCornerShape(25.dp)), contentScale = ContentScale.Crop)
-       /* Button(onClick = { navController.navigate("saveSayfa") }) {
-            Text(text = "SaveGit")
 
-        }*/
-        //Spacer(modifier = Modifier.height(7.dp))
-        //Text(text = story.title, fontSize = 25.sp)
-    }
-}*/
+
+
 
 

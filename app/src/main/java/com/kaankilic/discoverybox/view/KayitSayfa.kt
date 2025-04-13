@@ -37,6 +37,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -62,6 +64,7 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
     val context = LocalContext.current
     val regSuc = stringResource(R.string.Registrationsuccessful)
     val regFail = stringResource(R.string.Registrationfailed)
+    val delbold= FontFamily(Font(R.font.delbold))
 
     fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
@@ -110,13 +113,13 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                     /*"WELCOME TO "*/stringResource(R.string.WELCOMETO),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
-                    color = Color.DarkGray
+                    color = Color.DarkGray,fontFamily = delbold
                 )
                 Text(
                     /*"Discovery Box"*/stringResource(R.string.DiscoveryBox),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
-                    color = Color.DarkGray
+                    color = Color.DarkGray,fontFamily = delbold
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -172,33 +175,40 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                                 .clip(RoundedCornerShape(10.dp))
                                 .padding(start = 20.dp, end = 20.dp),
                             onClick = {
-                                kayitSayfaViewModel.signUpWithEmail(email, password)
+                                if (ad.isEmpty()|| soyad.isEmpty() || email.isEmpty() || password.isEmpty()){
+                                    Toast.makeText(context, "Name,Surname,Email and Password cannot be empty", Toast.LENGTH_SHORT).show()
 
-                                signUpResult?.let { (success, message) ->
-                                    if (success) {
-                                        kayitSayfaViewModel.saveUserData(
-                                            getCurrentUserId()!!,
-                                            ad,
-                                            soyad,
-                                            email
-                                        )
-                                        navController.navigate("anasayfa")
-                                        Toast.makeText(
-                                            context,
-                                            /*"Registration successful"*/regSuc,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    } else {
-                                        Toast.makeText(
-                                            context,
-                                            "Registration failed: $message",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                }else{
+                                    kayitSayfaViewModel.signUpWithEmail(email, password)
 
+                                    signUpResult?.let { (success, message) ->
+                                        if (success) {
+                                            kayitSayfaViewModel.saveUserData(
+                                                getCurrentUserId()!!,
+                                                ad,
+                                                soyad,
+                                                email
+                                            )
+                                            navController.navigate("anasayfa")
+                                            Toast.makeText(
+                                                context,
+                                                /*"Registration successful"*/regSuc,
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "Registration failed: $message",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+
+                                        }
                                     }
+
                                 }
+
                             },
-                            colors = ButtonDefaults.buttonColors(Color(0xFFE0BACD))//9148fc
+                            colors = ButtonDefaults.buttonColors(Color(0xFFFF5D9C))//9148fc
                         ) {
                             Text(text = /*"Sign Up"*/stringResource(R.string.SignUp), color = Color.White, fontWeight = FontWeight.ExtraBold
                                 , fontSize = 20.sp)

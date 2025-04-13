@@ -16,11 +16,11 @@
 
     <string name="MATCHINGGAME">MATCHING GAME</string>
     <string name="CongratulationsGameisOver">Congratulations, Game is Over!</string>
-    <string name="matchWelcomeMessage">"Welcome again!.Let's match the words</string>
+    <string name="matchWelcomeMessage">"Welcome!.Let's match the words</string>
     <string name="Congratulations">Congratulations</string>
 
     <string name="COLORMATCHINGGAME">COLOR MATCHINGG GAME</string>
-    <string name="ColorWelcomeMessage">"Welcome again!.Let's find the right colors"</string>
+    <string name="ColorWelcomeMessage">"Welcome!Let's find the right colors"</string>
     <string name="Right">Right!</string>
     <string name="Wrong">Wrong!</string>
     <string name="SignIn">Sign In</string>
@@ -93,6 +93,22 @@
     <string name="Storyandimagesavedsuccessfully">Story and image saved successfully</string>
     <string name="UserSessionMessage">User session not available or image not available!</string>
     <string name="Rebuild">Rebuild</string>
+
+
+    <string name="MakeStory">"Write me a story. " +
+                                "Topic: ${konu.text}," +
+                                " Location: ${mekan.text}," +
+                                " Main character: ${anaKarakter.text}," +
+                                " Main character trait: ${anaKarakterOzellik.text}," +
+                                " Supporting characters: ${yanKarakterlerText}, " +
+                                "Theme: ${temaText}," +
+                                " Length: ${uzunlukText}."</string>
+
+    <string name="makeImage">"Draw me a picture.. let the subject be ${konu.text} and the place be ${mekan.text}. let the theme be $temaText. "</string>
+
+
+    <string name="language">en</string>
+    <string name="country">US</string>
 
 
 </resources>

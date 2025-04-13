@@ -43,6 +43,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +57,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun GradientBackground(colors:List<Color>,modifier: Modifier = Modifier) {
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -71,11 +74,10 @@ fun GradientBackground(colors:List<Color>,modifier: Modifier = Modifier) {
 
 @Composable
 fun LoginSplashScreen(navController: NavController) {
+    val delbold= FontFamily(Font(R.font.delbold))
     LaunchedEffect(Unit) {
         delay(3000) // 3 saniye bekle
-        navController.navigate("anasayfa") { // "home" yerine gideceğiniz route'u yazın
-            popUpTo("loginSplash") { inclusive = true } // Splash ekranını geri dönülemez yapar
-        }
+        navController.navigate("anasayfa")
     }
 
     Box(modifier = Modifier.fillMaxSize()){
@@ -109,7 +111,7 @@ fun LoginSplashScreen(navController: NavController) {
 
             }
             Spacer(modifier = Modifier.height(30.dp))
-            Text("DISCOVERY BOX", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 40.sp)
+            Text("DISCOVERY BOX", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 40.sp,fontFamily = delbold)
 
         }
 
@@ -122,6 +124,7 @@ fun LoginSplashScreen(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SplashScreen1(navController: NavController) {
+    val delbold= FontFamily(Font(R.font.delbold))
 
     Scaffold(
 
@@ -157,10 +160,10 @@ fun SplashScreen1(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text("StoryPals", fontWeight = FontWeight.ExtraBold, fontSize = 40.sp, color = Color.DarkGray)
+                Text("StoryPals", fontWeight = FontWeight.ExtraBold, fontSize = 40.sp, color = Color.DarkGray,fontFamily = delbold)
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Text("Where Stories Come Alive!", fontWeight = FontWeight.Normal, fontSize = 24.sp)
+                Text("Where Stories Come Alive!", fontWeight = FontWeight.Normal, fontSize = 24.sp,fontFamily = delbold)
                 Spacer(modifier = Modifier.height(60.dp))
 
                 PageIndicator(3,0)
@@ -200,6 +203,7 @@ fun SplashScreen1(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SplashScreen2(navController: NavController) {
+    val delbold= FontFamily(Font(R.font.delbold))
     Scaffold(
 
     ) { paddingValues ->
@@ -221,10 +225,10 @@ fun SplashScreen2(navController: NavController) {
                     "Learn Through Play",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 34.sp,
-                    color = Color.DarkGray
+                    color = Color.DarkGray,fontFamily = delbold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Text("Fun Educational Games", fontWeight = FontWeight.Medium, fontSize = 20.sp)
+                Text("Fun Educational Games", fontWeight = FontWeight.Medium, fontSize = 20.sp,fontFamily = delbold)
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Row(
@@ -345,6 +349,8 @@ fun SplashScreen2(navController: NavController) {
 
 @Composable
 fun SplashScreen3(navController: NavController) {
+    val delbold= FontFamily(Font(R.font.delbold))
+
 
     Scaffold(
 
@@ -404,17 +410,17 @@ fun SplashScreen3(navController: NavController) {
                     "Get",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 40.sp,
-                    color = Color.DarkGray
+                    color = Color.DarkGray,fontFamily = delbold
                 )
                 Text(
                     "Started!",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 40.sp,
-                    color = Color.DarkGray
+                    color = Color.DarkGray,fontFamily = delbold
                 )
                 Spacer(Modifier.height(10.dp))
-                Text("Touch to Begin Your", fontWeight = FontWeight.Normal, fontSize = 16.sp)
-                Text("Adventure", fontWeight = FontWeight.Normal, fontSize = 16.sp)
+                Text("Touch to Begin Your", fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
+                Text("Adventure", fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
                 Spacer(Modifier.height(40.dp))
                 Button(
                     modifier = Modifier.size(230.dp, 55.dp),
@@ -429,7 +435,7 @@ fun SplashScreen3(navController: NavController) {
 
                     }
                 ) {
-                    Text("Start Now ->", fontWeight = FontWeight.Normal, fontSize = 20.sp)
+                    Text("Start Now ->", fontWeight = FontWeight.Normal, fontSize = 20.sp,fontFamily = delbold)
                 }
                 Spacer(Modifier.height(20.dp))
                 PageIndicator(3, 2)

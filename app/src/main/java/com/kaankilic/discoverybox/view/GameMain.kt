@@ -27,6 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,13 +41,15 @@ import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 @Composable
 fun GameMain(navController: NavController, anasayfaViewModel: AnasayfaViewModel) {
     val konular by anasayfaViewModel.konular.observeAsState(emptyList()) // Boş bir liste ile başlatıyoruz
+    val delbold= FontFamily(Font(R.font.delbold))
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = /*"Game Screen"*/stringResource(R.string.GameScreen), fontSize = 35.sp) })
+            TopAppBar(title = { Text(text = /*"Game Screen"*/stringResource(R.string.GameScreen), fontSize = 35.sp, fontFamily = delbold) })
         }
     ) { paddingValues ->
         if (konular.isEmpty()){
-            Text(text = /*"There is no story to show"*/stringResource(R.string.NoStoryMessage))
+            Text(text = /*"There is no story to show"*/stringResource(R.string.NoStoryMessage), fontFamily = delbold)
         } else{
             LazyVerticalGrid(
                 modifier = Modifier
@@ -82,7 +86,7 @@ fun GameItem(story: Story, navController: NavController) {
                     "wordGame" -> navController.navigate("wordGame")
                     "matchingGame" -> navController.navigate("matchingGame")
                     "colorGame" -> navController.navigate("colorGame")
-                    "wordGame" -> navController.navigate("wordGame")
+                    "numberGame" -> navController.navigate("numberGame")
                     "wordGame" -> navController.navigate("wordGame")
                     else -> {} // Diğer kategoriler için bir şey yapılmaz
                 }

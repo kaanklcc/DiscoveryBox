@@ -48,6 +48,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +73,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
     val firestore = FirebaseFirestore.getInstance()
     val userId = auth.currentUser?.uid
     val stories by saveSayfaViewModel.stories.observeAsState(emptyList())
+    val delbold= FontFamily(Font(R.font.delbold))
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -92,7 +95,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = /*"YOUR STORIES"*/stringResource(R.string.YOURSTORY), fontSize = 35.sp, textAlign = TextAlign.Center)},
+            CenterAlignedTopAppBar(title = { Text(text = /*"YOUR STORIES"*/stringResource(R.string.YOURSTORY), fontSize = 35.sp, textAlign = TextAlign.Center,fontFamily = delbold)},
                 colors = TopAppBarColors( Color(0xFF2A3E52), Color(0xFF2A3E52), Color(0xFF2A3E52), Color.White, Color.White)
             )
 
@@ -123,6 +126,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
 
 @Composable
 fun StoryItem(hikaye: Hikaye, navController: NavController, saveSayfaViewModel: SaveSayfaViewModel,hikayeViewModel: HikayeViewModel) {
+    val delbold= FontFamily(Font(R.font.delbold))
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -149,8 +153,8 @@ fun StoryItem(hikaye: Hikaye, navController: NavController, saveSayfaViewModel: 
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally) {
 
-                    Text(text = hikaye.title, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
-                    Text(text = hikaye.content.take(100) + "...")
+                    Text(text = hikaye.title, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center,fontFamily = delbold)
+                    Text(text = hikaye.content.take(100) + "...",fontFamily = delbold)
                     IconButton(
                         modifier = Modifier.align(Alignment.End),
                         onClick = {

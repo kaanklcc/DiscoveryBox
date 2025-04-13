@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
     val kayitSayfaViewModel : KayitSayfaViewModel by viewModels()
     val saveSayfaViewModel : SaveSayfaViewModel by viewModels()
     val cardSayfaViewModel:CardSayfaViewModel by viewModels()
-    val get:NumberGameViewModel by viewModels()
+    val numberGameViewModel:NumberGameViewModel by viewModels()
     val gameViewModel : GameViewModel by viewModels()
 
 
@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
                     kayitSayfaViewModel,
                    saveSayfaViewModel,
                    cardSayfaViewModel,
+                   numberGameViewModel
 
                 )
                // SaveSayfa(navController = rememberNavController() , saveSayfaViewModel =saveSayfaViewModel )

@@ -1,5 +1,8 @@
 package com.kaankilic.discoverybox.view
 
+import android.app.Activity
+import android.content.Context
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,8 +21,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.DropdownMenu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -38,6 +43,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
@@ -52,6 +59,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.viewmodel.GirisSayfaViewModel
 import kotlinx.coroutines.withContext
+import java.util.Locale
+
 
 @Composable
 fun GradientBackgroundd(colors:List<Color>,modifier: Modifier = Modifier) {
@@ -76,6 +85,8 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
     val loginResult by GirisSayfaViewModel.loginResult.observeAsState()
     val logsuc = stringResource(R.string.LoginSuccesful)
     val logfail = stringResource(R.string.LoginFailed)
+    val delbold= FontFamily(Font(R.font.delbold))
+
 
     Scaffold(
 
@@ -91,35 +102,47 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 60.dp),
+                    .padding(top = 15.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
                     modifier = Modifier
-                        .size(150.dp) // Dairenin boyutu
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(Color.White), // Beyaz arka plan
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .padding(end = 16.dp), // Sağdan 16 dp boşluk bırak
+                    contentAlignment = Alignment.TopEnd
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.logoyapay),
-                        contentDescription = "Profile Image",
-                        contentScale = ContentScale.Crop, // Görseli kırpmadan ortalar
-                        modifier = Modifier
-                            .size(300.dp) // Görselin boyutu (çerçeve içinde)
-
-                    )
+                    LanguageSwitcher(context = LocalContext.current)
                 }
+
+                    Box(
+                        modifier = Modifier
+                            .size(150.dp) // Dairenin boyutu
+                            .clip(RoundedCornerShape(18.dp))
+                            .background(Color.White), // Beyaz arka plan
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Image(
+                            painter = painterResource(id = R.drawable.logoyapay),
+                            contentDescription = "Profile Image",
+                            contentScale = ContentScale.Crop, // Görseli kırpmadan ortalar
+                            modifier = Modifier
+                                .size(300.dp) // Görselin boyutu (çerçeve içinde)
+
+                        )
+
+                    }
+
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     /*"Discovery Box"*/stringResource(R.string.DiscoveryBox),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
-                    color = Color.DarkGray
+                    color = Color.DarkGray, fontFamily = delbold
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(/*"Welcome To Magic World"*/stringResource(R.string.WelcomeToMagicWorld), fontWeight = FontWeight.Normal, fontSize = 24.sp)
+                Text(/*"Welcome To Magic World"*/stringResource(R.string.WelcomeToMagicWorld), fontWeight = FontWeight.Normal, fontSize = 24.sp, fontFamily = delbold)
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Box(
@@ -155,29 +178,39 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                                 .clip(RoundedCornerShape(10.dp))
                                 .padding(start = 20.dp, end = 20.dp),
                             onClick = {
-                                GirisSayfaViewModel.signInWithEmail(email, password)
 
-                                loginResult?.let { (success, message) ->
-                                    if (success) {
-                                        Toast.makeText(
-                                            context,
-                                            /*"Login Succesful"*/logsuc,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        navController.navigate("anasayfa")
-                                    } else {
-                                        Toast.makeText(
-                                            context,
-                                            /*"Login Failed:*/ "logfail $message",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                if (email.isEmpty() || password.isEmpty() ){
+                                    Toast.makeText(context, "Email and Password cannot be empty", Toast.LENGTH_SHORT).show()
+
+                                }else{
+                                    GirisSayfaViewModel.signInWithEmail(email, password)
+
+                                    loginResult?.let { (success, message) ->
+                                        if (success) {
+                                            Toast.makeText(
+                                                context,
+                                                /*"Login Succesful"*/logsuc,
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            navController.navigate("anasayfa")
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                /*"Login Failed:*/ "logfail $message",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                                     }
+
                                 }
+
+
+
 
 
                             },
 
-                            colors = ButtonDefaults.buttonColors(Color(0xFFE0BACD))//9148fc
+                            colors = ButtonDefaults.buttonColors(Color(0xFFFA69AF))//9148fc
 
                         ) {
                             Text(text = /*"Sign in"*/stringResource(R.string.SignIn), color = Color.White, fontWeight = FontWeight.ExtraBold
@@ -217,6 +250,50 @@ fun PreviewGirisSayfa() {
 
     GirisSayfa(navController = fakeNavController, GirisSayfaViewModel = fakeViewModel)
 }
+
+@Composable
+fun LanguageSwitcher(context: Context) {
+    var locale by remember { mutableStateOf(Locale.getDefault()) }
+    var showMenu by remember { mutableStateOf(false) }
+
+    Box(
+        contentAlignment = Alignment.TopEnd
+    ) {
+        Button(onClick = { showMenu = true },
+            colors = ButtonDefaults.buttonColors(Color.DarkGray),) {
+            Text(text = "🌍")
+        }
+
+        DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+            DropdownMenuItem(text = { Text("Türkçe 🇹🇷") }, onClick = {
+                locale = Locale("tr")
+                updateLocale(context, locale)
+                showMenu = false
+            })
+            DropdownMenuItem(text = { Text("English 🇺🇸") }, onClick = {
+                locale = Locale("en")
+                updateLocale(context, locale)
+                showMenu = false
+            })
+        }
+    }
+}
+
+
+fun updateLocale(context: Context, locale: Locale) {
+    Locale.setDefault(locale)
+    val config = Configuration(context.resources.configuration)
+    config.setLocale(locale)
+
+    val resources = context.resources
+    resources.updateConfiguration(config, resources.displayMetrics)
+
+    // Activity'yi yeniden başlat (Compose'da etkisini görmek için)
+   if (context is Activity) {
+        context.recreate()
+    }
+}
+
 
 
 

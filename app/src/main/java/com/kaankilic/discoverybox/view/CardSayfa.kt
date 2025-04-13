@@ -1,5 +1,7 @@
 package com.kaankilic.discoverybox.view
 
+import android.content.Context
+import android.media.MediaPlayer
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -52,6 +54,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -80,6 +84,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
     val context = LocalContext.current
     var isPlaying by remember { mutableStateOf(false) }
     val isGameOver = remember { mutableStateOf(false) }
+    val delbold= FontFamily(Font(R.font.delbold))
 
 
 
@@ -126,6 +131,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
     val groupSize = 3
     val currentWords = shuffledWords.drop(currentGroupIndex.value * (groupSize/3)).take(groupSize/3)
     val currentImages = shuffledImages.drop(currentGroupIndex.value * groupSize ).take(groupSize )
+    val currentTargetWord = currentWords.first().nameEn
 
     Scaffold(
         topBar = {
@@ -135,6 +141,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                         text = /*"MATCHING GAME"*/stringResource(R.string.MATCHINGGAME),
                         fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
+                        fontFamily = delbold
                     )
                 },
                 modifier = Modifier.background(Color.Transparent),
@@ -163,7 +170,8 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                     text =/* "Congratulations, Game is Over!"*/stringResource(R.string.CongratulationsGameisOver),
                     color = Color.White,
                     fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = delbold
                 )
             }
         } else {
@@ -234,11 +242,11 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                 )
                                 {
                                     androidx.compose.material.Text(
-                                        text = /* "Welcome again!. " +
-                                                "Let's match the words",*/stringResource(R.string.matchWelcomeMessage),
+                                        text = stringResource(R.string.matchWelcomeMessage),
                                         style = TextStyle(
                                             color = Color.Black,
-                                            fontSize = 20.sp
+                                            fontSize = 18.sp,
+                                            fontFamily = delbold
                                         )
                                     )
                                 }
@@ -352,7 +360,9 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                                         cardSayfaViewModel,
                                                         currentGroupIndex,
                                                         showCelebration,
-                                                        isGameOver
+                                                        isGameOver,
+                                                        currentTargetWord,
+                                                        context
 
 
                                                     )
@@ -386,24 +396,38 @@ fun CelebrationAnimation(
     cardSayfaViewModel: CardSayfaViewModel,
     currentGroupIndex: MutableState<Int>,
     isGameOver: MutableState<Boolean>// MutableState<Int> alıyoruz
+
 ) {
+    val delbold= FontFamily(Font(R.font.delbold))
+    val context = LocalContext.current
+    fun playSoundEffect(resId: Int) {
+        val mediaPlayer = MediaPlayer.create(context, resId)
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener { it.release() }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.7f)),
         contentAlignment = Alignment.Center
     ) {
+        playSoundEffect(R.raw.correctlong)
+
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = /*"Congratulations!"*/stringResource(R.string.Congratulations),
                 color = Color.White,
                 fontSize = 40.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontFamily = delbold
+
             )
             Image(
                 painter = painterResource(id = R.drawable.pars),
                 contentDescription = "pars",
-                modifier = Modifier.size(400.dp)
+                modifier = Modifier.size(400.dp),
+
 
 
             )
@@ -425,6 +449,7 @@ fun CelebrationAnimation(
     }
 }
 
+
 fun checkMatch(
     selectedImage: String,
     words: List<Word>,
@@ -433,21 +458,57 @@ fun checkMatch(
     cardSayfaViewModel: CardSayfaViewModel,
     currentGroupIndex: MutableState<Int>,
     showCelebration: MutableState<Boolean>,
-    isGameOver: MutableState<Boolean>
+    isGameOver: MutableState<Boolean>,
+    currentTargetWord: String,  // 🔴 Üstte gösterilen kelime
+    context: Context
 ) {
-    val matchedWord = words.find { it.imageUrl == selectedImage }
-    isMatch.value = matchedWord != null
+    Log.d("checkMatch", "🖼 Seçilen Görsel URL: $selectedImage")
+    Log.d("checkMatch", "🔠 Hedef Kelime: $currentTargetWord")  // 🔴 Üstteki kelimeyi loga bas
 
-    if (isMatch.value) {
-        matchedItem.value = matchedWord?.nameEn
-        matchedWord?.let { cardSayfaViewModel.removeWord(it) }
+    words.forEach { word ->
+        Log.d("checkMatch", "🔎 Kontrol Edilen: ${word.nameEn} | Görsel URL: ${word.imageUrl}")
+    }
+
+    // Seçilen görseli liste içinde bul
+    val matchedWord = words.find { it.imageUrl.trim() == selectedImage.trim() }
+
+    if (matchedWord != null && matchedWord.nameEn.equals(currentTargetWord, ignoreCase = true)) {
+        // 🔥 Eğer hem görsel doğru hem de üstteki kelimeyle eşleşiyorsa doğru eşleşme
+        isMatch.value = true
+        matchedItem.value = matchedWord.nameEn
+
+        Log.d("checkMatch", "✅ DOĞRU EŞLEŞME! Kelime: ${matchedWord.nameEn}")
+
+        playSoundEffect(context, R.raw.correctshort)
+
+        // Eşleşen kelimeyi listeden kaldır
+        matchedWord.let { cardSayfaViewModel.removeWord(it) }
 
         if (cardSayfaViewModel.shuffledWords.none { it.isVisible }) {
-           showCelebration.value=true
-            cardSayfaViewModel.loadNextGroup(currentGroupIndex.value,3,isGameOver)
+            showCelebration.value = true
+            cardSayfaViewModel.loadNextGroup(currentGroupIndex.value, 3, isGameOver)
         }
+    } else {
+        // 🚨 Yanlış eşleşme (ya görsel yanlış ya da kelime yanlış)
+        isMatch.value = false
+        Log.d("checkMatch", "❌ YANLIŞ EŞLEŞME! Seçilen: ${matchedWord?.nameEn ?: "Bulunamadı"}")
+        playSoundEffect(context, R.raw.wrong)
     }
 }
+
+
+
+
+
+
+
+
+fun playSoundEffect(context: Context, resId: Int) {
+    val mediaPlayer = MediaPlayer.create(context, resId)
+    mediaPlayer?.start()
+    mediaPlayer?.setOnCompletionListener { it.release() }
+}
+
 
 
 

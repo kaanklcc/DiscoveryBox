@@ -55,6 +55,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -77,6 +79,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
     var isFlipped by remember { mutableStateOf(false) } // Kartın dönme durumu
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     val context = LocalContext.current
+    val delbold= FontFamily(Font(R.font.delbold))
 
 
     val gradientBackground = Brush.verticalGradient(
@@ -115,7 +118,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                         text = /*"Word Quiz"*/stringResource(R.string.WordQuiz),
                         fontSize = 45.sp,
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,fontFamily = delbold
                     )
                 },
                 modifier = Modifier.background(Color.Transparent),
@@ -198,7 +201,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                         style = TextStyle(
                                             color = Color.Black,
                                             fontSize = 18.sp
-                                        )
+                                        ),fontFamily = delbold
                                     )
                                 }
 
@@ -247,7 +250,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                 currentIndex = (currentIndex + 1) % wordList.size
                             }
                         ) {
-                            Text("Next", fontSize = 30.sp, color = Color.White)
+                            Text("Next", fontSize = 30.sp, color = Color.White,fontFamily = delbold)
                         }
                     }
                 } else {
@@ -258,7 +261,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                             .background(Color.White),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = /*"Cards Are Loading..."*/stringResource(R.string.CardsAreLoading___))
+                        Text(text = /*"Cards Are Loading..."*/stringResource(R.string.CardsAreLoading___),fontFamily = delbold)
                     }
                 }
             }
@@ -295,6 +298,7 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     val context = LocalContext.current
     var isPlaying by remember { mutableStateOf(false) }
+    val delbold= FontFamily(Font(R.font.delbold))
 
     DisposableEffect(key1 = context) {
 
@@ -346,7 +350,7 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
             color = Color.White,
             fontSize = 60.sp,
             fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,fontFamily = delbold
 
         )
 

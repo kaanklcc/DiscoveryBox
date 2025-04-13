@@ -72,6 +72,8 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
     val delbold= FontFamily(Font(R.font.delbold))
     val saveMessage = stringResource(R.string.Storyandimagesavedsuccessfully)
     val saveFail = stringResource(R.string.UserSessionMessage)
+    val language = stringResource(R.string.language)
+    val country = stringResource(R.string.country)
 
     fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
@@ -96,7 +98,7 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("en", "US"))
+                val result = textToSpeech?.setLanguage(Locale(/*"en"*/language, /*"US"*/country))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }
@@ -377,6 +379,10 @@ fun Metin(navController: NavController, hikayeViewModel: HikayeViewModel,metinVi
         }
     }
 
+
+
+
+
 }
 
 
@@ -389,6 +395,8 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     var audioVisible by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
+    val language = stringResource(R.string.language)
+    val country = stringResource(R.string.country)
 
     val infiniteTransition = rememberInfiniteTransition()
     val barHeights = List(6) { index ->
@@ -421,7 +429,7 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("en", "US"))
+                val result = textToSpeech?.setLanguage(Locale(/*"en"*/language, /*"US"*/country))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }
@@ -551,6 +559,8 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     var audioVisible by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
+    val language = stringResource(R.string.language)
+    val country = stringResource(R.string.country)
 
     val infiniteTransition = rememberInfiniteTransition()
     val barHeights = List(6) { index ->
@@ -583,7 +593,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("en", "US"))
+                val result = textToSpeech?.setLanguage(Locale(/*"en"*/language, /*"US"*/country))
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     Log.e("TextToSpeech", "Dil desteklenmiyor.")
                 }

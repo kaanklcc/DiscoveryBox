@@ -19,6 +19,7 @@ import com.kaankilic.discoverybox.viewmodel.GirisSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.KayitSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
+import com.kaankilic.discoverybox.viewmodel.NumberGameViewModel
 import com.kaankilic.discoverybox.viewmodel.SaveSayfaViewModel
 
 @Composable
@@ -32,6 +33,7 @@ fun SayfaGecisleri(
     kayitSayfaViewModel: KayitSayfaViewModel,
     saveSayfaViewModel: SaveSayfaViewModel,
     cardSayfaViewModel: CardSayfaViewModel,
+    numberGameViewModel: NumberGameViewModel
 
 
     ) {
@@ -101,6 +103,10 @@ fun SayfaGecisleri(
             LoginSplashScreen(navController)
 
         }
+        composable("numberGame"){
+        NumberGameScreen(navController,numberGameViewModel)
+
+    }
 
     }
     

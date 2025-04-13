@@ -25,7 +25,7 @@ fun getAllGames(): List<Story>{
         Story("wordGame", R.drawable.words,"wordGame"),
         Story("matchingGame", R.drawable.matching,"matchingGame"),
         Story("colorGame", R.drawable.colour,"colorGame"),
-        Story("rakam", R.drawable.numbers,"guncelHayat"),
+        Story("numberGame", R.drawable.numbers,"numberGame"),
         Story("duyuOrgan", R.drawable.sense,"diger"),
     )
 }

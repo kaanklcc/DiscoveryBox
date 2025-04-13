@@ -1,5 +1,6 @@
 package com.kaankilic.discoverybox.view
 
+import android.media.MediaPlayer
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.Toast
@@ -41,6 +42,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -61,8 +64,15 @@ fun GameScreen(viewModel: GameViewModel) {
     val currentData by viewModel.currentData.collectAsState()
     val right = stringResource(R.string.Right)
     val wrong = stringResource(R.string.Wrong)
+    val delbold= FontFamily(Font(R.font.delbold))
 
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
+
+    fun playSoundEffect(resId: Int) {
+        val mediaPlayer = MediaPlayer.create(context, resId)
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener { it.release() }
+    }
 
     DisposableEffect(key1 = context) {
 
@@ -90,7 +100,7 @@ fun GameScreen(viewModel: GameViewModel) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text(text = /*"COLOR MATCHINGG GAME"*/stringResource(R.string.COLORMATCHINGGAME), fontSize = 35.sp, textAlign = TextAlign.Center) },
+                    title = { Text(text = /*"COLOR MATCHINGG GAME"*/stringResource(R.string.COLORMATCHINGGAME), fontSize = 35.sp, textAlign = TextAlign.Center,fontFamily = delbold) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = getColorFromName(currentColour), // Dinamik renk burada
                         titleContentColor = Color.Black, // Başlık rengi
@@ -146,7 +156,7 @@ fun GameScreen(viewModel: GameViewModel) {
                                     style = TextStyle(
                                         color = Color.Black,
                                         fontSize = 15.sp
-                                    )
+                                    ),fontFamily = delbold
                                 )
                             }
                         }
@@ -159,7 +169,7 @@ fun GameScreen(viewModel: GameViewModel) {
                         fontSize = 55.sp,
                         fontStyle = FontStyle.Italic,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.offset(y=(-45).dp)
+                        modifier = Modifier.offset(y=(-45).dp),fontFamily = delbold
 
                     )
                     // Seslendirme İkonu
@@ -189,6 +199,7 @@ fun GameScreen(viewModel: GameViewModel) {
                                     .size(100.dp)
                                     .clickable {
                                         if (word.colour == currentColour) {
+                                            playSoundEffect(R.raw.correctshort)
                                             Toast.makeText(
                                                 context, // Burada context kullanıyoruz
                                                 /*"Right!"*/right,
@@ -196,6 +207,7 @@ fun GameScreen(viewModel: GameViewModel) {
                                             ).show()
                                             viewModel.loadNewData()
                                         } else {
+                                            playSoundEffect(R.raw.wrong)
                                             Toast.makeText(
                                                 context,
                                                 /*"Wrong!"*/wrong,

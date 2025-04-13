@@ -28,6 +28,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +41,7 @@ import com.kaankilic.discoverybox.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HikayeGecis(navController: NavController) {
+    val delbold= FontFamily(Font(R.font.delbold))
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -51,7 +54,7 @@ fun HikayeGecis(navController: NavController) {
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = /*"STORY"*/stringResource(R.string.Story), fontSize = 35.sp, textAlign = TextAlign.Center) }
+            CenterAlignedTopAppBar(title = { Text(text = stringResource(R.string.Story), fontSize = 35.sp, textAlign = TextAlign.Center,fontFamily = delbold) }
                 ,colors = TopAppBarColors( Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF81D4FA), Color.White, Color.White))
 
         }
@@ -68,7 +71,9 @@ fun HikayeGecis(navController: NavController) {
                     .weight(1f)
                     .padding(12.dp)
                     .clip(RoundedCornerShape(60.dp))
-                    .clickable { navController.navigate("hikaye") }
+                    .clickable { navController.navigate("hikaye")
+
+                    }
                     .background(Color.Transparent)
             ) {
                 Image(
@@ -95,6 +100,7 @@ fun HikayeGecis(navController: NavController) {
                     color = Color.White,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = delbold,
                     modifier = Modifier
                         .align(Alignment.TopCenter) // Yazıyı ortalar
                         .padding(8.dp)
@@ -132,6 +138,7 @@ fun HikayeGecis(navController: NavController) {
                     color = Color.White,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = delbold,
                     modifier = Modifier
                         .align(Alignment.TopCenter) // Yazıyı ortalar
                         .padding(8.dp)
