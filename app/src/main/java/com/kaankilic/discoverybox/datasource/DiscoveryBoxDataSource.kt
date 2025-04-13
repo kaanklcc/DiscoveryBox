@@ -36,7 +36,7 @@ class DiscoveryBoxDataSource {
     }
 
     private val generativeModel = GenerativeModel(
-        modelName = "gemini-1.5-flash",
+        modelName = "gemini-2.0-flash",
         apiKey = "AIzaSyDqVkaCBrlFoa9h_PQOj5VsHhrph5O2Cio"
     )
 
