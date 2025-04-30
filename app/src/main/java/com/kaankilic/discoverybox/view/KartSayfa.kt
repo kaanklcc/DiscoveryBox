@@ -6,40 +6,35 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
+
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,8 +58,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Word
 import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
@@ -80,6 +73,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     val context = LocalContext.current
     val delbold= FontFamily(Font(R.font.delbold))
+    val currentLang = context.resources.configuration.locales[0].language
 
 
     val gradientBackground = Brush.verticalGradient(
@@ -115,8 +109,8 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
             CenterAlignedTopAppBar(
                 title = {
                     androidx.compose.material3.Text(
-                        text = /*"Word Quiz"*/stringResource(R.string.WordQuiz),
-                        fontSize = 45.sp,
+                        text = stringResource(R.string.WordQuiz),
+                        fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,fontFamily = delbold
                     )
@@ -151,9 +145,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
 
             Column(
                 modifier = Modifier.fillMaxSize()
-                   // .padding(paddingValues)
                     .fillMaxSize(),
-                  // .padding(WindowInsets.systemBars.asPaddingValues()),
                 verticalArrangement = Arrangement.SpaceEvenly,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -196,11 +188,10 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                 )
                                 {
                                     Text(
-                                        text = /* "Welcome !. " +
-                                                "Let's learn the words"*/stringResource(R.string.WordLearnWelcomeMessage),
+                                        text = stringResource(R.string.WordLearnWelcomeMessage),
                                         style = TextStyle(
                                             color = Color.Black,
-                                            fontSize = 18.sp
+                                            fontSize = 12.sp
                                         ),fontFamily = delbold
                                     )
                                 }
@@ -210,8 +201,6 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
 
 
                         }
-
-                       // Spacer(modifier = Modifier.height(20.dp))
 
                         // Kart Animasyonu
                         val rotation by animateFloatAsState(
@@ -250,7 +239,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                 currentIndex = (currentIndex + 1) % wordList.size
                             }
                         ) {
-                            Text("Next", fontSize = 30.sp, color = Color.White,fontFamily = delbold)
+                            Text("Next", fontSize = 22.sp, color = Color.White,fontFamily = delbold)
                         }
                     }
                 } else {
@@ -297,8 +286,9 @@ fun FrontCardContent(word: Word) {
 fun BackCardContent(word: Word, flipped: Boolean = false) {
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     val context = LocalContext.current
-    var isPlaying by remember { mutableStateOf(false) }
     val delbold= FontFamily(Font(R.font.delbold))
+    val currentLang = context.resources.configuration.locales[0].language
+    val displayText = if (currentLang == "tr") word.nameTr else word.nameEn
 
     DisposableEffect(key1 = context) {
 
@@ -346,9 +336,9 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
     ) {
         // İngilizce Kelime
         Text(
-            text = word.nameEn,
+            text = displayText,
             color = Color.White,
-            fontSize = 60.sp,
+            fontSize = 45.sp,
             fontStyle = FontStyle.Italic,
             fontWeight = FontWeight.Bold,fontFamily = delbold
 
@@ -365,7 +355,7 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
                 .clip(CircleShape) // Yuvarlak yapmak için CircleShape kullanılır
                 .background(Color.LightGray) // İsteğe bağlı arka plan rengi
                 .clickable {
-                    textToSpeech?.speak(word.nameEn, TextToSpeech.QUEUE_FLUSH, null, null)
+                    textToSpeech?.speak(displayText, TextToSpeech.QUEUE_FLUSH, null, null)
                 }
         )
     }
@@ -373,11 +363,5 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
 
 }
 
-
-
-@Composable
-fun AppScreen() {
-    MeyveKartSirali()
-}
 
 

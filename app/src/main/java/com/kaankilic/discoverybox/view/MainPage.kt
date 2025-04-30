@@ -30,14 +30,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +42,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -61,30 +56,26 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage() {
-    //val konular by anasayfaViewModel.konular.observeAsState(emptyList()) // Boş bir liste ile başlatıyoruz
+
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showDialog by remember { mutableStateOf(false) }
-    var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
     val message = stringResource(R.string.logOutMessage)
     val actionLabel = stringResource(R.string.Yes)
     val exitedApp = stringResource(R.string.exitMessage)
-    val wrongPassword = stringResource(R.string.WrongPassword)
-    val context = LocalContext.current
+
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
             Color(0xFFFCD7D7), // Sarı
             Color(0xFFB0D2FD), // Açık Mavi
-           // Color(0xFFFF8A80)  // Pembe
+
         )
     )
     val gradientBrush2 = Brush.linearGradient(
         colors = listOf(
             Color(0xFFC5FCC6), // Sarı
             Color(0xFFFCC1FC), // Açık Mavi
-            // Color(0xFFFF8A80)  // Pembe
+
         )
     )
 
@@ -111,13 +102,11 @@ fun MainPage() {
                             scope.launch {
                                 val sb = snackbarHostState
                                     .showSnackbar(
-                                        message = /*"Do you want to log out?"*/message,
-                                        actionLabel = /*"Yes"*/actionLabel
+                                        message = message,
+                                        actionLabel = actionLabel
                                     )
                                 if (sb == SnackbarResult.ActionPerformed) {
-                                    snackbarHostState.showSnackbar(message = /*"exited the application"*/exitedApp)
-                                    /*anasayfaViewModel.signOut()
-                                    navController.navigate("girisSayfa")*/
+                                    snackbarHostState.showSnackbar(message = exitedApp)
 
                                 }
                             }
@@ -141,7 +130,7 @@ fun MainPage() {
 
         if ("blabla"=="blala") {
             Text(
-                text = /*"There is no story to show"*/stringResource(R.string.NoStoryMessage),
+                text = stringResource(R.string.NoStoryMessage),
                 modifier = Modifier.padding(paddingValues).fillMaxSize(),
                 textAlign = TextAlign.Center
             )
@@ -275,9 +264,7 @@ fun MainPage() {
                                 .fillMaxWidth()
                                 .height(50.dp),
                             shape = RoundedCornerShape(12.dp),
-                            // .padding(horizontal = 16.dp),
                             onClick = {
-                                // Buton aksiyonu
                             }, colors = ButtonDefaults.buttonColors(Color(0xFFFA6868))
                         ) {
                             Text("Play Time", fontWeight = FontWeight.Bold, fontSize = 22.sp)

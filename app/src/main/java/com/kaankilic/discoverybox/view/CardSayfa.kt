@@ -74,7 +74,6 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
     val words = cardSayfaViewModel.words
     val shuffledWords = cardSayfaViewModel.shuffledWords
     val shuffledImages = cardSayfaViewModel.shuffledImages
-    val selectedWord = remember { mutableStateOf("") }
     val selectedImage = remember { mutableStateOf("") }
     val isMatch = remember { mutableStateOf(false) }
     val currentGroupIndex = remember { mutableStateOf(0) }
@@ -82,9 +81,10 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
     val showCelebration = remember { mutableStateOf(false) }
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     val context = LocalContext.current
-    var isPlaying by remember { mutableStateOf(false) }
     val isGameOver = remember { mutableStateOf(false) }
     val delbold= FontFamily(Font(R.font.delbold))
+    val currentLang = context.resources.configuration.locales[0].language
+
 
 
 
@@ -109,8 +109,8 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
     }
 
 
-    val infiniteTransition = rememberInfiniteTransition()
-    val animatedAlpha = infiniteTransition.animateFloat(
+   val infiniteTransition = rememberInfiniteTransition()
+   val animatedAlpha = infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = 0.5f,
         animationSpec = infiniteRepeatable(
@@ -139,8 +139,9 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                 title = {
                     Text(
                         text = /*"MATCHING GAME"*/stringResource(R.string.MATCHINGGAME),
-                        fontSize = 40.sp,
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
                         fontFamily = delbold
                     )
                 },
@@ -190,7 +191,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                     )
 
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().padding(top = 4.dp),
                   // verticalArrangement = Arrangement.spacedBy(10.dp),
                     verticalArrangement = Arrangement.SpaceEvenly,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -241,11 +242,11 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                         .align(Alignment.CenterVertically)
                                 )
                                 {
-                                    androidx.compose.material.Text(
+                                    Text(
                                         text = stringResource(R.string.matchWelcomeMessage),
                                         style = TextStyle(
                                             color = Color.Black,
-                                            fontSize = 18.sp,
+                                            fontSize = 12.sp,
                                             fontFamily = delbold
                                         )
                                     )
@@ -287,6 +288,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     items(currentWords) { word ->
+                                        val displayText = if (currentLang == "tr") word.nameTr else word.nameEn
 
                                         Box(
                                             modifier = Modifier
@@ -297,7 +299,6 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                         ) {
                                             Column(
                                                 modifier = Modifier
-                                                   // .size(300.dp, 300.dp)
                                                     .padding(2.dp)
                                                     .padding(6.dp),
                                                 verticalArrangement = Arrangement.Center,
@@ -305,14 +306,14 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                             ) {
 
                                                 Text(
-                                                    text = word.nameEn,
+                                                    text = displayText,
                                                     color = Color.White,
                                                     fontSize = 70.sp,
                                                     fontStyle = FontStyle.Italic,
                                                     textAlign = TextAlign.Center
                                                 )
 
-                                                Spacer(modifier = Modifier.height(5.dp))
+                                                Spacer(modifier = Modifier.height(8.dp))
 
                                                 Image(
                                                     painter = painterResource(id = R.drawable.greenvoice),
@@ -322,7 +323,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                                         .clip(CircleShape)
                                                         //.background(Color.LightGray)
                                                         .clickable {
-                                                            textToSpeech?.speak(word.nameEn, TextToSpeech.QUEUE_FLUSH, null, null)
+                                                            textToSpeech?.speak(displayText, TextToSpeech.QUEUE_FLUSH, null, null)
                                                         }
                                                         .aspectRatio(1f),
                                                     contentScale = ContentScale.Fit
@@ -366,7 +367,8 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
 
 
                                                     )
-                                                },    contentScale = ContentScale.Crop // Resmi kırpmadan büyütmek için
+                                                },
+                                            contentScale = ContentScale.Fit // Crop yerine Cover ya da Fit dene
 
                                         )
                                     }
@@ -416,9 +418,9 @@ fun CelebrationAnimation(
 
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = /*"Congratulations!"*/stringResource(R.string.Congratulations),
+                text = stringResource(R.string.Congratulations),
                 color = Color.White,
-                fontSize = 40.sp,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = delbold
 

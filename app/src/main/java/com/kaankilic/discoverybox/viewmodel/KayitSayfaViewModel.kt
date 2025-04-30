@@ -1,24 +1,25 @@
 package com.kaankilic.discoverybox.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.AuthCredential
+
 import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
+import com.kaankilic.discoverybox.util.GoogleAuthViewModel
+import kotlinx.coroutines.launch
 
-class KayitSayfaViewModel : ViewModel() {
+class KayitSayfaViewModel : ViewModel(),GoogleAuthViewModel {
     var dbRepo= DiscoveryBoxRepository()
-
     val signUpResult = MutableLiveData<Pair<Boolean, String?>>()
-
     val saveUserResult = MutableLiveData<Pair<Boolean, String?>>()
+    val googleSignInResult = MutableLiveData<Pair<Boolean, String?>>()
 
 
     fun signUpWithEmail(email: String, password: String)  {
         dbRepo.signUpWithEmail(email,password){ success,message ->
             signUpResult.value=Pair(success,message)
-
-
         }
     }
 
@@ -27,6 +28,33 @@ class KayitSayfaViewModel : ViewModel() {
             saveUserResult.value = Pair(success, message)
         }
     }
+
+    /*fun signInWithGoogleCredential(
+        credential: AuthCredential,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        dbRepo.signInWithGoogle(credential) { isSuccess, message ->
+            if (isSuccess) {
+                onSuccess()
+            } else {
+                Log.e("GoogleSignIn", message ?: "Bilinmeyen hata")
+                onFailure()
+            }
+        }
+    }*/
+
+    override fun signInWithGoogleCredential(
+        credential: AuthCredential,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
+    ) {
+        dbRepo.signInWithGoogle(credential) { isSuccess, _ ->
+            if (isSuccess) onSuccess() else onFailure()
+        }
+    }
+
+
 
 
 }

@@ -8,3 +8,7 @@ data class Word(
     var isVisible: Boolean = true // Varsayılan olarak görünür
 )
 
+
+
+
+

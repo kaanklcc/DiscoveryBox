@@ -24,7 +24,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -62,9 +61,9 @@ import java.util.Locale
 fun GameScreen(viewModel: GameViewModel) {
     val context = LocalContext.current
     val currentData by viewModel.currentData.collectAsState()
-    val right = stringResource(R.string.Right)
-    val wrong = stringResource(R.string.Wrong)
     val delbold= FontFamily(Font(R.font.delbold))
+    val currentLang = context.resources.configuration.locales[0].language
+
 
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
 
@@ -100,7 +99,7 @@ fun GameScreen(viewModel: GameViewModel) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text(text = /*"COLOR MATCHINGG GAME"*/stringResource(R.string.COLORMATCHINGGAME), fontSize = 35.sp, textAlign = TextAlign.Center,fontFamily = delbold) },
+                    title = { Text(text =stringResource(R.string.COLORMATCHINGGAME), fontSize = 30.sp, textAlign = TextAlign.Center,fontFamily = delbold) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = getColorFromName(currentColour), // Dinamik renk burada
                         titleContentColor = Color.Black, // Başlık rengi
@@ -127,7 +126,7 @@ fun GameScreen(viewModel: GameViewModel) {
                     Box(
                         modifier = Modifier.fillMaxWidth().height(200.dp)
                     ){
-                        Row(modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                        Row(modifier = Modifier.fillMaxWidth().padding(end = 16.dp, top = 5.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
 
@@ -151,11 +150,10 @@ fun GameScreen(viewModel: GameViewModel) {
                             )
                             {
                                 androidx.compose.material.Text(
-                                    text = /* "Welcome again!." +
-                                            "Let's find the right colors"*/stringResource(R.string.ColorWelcomeMessage),
+                                    text = stringResource(R.string.ColorWelcomeMessage),
                                     style = TextStyle(
                                         color = Color.Black,
-                                        fontSize = 15.sp
+                                        fontSize = 14.sp
                                     ),fontFamily = delbold
                                 )
                             }
@@ -164,7 +162,7 @@ fun GameScreen(viewModel: GameViewModel) {
                     }
                     // İngilizce Renk
                     Text(
-                        text = currentColour,
+                        text =  getLocalizedColorName(currentColour, currentLang),
                         color = Color.Black,
                         fontSize = 55.sp,
                         fontStyle = FontStyle.Italic,
@@ -182,7 +180,8 @@ fun GameScreen(viewModel: GameViewModel) {
                             .clip(CircleShape) // Yuvarlak yapmak için CircleShape kullanılır
                             .background(Color.LightGray) // İsteğe bağlı arka plan rengi
                             .clickable {
-                                textToSpeech?.speak(currentColour, TextToSpeech.QUEUE_FLUSH, null, null)
+                                val toSpeak = getLocalizedColorName(currentColour, currentLang)
+                                textToSpeech?.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null, null)
                             }
                     )
 
@@ -200,19 +199,11 @@ fun GameScreen(viewModel: GameViewModel) {
                                     .clickable {
                                         if (word.colour == currentColour) {
                                             playSoundEffect(R.raw.correctshort)
-                                            Toast.makeText(
-                                                context, // Burada context kullanıyoruz
-                                                /*"Right!"*/right,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+
                                             viewModel.loadNewData()
                                         } else {
                                             playSoundEffect(R.raw.wrong)
-                                            Toast.makeText(
-                                                context,
-                                                /*"Wrong!"*/wrong,
-                                                Toast.LENGTH_SHORT
-                                            ).show()
+
                                         }
                                     }
                             )
@@ -243,6 +234,25 @@ fun getColorFromName(colorName: String): Color {
         else -> Color.White// Tanımlı olmayan renkler için varsayılan renk
     }
 }
+
+fun getLocalizedColorName(color: String, lang: String): String {
+    return when (lang) {
+        "tr" -> when (color.lowercase()) {
+            "red" -> "Kırmızı"
+            "blue" -> "Mavi"
+            "yellow" -> "Sarı"
+            "green" -> "Yeşil"
+            "orange" -> "Turuncu"
+            "purple" -> "Mor"
+            "black" -> "Siyah"
+            "white" -> "Beyaz"
+            "brown" -> "Kahverengi"
+            else -> color
+        }
+        else -> color // English default
+    }
+}
+
 @Composable
 fun GameApp() {
     val viewModel: GameViewModel = viewModel()

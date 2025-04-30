@@ -2,18 +2,12 @@
 
 package com.kaankilic.discoverybox.view
 
+import android.media.MediaPlayer
 import android.util.Log
-import android.view.MotionEvent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,29 +30,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.pointerInteropFilter
-import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -74,7 +60,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.viewmodel.NumberGameViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun NumberGameScreen(navController: NavController, numberGameViewModel: NumberGameViewModel) {
@@ -87,7 +72,7 @@ fun NumberGameScreen(navController: NavController, numberGameViewModel: NumberGa
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text ="Drag And Drop", fontSize = 24.sp, textAlign = TextAlign.Center,fontFamily = delbold) },
+                title = { Text(text = stringResource(R.string.DragAndDrop), fontSize = 24.sp, textAlign = TextAlign.Center,fontFamily = delbold) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFEF2D81), // Dinamik renk burada
                     titleContentColor = Color.White, // Başlık rengi
@@ -138,10 +123,10 @@ fun NumberGameScreen(navController: NavController, numberGameViewModel: NumberGa
                         )
                         {
                             Text(
-                                text = "Doğru numaraları renklerle eşleştir",
+                                text = stringResource(R.string.numaraeslestir),
                                 style = TextStyle(
                                     color = Color.Black,
-                                    fontSize = 12.sp,fontFamily = delbold
+                                    fontSize = 14.sp,fontFamily = delbold
                                 )
                             )
                         }
@@ -165,19 +150,22 @@ fun NumberGameScreen(navController: NavController, numberGameViewModel: NumberGa
                     }
                 }
 
-
-
                 Spacer(modifier = Modifier.height(20.dp))
                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    items.forEach { item ->
-                        DraggableNumber(
-                            number = item.numara,
-                            draggingState = draggingState,
-                            numberGameViewModel = numberGameViewModel,
-                            dropPosition = dropPosition  // dropPosition'ı geçiyoruz
-                        )
-                    }
-                }
+
+                   numberGameViewModel.numberItems.forEach { number ->
+                       DraggableNumber(
+                           number = number,
+                           draggingState = draggingState,
+                           numberGameViewModel = numberGameViewModel,
+                           dropPosition = dropPosition
+                       )
+                   }
+
+               }
+
+
+
             }
         }
     }
@@ -246,6 +234,7 @@ fun DroppableImage(
 ) {
     val painter = rememberAsyncImagePainter(imageUrl)
     if (!numberGameViewModel.isNumberVisible(expectedNumber)) return
+    val context = LocalContext.current
 
     var boxPosition by remember { mutableStateOf(Rect.Zero) }
     val currentDropPosition = rememberUpdatedState(dropPosition.value)  // En güncel değeri al
@@ -253,8 +242,13 @@ fun DroppableImage(
     // UI değiştiğinde pozisyonları sıfırla ve tekrar hesapla
     LaunchedEffect(imageUrl, expectedNumber) {
         delay(50) // UI tamamen değişsin diye bekleyelim
-        //boxPosition = Rect.Zero
         Log.d("DragDrop", "🔄 UI değişti, Box Pozisyonları sıfırlandı!")
+    }
+
+    fun playSoundEffect(resId: Int) {
+        val mediaPlayer = MediaPlayer.create(context, resId)
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener { it.release() }
     }
 
 
@@ -266,9 +260,12 @@ fun DroppableImage(
 
                 if (adjustedBoxPosition.contains(dropped)) {
                     Log.d("DragDrop", "✅ Doğru eşleşme: $expectedNumber")
+                    playSoundEffect(R.raw.correctshort)
                     numberGameViewModel.setDroppedCorrectly(expectedNumber)
                     draggingState.value = null
                     dropPosition.value = null // Drop pozisyonunu sıfırla
+                }else{
+                    playSoundEffect(R.raw.wrong)
                 }
             }
         }

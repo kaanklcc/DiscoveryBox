@@ -1,22 +1,20 @@
 package com.kaankilic.discoverybox.view
 
+import android.app.Activity
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -41,15 +39,13 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextAlign.Companion.Start
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.kaankilic.discoverybox.R
+import com.kaankilic.discoverybox.util.GoogleSignInHelper
 import com.kaankilic.discoverybox.viewmodel.KayitSayfaViewModel
 
 @Composable
@@ -63,16 +59,34 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
     val signUpResult by kayitSayfaViewModel.signUpResult.observeAsState()
     val context = LocalContext.current
     val regSuc = stringResource(R.string.Registrationsuccessful)
-    val regFail = stringResource(R.string.Registrationfailed)
     val delbold= FontFamily(Font(R.font.delbold))
+    val activity = context as Activity
+
+
 
     fun getCurrentUserId(): String? {
         return auth.currentUser?.uid
     }
 
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        GoogleSignInHelper.handleGoogleSignInResult(
+            data = result.data,
+            viewModel = kayitSayfaViewModel,
+            onSuccess = {
+                navController.navigate("anasayfa")
+            },
+            onFailure = {
+                Toast.makeText(context, "Giriş başarısız", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
+
+
 
     Scaffold(
-
     ) { paddingValues ->
 
 
@@ -110,13 +124,13 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                 }
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
-                    /*"WELCOME TO "*/stringResource(R.string.WELCOMETO),
+                    stringResource(R.string.WELCOMETO),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
                     color = Color.DarkGray,fontFamily = delbold
                 )
                 Text(
-                    /*"Discovery Box"*/stringResource(R.string.DiscoveryBox),
+                    stringResource(R.string.DiscoveryBox),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 30.sp,
                     color = Color.DarkGray,fontFamily = delbold
@@ -142,14 +156,14 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                                 .clip(RoundedCornerShape(20.dp)),
                             value = ad,
                             onValueChange = { ad = it },
-                            label = { Text(text = /*"Name"*/stringResource(R.string.Name), textAlign = Start) },
+                            label = { Text(text = stringResource(R.string.Name), textAlign = Start) },
                         )
                         TextField(
                             modifier = Modifier.padding(start = 20.dp, end = 20.dp)
                                 .clip(RoundedCornerShape(20.dp)),
                             value = soyad,
                             onValueChange = { soyad = it },
-                            label = { Text(text = /*"Surname"*/stringResource(R.string.Surname), textAlign = Start) },
+                            label = { Text(text =stringResource(R.string.Surname), textAlign = Start) },
                         )
 
 
@@ -192,7 +206,7 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                                             navController.navigate("anasayfa")
                                             Toast.makeText(
                                                 context,
-                                                /*"Registration successful"*/regSuc,
+                                              regSuc,
                                                 Toast.LENGTH_SHORT
                                             ).show()
                                         } else {
@@ -210,9 +224,30 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                             },
                             colors = ButtonDefaults.buttonColors(Color(0xFFFF5D9C))//9148fc
                         ) {
-                            Text(text = /*"Sign Up"*/stringResource(R.string.SignUp), color = Color.White, fontWeight = FontWeight.ExtraBold
+                            Text(text = stringResource(R.string.SignUp), color = Color.White, fontWeight = FontWeight.ExtraBold
                                 , fontSize = 20.sp)
                         }
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Button(
+                            onClick = {
+                                GoogleSignInHelper.signInWithGoogle(
+                                    context = context,
+                                    launcher = googleSignInLauncher,
+                                    //activity = activity
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp)
+                                .clip(RoundedCornerShape(10.dp)),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF4285F4))
+                        ) {
+                            Text("Google ile Kayıt Ol", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+
+
+
 
                     }
                 }

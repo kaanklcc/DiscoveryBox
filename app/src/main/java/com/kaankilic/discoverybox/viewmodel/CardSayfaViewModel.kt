@@ -1,20 +1,16 @@
 package com.kaankilic.discoverybox.viewmodel
 
-import androidx.compose.material.Text
+
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kaankilic.discoverybox.entitiy.Word
-import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
 import kotlinx.coroutines.launch
 
 
 class CardSayfaViewModel : ViewModel() {
-    var dbRepo= DiscoveryBoxRepository()
     private val firestore = FirebaseFirestore.getInstance()
     val words = mutableStateListOf<Word>()
 

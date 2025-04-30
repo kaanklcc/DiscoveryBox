@@ -19,7 +19,7 @@
     <string name="matchWelcomeMessage">"Welcome!.Let's match the words</string>
     <string name="Congratulations">Congratulations</string>
 
-    <string name="COLORMATCHINGGAME">COLOR MATCHINGG GAME</string>
+    <string name="COLORMATCHINGGAME">COLOR MATCHING GAME</string>
     <string name="ColorWelcomeMessage">"Welcome!Let's find the right colors"</string>
     <string name="Right">Right!</string>
     <string name="Wrong">Wrong!</string>
@@ -34,6 +34,8 @@
     <string name="LoginFailed">Login Failed:</string>
     <string name="NewToDiscoveryBox">New To DiscoveryBox?</string>
     <string name="SignUp">Sign Up</string>
+
+    <string name="default_web_client_id">764790962175-86cdpa0e5vi52scv1incbf4e7dph73m6.apps.googleusercontent.com</string>
 
 
 
@@ -84,7 +86,7 @@
 
 
 
-    <string name="YOURSTORY">YOUR STORY</string>
+    <string name="YOURSTORY">YOUR STORIES</string>
     <string name="Storyisbeingcreated...">Story is being created...</string>
     <string name="Imageisbeingcreated..">Image is being created..</string>
     <string name="Convertedtosound...">Converted to sound...</string>
@@ -109,6 +111,40 @@
 
     <string name="language">en</string>
     <string name="country">US</string>
+
+
+    <string name="EducationalGames">Educational Games</string>
+    <string name="Learnwhileplaying">Learn while playing!</string>
+    <string name="CreateStorieswithAI">Create Stories with AI!</string>
+    <string name="Letyourimaginationfly">Let your imagination fly!</string>
+
+    <string name="HakkınızTükendi">Your membership has expired!</string>
+    <string name="haktükendiuzun">You can purchase a membership to continue or continue with the free version.</string>
+    <string name="ÜyelikAl">Get Membership</string>
+    <string name="ÜcretsizDevamEt">Continue for Free</string>
+
+    <string name="HikayeSİlindi">Story deleted</string>
+
+    <string name="DragAndDrop">Drag And Drop</string>
+    <string name="numaraeslestir">Match the correct numbers with the correct colors</string>
+
+
+
+    <string name="storyfriend">Story Friends</string>
+    <string name="wherestory">Where Stories Come Alive!</string>
+    <string name="ogrenoyunla">Learn Through Play</string>
+    <string name="fungames">Fun Educational Games</string>
+    <string name="get">Get</string>
+    <string name="started">Started!</string>
+    <string name="touch">Touch to Begin Your</string>
+    <string name="Advanturemacera">Adventure!</string>
+    <string name="StartNow">Start Now ->!</string>
+    <string name="learn">Learn &amp; Play</string>
+    <string name="play">Play</string>
+    <string name="andmore">Colors, Words and More</string>
+
+
+
 
 
 </resources>

@@ -1,8 +1,6 @@
 package com.kaankilic.discoverybox.view
 
-import android.graphics.pdf.PdfDocument.Page
-import android.provider.CalendarContract.Colors
-import androidx.compose.foundation.ExperimentalFoundationApi
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,8 +15,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,21 +24,18 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -63,7 +56,6 @@ fun GradientBackground(colors:List<Color>,modifier: Modifier = Modifier) {
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    //colors = listOf(Color(0xFFDCEEFF), Color(0xFFFAD6FF)), // Açık mavi → Açık pembe
                     colors = colors, // Açık mavi → Açık pembe
                     startY = 0f,
                     endY = Float.POSITIVE_INFINITY
@@ -119,9 +111,6 @@ fun LoginSplashScreen(navController: NavController) {
 
 }
 
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SplashScreen1(navController: NavController) {
     val delbold= FontFamily(Font(R.font.delbold))
@@ -155,15 +144,14 @@ fun SplashScreen1(navController: NavController) {
                         contentScale = ContentScale.Crop, // Görseli kırpmadan ortalar
                         modifier = Modifier
                             .size(150.dp) // Görselin boyutu (çerçeve içinde)
-                        //.clip(CircleShape) // Görselin de yuvarlak olması
                     )
                 }
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text("StoryPals", fontWeight = FontWeight.ExtraBold, fontSize = 40.sp, color = Color.DarkGray,fontFamily = delbold)
+                Text(stringResource(R.string.storyfriend), lineHeight = 40.sp, modifier = Modifier.padding(start = 20.dp), fontWeight = FontWeight.ExtraBold, fontSize = 32.sp, color = Color.DarkGray,fontFamily = delbold)
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Text("Where Stories Come Alive!", fontWeight = FontWeight.Normal, fontSize = 24.sp,fontFamily = delbold)
+                Text(stringResource(R.string.wherestory), fontWeight = FontWeight.Normal, fontSize = 17.sp,fontFamily = delbold, modifier = Modifier.padding(start = 3.dp, end = 3.dp))
                 Spacer(modifier = Modifier.height(60.dp))
 
                 PageIndicator(3,0)
@@ -222,13 +210,13 @@ fun SplashScreen2(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Learn Through Play",
+                    stringResource(R.string.ogrenoyunla),
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 34.sp,
-                    color = Color.DarkGray,fontFamily = delbold
+                    fontSize = 22.sp,
+                    color = Color.Black,fontFamily = delbold, modifier = Modifier.padding(start = 4.dp, end = 4.dp)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Text("Fun Educational Games", fontWeight = FontWeight.Medium, fontSize = 20.sp,fontFamily = delbold)
+                Text(stringResource(R.string.fungames), fontWeight = FontWeight.Medium, fontSize = 14.sp,fontFamily = delbold)
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Row(
@@ -407,20 +395,20 @@ fun SplashScreen3(navController: NavController) {
                 )
                 Spacer(Modifier.height(25.dp))
                 Text(
-                    "Get",
+                    stringResource(R.string.get),
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 40.sp,
+                    fontSize = 32.sp,
                     color = Color.DarkGray,fontFamily = delbold
                 )
                 Text(
-                    "Started!",
+                    stringResource(R.string.started),
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 40.sp,
+                    fontSize = 32.sp,
                     color = Color.DarkGray,fontFamily = delbold
                 )
                 Spacer(Modifier.height(10.dp))
-                Text("Touch to Begin Your", fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
-                Text("Adventure", fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
+                Text(stringResource(R.string.touch), fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
+                Text(stringResource(R.string.Advanturemacera), fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
                 Spacer(Modifier.height(40.dp))
                 Button(
                     modifier = Modifier.size(230.dp, 55.dp),
@@ -435,7 +423,7 @@ fun SplashScreen3(navController: NavController) {
 
                     }
                 ) {
-                    Text("Start Now ->", fontWeight = FontWeight.Normal, fontSize = 20.sp,fontFamily = delbold)
+                    Text(stringResource(R.string.StartNow), fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
                 }
                 Spacer(Modifier.height(20.dp))
                 PageIndicator(3, 2)

@@ -7,3 +7,4 @@ data class NumberItem(
     val numara: String = "",
     var isMatched: Boolean = false // Eşleşme durumu
 )
+

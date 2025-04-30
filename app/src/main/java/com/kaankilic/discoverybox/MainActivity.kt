@@ -1,6 +1,8 @@
 package com.kaankilic.discoverybox
 
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,6 +23,7 @@ import com.kaankilic.discoverybox.viewmodel.KayitSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
 import com.kaankilic.discoverybox.viewmodel.NumberGameViewModel
 import com.kaankilic.discoverybox.viewmodel.SaveSayfaViewModel
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
@@ -35,8 +38,6 @@ class MainActivity : ComponentActivity() {
     val numberGameViewModel:NumberGameViewModel by viewModels()
     val gameViewModel : GameViewModel by viewModels()
 
-
-    //val colorGameViewModel : ColorGameViewModel by viewModels()
 
     private lateinit var auth: FirebaseAuth
     val isEnglish = true
@@ -75,26 +76,25 @@ class MainActivity : ComponentActivity() {
                    numberGameViewModel
 
                 )
-               // SaveSayfa(navController = rememberNavController() , saveSayfaViewModel =saveSayfaViewModel )
-                //GirisSayfa()
-                //KayitSayfa()
-               // Anasayfa(anasayfaViewModel = anasayfaViewModel)
-               // Hikaye()
-               // Dil()
-                //GuncelHayat()
-                //Bilim()
-                //Diger()*/
-             //MatchGameScreen(cardSayfaViewModel = cardSayfaViewModel, isEnglish = isEnglish )
-             //AppScreen()
-            //GameApp()
-
-
-
-
-
             }
         }
     }
+
+    override fun attachBaseContext(newBase: Context) {
+        val prefs = newBase.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val langCode = prefs.getString("language_code", "tr") ?: "tr"
+
+        val locale = Locale(langCode)
+        Locale.setDefault(locale)
+
+        val config = Configuration()
+        config.setLocale(locale)
+
+        val updatedContext = newBase.createConfigurationContext(config)
+        super.attachBaseContext(updatedContext)
+    }
+
+
 }
 
 

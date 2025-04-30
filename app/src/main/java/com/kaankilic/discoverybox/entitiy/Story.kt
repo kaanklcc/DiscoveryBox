@@ -7,25 +7,12 @@ data class Story(
     var imageRes: Int,
     val category: String
 )
-
-fun getAllStory(): List<Story>{
-   return listOf<Story>(
-      Story("hikaye", R.drawable.story,"hikaye"),
-       Story("dil", R.drawable.lang,"dil"),
-       Story("bilim", R.drawable.science,"bilim"),
-       Story("guncelHayat", R.drawable.dailylife,"guncelHayat"),
-       Story("diger", R.drawable.other,"diger"),
-       Story("saveSayfa", R.drawable.save,"saveSayfa")
-
-   )
-}
-
 fun getAllGames(): List<Story>{
     return listOf<Story>(
-        Story("wordGame", R.drawable.words,"wordGame"),
-        Story("matchingGame", R.drawable.matching,"matchingGame"),
-        Story("colorGame", R.drawable.colour,"colorGame"),
-        Story("numberGame", R.drawable.numbers,"numberGame"),
-        Story("duyuOrgan", R.drawable.sense,"diger"),
+        Story("Words", R.drawable.words,"wordGame"),
+        Story("Matching", R.drawable.matching,"matchingGame"),
+        Story("Colors", R.drawable.colour,"colorGame"),
+        Story("Numbers", R.drawable.numbers,"numberGame"),
+       // Story("duyuOrgan", R.drawable.sense,"diger"),
     )
 }

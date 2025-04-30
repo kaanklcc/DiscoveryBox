@@ -1,12 +1,14 @@
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.kaankilic.discoverybox.view
 
 import android.annotation.SuppressLint
-import android.util.Log
-import androidx.compose.foundation.Image
+import android.widget.Toast
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -14,10 +16,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,58 +25,50 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-
-import com.google.ai.client.generativeai.GenerativeModel
-import com.google.firebase.auth.FirebaseAuth
 import com.kaankilic.discoverybox.R
-import com.kaankilic.discoverybox.entitiy.Hikaye
-import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
+import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
+import com.google.accompanist.flowlayout.FlowRow
+import androidx.compose.material.icons.filled.Add
+import com.google.firebase.auth.FirebaseAuth
+import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
+import com.kaankilic.discoverybox.util.isInternetAvailable
 
 @SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinViewModel: MetinViewModel) {
+fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinViewModel: MetinViewModel,anasayfaViewModel: AnasayfaViewModel) {
     var konu by remember { mutableStateOf(TextFieldValue("")) }
     var mekan by remember { mutableStateOf(TextFieldValue("")) }
-    var dbRepo= DiscoveryBoxRepository()
     var anaKarakter by remember { mutableStateOf(TextFieldValue("")) }
     var anaKarakterOzellik by remember { mutableStateOf(TextFieldValue("")) }
     val (yanKarakterler, setTextFields) = remember { mutableStateOf(listOf("")) }
     val (selectedChip, setSelectedChip) = remember { mutableStateOf("") }
-    val chipOptions = listOf(/*"Adventure", "Love", "Friendship", "Family", "Action"*/stringResource(R.string.Adventure),stringResource(R.string.Love),stringResource(R.string.Friendship),stringResource(R.string.Family),stringResource(R.string.Action))
+    val chipOptions = listOf(stringResource(R.string.Adventure),stringResource(R.string.Love),stringResource(R.string.Friendship),stringResource(R.string.Family),stringResource(R.string.Action))
     val(secilenChip , ayarSecilenChip) = remember { mutableStateOf("") }
-    var chipAyar = listOf(/*"Short","Medium","Long"*/stringResource(R.string.Short),stringResource(R.string.Medium),stringResource(R.string.Long))
+    var chipAyar = listOf(stringResource(R.string.Short),stringResource(R.string.Medium),stringResource(R.string.Long))
     var generatedStory by remember { mutableStateOf("") }
     var imageGenerate by remember { mutableStateOf("") }
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val snackbarHostState= remember { SnackbarHostState() }
     var focusState by remember { mutableStateOf(false) }
-    val makeStory = stringResource(R.string.MakeStory,)
-    val makeImage = stringResource(R.string.makeImage)
     val delbold= FontFamily(Font(R.font.delbold))
+    var showDialogPay by remember { mutableStateOf(false) }
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    var dbRepo= DiscoveryBoxRepository()
+
+
 
 
     val gradientBrush = Brush.verticalGradient(
@@ -116,7 +108,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
 
 
             Text(
-                text = /*"Subject"*/stringResource(R.string.Subject),
+                text = stringResource(R.string.Subject),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 25.dp, start = 15.dp),
@@ -143,10 +135,10 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = /*"Exp: Space Travel, importance of friendship"*/stringResource(R.string.SubjectExp), fontSize = 15.sp, fontFamily = delbold) }
+                label = { Text(text = stringResource(R.string.SubjectExp), fontSize = 12.sp, fontFamily = delbold) }
             )
             Text(
-                text = /*"Location"*/stringResource(R.string.Location),
+                text = stringResource(R.string.Location),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -173,10 +165,10 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = /*"Exp: Desert, School, Forest"*/stringResource(R.string.LocationExp), fontSize = 15.sp, fontFamily = delbold) }
+                label = { Text(text =stringResource(R.string.LocationExp), fontSize = 12.sp, fontFamily = delbold) }
             )
             Text(
-                text = /*"Main Character"*/stringResource(R.string.MainCharacter),
+                text = stringResource(R.string.MainCharacter),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -203,10 +195,10 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = /*"Exp: Cınderella, James , Emily"*/stringResource(R.string.MainCharacterExp), fontSize = 15.sp, fontFamily = delbold) }
+                label = { Text(text = stringResource(R.string.MainCharacterExp), fontSize = 12.sp, fontFamily = delbold) }
             )
             Text(
-                text = /*"Minor Character"*/stringResource(R.string.MinorCharacter),
+                text = stringResource(R.string.MinorCharacter),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -242,19 +234,19 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
 
                             ),
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
+                                .weight(1f) // fillMaxWidth yerine weight kullan
+                                .padding(start = 10.dp, top = 10.dp, bottom = 25.dp)
                                 .onFocusChanged { focusState = it.isFocused },
-                            label = { Text(text = /*"Exp: Shrek, Liam, Kylie"*/stringResource(R.string.MinorCharacterExp), fontSize = 15.sp, fontFamily = delbold) }
+                            label = { Text(text = stringResource(R.string.MinorCharacterExp), fontSize = 12.sp, fontFamily = delbold) }
                         )
 
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Ekle",
                             modifier = Modifier
-                                .clickable { setTextFields(yanKarakterler + "") }
-                                .align(Alignment.CenterVertically)
-                                .padding(end = 2.dp),
+                                .padding(end = 7.dp)
+                                .size(34.dp)
+                                .clickable { setTextFields(yanKarakterler + "") },
                             tint = Color.White
                         )
                     }
@@ -262,7 +254,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
             }
 
             Text(
-                text = /*"Main Character Characteristic"*/stringResource(R.string.MainCharacterCharacteristic),
+                text =stringResource(R.string.MainCharacterCharacteristic),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -289,10 +281,10 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = /*"Exp: Naughty, Lovable, Honest"*/stringResource(R.string.MainCharacterCharacteristicExp), fontSize = 15.sp, fontFamily = delbold) }
+                label = { Text(text =stringResource(R.string.MainCharacterCharacteristicExp), fontSize = 12.sp, fontFamily = delbold) }
             )
             Text(
-                text = /*"Story Length"*/stringResource(R.string.StoryLength) ,
+                text = stringResource(R.string.StoryLength) ,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -325,7 +317,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 }
             }
             Text(
-                text = /*"Theme"*/stringResource(R.string.Theme),
+                text = stringResource(R.string.Theme),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
@@ -333,29 +325,35 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 color = Color.White, fontFamily = delbold
             )
             Spacer(modifier = Modifier.height(2.dp))
-            Row(
+
+            FlowRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                mainAxisSpacing = 5.dp,
+                crossAxisSpacing = 5.dp
             ) {
                 chipOptions.forEach { option ->
                     FilterChip(
                         selected = selectedChip == option,
                         onClick = { setSelectedChip(option) },
-                        label = { Text(text = option, color = Color.White, fontSize = 10.sp, textAlign = TextAlign.Center) },
+                        label = {
+                            Text(
+                                text = option,
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                textAlign = TextAlign.Center
+                            )
+                        },
                         colors = FilterChipDefaults.filterChipColors(
-                            containerColor = Color.Black, // Varsayılan arka plan rengi
+                            containerColor = Color.Black,
                             selectedContainerColor = Color(0xFF21324A),
-                            labelColor = Color.Black, // Varsayılan yazı rengi
-                            selectedLabelColor = Color.Black // Seçili olduğunda yazı rengi
+                            labelColor = Color.White,
+                            selectedLabelColor = Color.White
                         ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable {}
-                            .padding(bottom = 30.dp)
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
             }
+
 
             Button(
                 colors = ButtonDefaults.buttonColors(Color.DarkGray),
@@ -363,55 +361,142 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 enabled = konu.text.isNotEmpty() && mekan.text.isNotEmpty(),
 
                 onClick = {
-                    MainScope().launch {
-
-                        val yanKarakterlerText = yanKarakterler.joinToString(", ") { it }
-                        val temaText = if (selectedChip.isNotEmpty()) "Tema: $selectedChip" else ""
-                        val uzunlukText = if (secilenChip.isNotEmpty()) "Uzunluk: $secilenChip" else ""
-
-                       /* generatedStory = "bana bir hikaye yaz. Konusu: ${konu.text}, Mekanı: ${mekan.text}, " +
-                                "Ana karakteri: ${anaKarakter.text}, Ana karakter özelliği: ${anaKarakterOzellik.text}, " +
-                                "Yan karakterler: $yanKarakterlerText,teması $temaText, uzunlugu $uzunlukText."*/
-                        generatedStory = "Write me a story. " +
-                                "Topic: ${konu.text}," +
-                                " Location: ${mekan.text}," +
-                                " Main character: ${anaKarakter.text}," +
-                                " Main character trait: ${anaKarakterOzellik.text}," +
-                                " Supporting characters: ${yanKarakterlerText}, " +
-                                "Theme: ${temaText}," +
-                                " Length: ${uzunlukText}."
-                        //generatedStory= makeStory
-
-                        imageGenerate= "Draw me a picture.. let the subject be ${konu.text} and the place be ${mekan.text}. let the theme be $temaText. "
-                        //imageGenerate = makeImage
+                    if (!isInternetAvailable(context = context)){
+                        Toast.makeText(context,"Internet connection error!",Toast.LENGTH_LONG).show()
+                    }else{
+                        anasayfaViewModel.checkUserAccess { hasTrial, isPremium, usedFreeTrial ->
+                            val isPro = isPremium || hasTrial
 
 
-                            hikayeViewModel.generateStory(generatedStory)
-                            metinViewModel.queryTextToImage(imageGenerate,context)
-                            navController.navigate("metin/${konu.text}")
+                            MainScope().launch {
+
+                                val yanKarakterlerText = yanKarakterler.joinToString(", ") { it }
+                                val temaText = if (selectedChip.isNotEmpty()) "Tema: $selectedChip" else ""
+                                val uzunlukText = if (secilenChip.isNotEmpty()) "Uzunluk: $secilenChip" else ""
+
+                                generatedStory = "Write me a story. " +
+                                        "Topic: ${konu.text}," +
+                                        " Location: ${mekan.text}," +
+                                        " Main character: ${anaKarakter.text}," +
+                                        " Main character trait: ${anaKarakterOzellik.text}," +
+                                        " Supporting characters: ${yanKarakterlerText}, " +
+                                        "Theme: ${temaText}," +
+                                        " Length: ${uzunlukText}" +
+                                        ".but at the beginning of the story, there shouldn't be an AI-related sentence — for example, no sentences like 'here is a story for you.' It should start directly with the story"
+
+
+                                // imageGenerate= "Draw me a picture.. let the subject be ${konu.text} and the place be ${mekan.text}. let the theme be $temaText. "
+                             /*   imageGenerate=  """
+      A semi-photorealistic illustration from a children's storybook, showing a vivid and emotional scene of "$konu" happening in $mekan. 
+The theme is $temaText. 
+Characters are mid-action and expressive, with joyful emotions and lifelike facial expressions, natural human proportions, and realistic lighting.
+Show dynamic movement, genuine interaction, and rich emotional depth.
+Instead of watercolor, use detailed digital painting with soft brushwork and gentle texture, but with realistic lighting, shadows, and material reflections.
+Warm natural tones dominate the scene, with nuanced lighting and soft depth-of-field effect to give photographic realism.
+The environment is immersive and richly detailed, with atmospheric perspective and spatial depth.
+Color palette: realistic soft colors with some pastel influence for charm, but not flat or cartoonish.
+Layout is horizontal, like a two-page spread in a high-end children's storybook. 
+Ultra-high detail, 1024x1024 resolution.
+
+    """.trimIndent()*/
+                                imageGenerate =  """
+A photorealistic digital painting in the style of a high-end children’s storybook illustration. 
+Depict a vivid and emotionally rich scene of "$konu" taking place in $mekan.
+The theme is $temaText.
+
+Characters are captured mid-action with lifelike gestures and natural expressions — full of joy, curiosity, and warmth. 
+Human anatomy is realistic and age-appropriate, with fine skin details, light reflections in eyes, and dynamic postures.
+
+Use cinematic, realistic lighting with global illumination, soft shadows, subtle reflections, and ambient occlusion.
+Textures such as skin, hair, fabric, and nature are richly detailed and physically accurate.
+Materials reflect light based on their real properties (e.g., soft cloth, shiny eyes, moist lips, natural wood).
+
+Camera style: shallow depth of field, slightly blurred background for realism and focus, gentle bokeh highlights.
+Atmospheric perspective enhances spatial depth, with misty or sunlit air particles adding realism.
+Warm natural tones dominate the palette, with pastel undertones used only subtly for charm — not cartoonish.
+
+Avoid watercolor or flat 2D styles; emphasize rich brushstroke simulation with physically-based rendering.
+Environment is immersive, filled with small details like dust particles in light, texture on walls or grass, and dynamic natural elements.
+
+Layout: wide horizontal (storybook spread), ultra-high detail, rendered at 1024x1024 resolution or higher.
+""".trimIndent()
+
+
+
+                                /* if (isPro){
+                                     hikayeViewModel.generateStory(generatedStory)
+                                     metinViewModel.queryTextToImage(imageGenerate, isPro = true, context = context)
+
+                                 }else{
+                                     hikayeViewModel.generateStory(generatedStory)
+                                     metinViewModel.queryTextToImage(imageGenerate, isPro = false, context = context)
+                                     dbRepo.decrementChatGptUseIfNotPro(userId, false) { success ->
+                                         if (!success) {
+                                             Toast.makeText(context, "Hakkı güncelleme başarısız", Toast.LENGTH_SHORT).show()
+                                         }
+                                     }
+                                 }
+                                 navController.navigate("metin/${konu.text}")*/
+
+                                if (isPro){
+                                    hikayeViewModel.generateStory(generatedStory)
+                                    metinViewModel.queryTextToImage(imageGenerate, isPro = true, context = context)
+                                    dbRepo.markUsedFreeTrialIfNeeded(userId)
+                                    navController.navigate("metin/${konu.text}")
+                                } else {
+                                    hikayeViewModel.generateStory(generatedStory)
+                                    metinViewModel.queryTextToImage(imageGenerate, isPro = false, context = context)
+                                    dbRepo.markUsedFreeTrialIfNeeded(userId)
+
+                                    dbRepo.decrementChatGptUseIfNotPro(userId, false) { success ->
+                                        if (!success) {
+                                            Toast.makeText(context, "Hakkı güncelleme başarısız", Toast.LENGTH_SHORT).show()
+                                        } else {
+                                            navController.navigate("metin/${konu.text}") // HAK eksiltme başarılıysa yönlendir
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
 
                     }
 
+
+
                 },
-
             ) {
-                Text(text = /*"Create the Story"*/stringResource(R.string.CreatetheStory))
+                Text(text = stringResource(R.string.CreatetheStory))
             }
-
+            if (showDialogPay) {
+                AlertDialog(
+                    onDismissRequest = {},
+                    title = { Text("Hakkınız Tükenmiş") },
+                    text = { Text("Ücretli üyelik hakkınız bulunmamaktadır. Ücretsiz hikaye üretebilirsiniz. Veya " +
+                            "daha kaliteli hikaye,görsel ve ses için ücretli plana geçiş yapabilirsiniz.") },
+                    confirmButton = {
+                        Button(onClick = {
+                            showDialogPay = false
+                            // Üyelik alma ekranına yönlendirme veya işlemi
+                            //navController.navigate("uyelikSayfasi")
+                        }) {
+                            Text("Üyelik Al")
+                        }
+                    },
+                    dismissButton = {
+                        androidx.compose.material.OutlinedButton(onClick = {
+                            showDialogPay = false
+                            // Ücretsiz sürümle devam et
+                        }) {
+                            Text("Ücretsiz Sürüm ile Hikaye Üret")
+                        }
+                    }
+                )
+            }
 
         }
     }
 }
 
-// modelCall fonksiyonunu suspend olarak tanımlayın
-/*suspend fun modelCall(prompt: String): String? {
-    val generativeModel = GenerativeModel(
-        modelName = "gemini-1.5-flash",
-        apiKey = "AIzaSyDqVkaCBrlFoa9h_PQOj5VsHhrph5O2Cio"
-    )
 
-    // API çağrısını yapın ve yanıtı alın
-    val response = generativeModel.generateContent(prompt)
-    return response.text // Yanıt metnini döndürün
-}*/
 

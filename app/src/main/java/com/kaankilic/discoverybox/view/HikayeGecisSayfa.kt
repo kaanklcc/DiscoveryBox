@@ -2,11 +2,9 @@ package com.kaankilic.discoverybox.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,12 +12,10 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
@@ -32,7 +28,6 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -45,7 +40,6 @@ fun HikayeGecis(navController: NavController) {
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
-           // Color(0xFFFFF59D), // Açık Sarı (mutluluk ve enerji)
             Color(0xFFA5D6A7), // Nane Yeşili (rahatlatıcı ve doğayla bağlantılı)
             Color(0xFF81D4FA), // Açık Mavi (huzur ve hayal gücü)
             Color(0xFFFFAB91)  // Açık Şeftali Rengi (sıcaklık ve sevimlilik)
@@ -96,9 +90,9 @@ fun HikayeGecis(navController: NavController) {
                         }
                 )
                 Text(
-                    text = /*"CREATE A STORY"*/stringResource(R.string.CreatetheStory),
+                    text =stringResource(R.string.CreatetheStory),
                     color = Color.White,
-                    fontSize = 32.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = delbold,
                     modifier = Modifier
@@ -134,7 +128,7 @@ fun HikayeGecis(navController: NavController) {
                         }
                 )
                 Text(
-                    text = /*"MY STORIES"*/stringResource(R.string.MYSTORIES),
+                    text = stringResource(R.string.MYSTORIES),
                     color = Color.White,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
