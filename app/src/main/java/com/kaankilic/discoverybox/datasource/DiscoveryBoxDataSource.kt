@@ -180,47 +180,6 @@ class DiscoveryBoxDataSource {
         return@withContext "Hata: ${response.errorBody()?.string()}"
     }
 
-
-    /*suspend fun queryTextToImage(prompt: String, context: Context): Bitmap? {
-       // val API_URL = "https://api-inference.huggingface.co/models/CompVis/stable-diffusion-v1-4"
-         val API_URL = "https://api-inference.huggingface.co/models/HiDream-ai/HiDream-I1-Fast"
-
-        val client = OkHttpClient.Builder()
-            .connectTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
-            .readTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
-            .writeTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
-            .build()
-
-        val mediaType = "application/json".toMediaType()
-        val body = """{"inputs": "$prompt", "resolution": "1920x1024"}""".toRequestBody(mediaType)
-
-        val request = Request.Builder()
-            .url(API_URL)
-            .addHeader("Authorization", "Bearer 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".trim())
-            .post(body)
-            .build()
-
-        return withContext(Dispatchers.IO) {
-            try {
-                val response = client.newCall(request).execute()
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                response.body?.let {
-                    val bytes = it.bytes()
-                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                getDefaultImage(context)
-            }
-        }
-    }*/
-
-   /* private fun getDefaultImage(context: Context): Bitmap {
-        // "default_image" drawable klasöründe olmalı
-        return BitmapFactory.decodeResource(context.resources, R.drawable.story)
-    }*/
-
     fun saveImageToStorage(bitmap: Bitmap, userId: String,  onResult: (Boolean, String?) -> Unit) {
         val storage = FirebaseStorage.getInstance()
         val storageRef = storage.reference

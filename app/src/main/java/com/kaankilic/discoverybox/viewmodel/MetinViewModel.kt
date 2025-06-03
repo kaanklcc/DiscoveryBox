@@ -61,7 +61,7 @@ class MetinViewModel : ViewModel() {
         }
     }*/
 
-    fun handleTTS(context: Context, apiKey: String, text: String) {
+    /*fun handleTTS(context: Context, apiKey: String, text: String) {
         viewModelScope.launch {
             val (premium, remaining) = dbRepo.isUserPremium()
             if (premium || remaining > 0) {
@@ -74,7 +74,26 @@ class MetinViewModel : ViewModel() {
                 }
             }
         }
+    }*/
+
+    fun handleTTS(context: Context, apiKey: String, text: String) {
+        viewModelScope.launch {
+            val (premium, usedFreeTrial, remaining) = dbRepo.isUserPremium()
+            val canUseGPTTTS = premium || !usedFreeTrial || remaining > 0
+
+            if (canUseGPTTTS) {
+                val result = dbRepo.generateGPTTTS(context, apiKey, text)
+                _ttsState.postValue(result)
+            } else {
+                dbRepo.generateGoogleTTS(context, text) { tts, result ->
+                    textToSpeech = tts
+                    _ttsState.postValue(result)
+                }
+            }
+        }
     }
+
+
 
     fun queryTextToImage(prompt: String, isPro: Boolean, context: Context) {
         CoroutineScope(Dispatchers.Main).launch {

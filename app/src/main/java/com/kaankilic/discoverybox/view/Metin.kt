@@ -60,6 +60,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.kaankilic.discoverybox.BuildConfig
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Hikaye
+import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
@@ -151,8 +152,6 @@ fun Metin(navController: NavController,
     }
 
         val scrollState = rememberScrollState()
-
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -505,12 +504,16 @@ fun Metin(navController: NavController,
 @Composable
 fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinViewModel: MetinViewModel,  onClose: () -> Unit) {
     val hikayeyiOlustur by hikayeViewModel.hikayeOlustur.observeAsState("")
+    var dbRepo= DiscoveryBoxRepository()
     val context = LocalContext.current
     val generatedImage by metinViewModel.imageBitmap.observeAsState(null)
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     var isPlaying by remember { mutableStateOf(false) }
+    var isStopped by remember { mutableStateOf(false) }  // Pause sonrası durumu kontrol etmek için ekledik.
     val language = stringResource(R.string.language)
     val country = stringResource(R.string.country)
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
 
     val infiniteTransition = rememberInfiniteTransition()
     val barHeights = List(6) { index ->
@@ -607,16 +610,22 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                 painter = painterResource(id = R.drawable.playicon),
                 contentDescription = "hizlandir icon",
                 modifier = Modifier
-                    .size(40.dp) // İkonun boyutunu ayarlamak için
-                    .clip(CircleShape) // Yuvarlak yapmak için CircleShape kullanılır
-                    .background(Color.LightGray) // İsteğe bağlı arka plan rengi
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
                     .border(2.dp, Color.Gray, CircleShape)
-                    .clickable {
+                    .graphicsLayer(
+                        alpha = if (isPlaying || isStopped) 0.5f else 1f // Solma efekti
+                    )
+                    .clickable(enabled = !isPlaying && !isStopped) {
                         metinViewModel.handleTTS(context,
                             BuildConfig.OPENAI_API_KEY,
                             hikayeyiOlustur)
-                       // textToSpeech?.speak(hikayeyiOlustur, TextToSpeech.QUEUE_FLUSH, null, null)
+                        dbRepo.markUsedFreeTrialIfNeeded(userId)
+
                         isPlaying = true
+                        Log.d("gpttts çağırdlı", "gpttts")
+
 
                     }
             )
@@ -631,13 +640,14 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                     .clip(CircleShape)
                     .background(Color.LightGray)
                     .border(2.dp, Color.Gray, CircleShape)
-                    .clickable {
-                        metinViewModel.stopMediaPlayer() // GPT TTS için
+                    .graphicsLayer(
+                        alpha = if (isStopped) 0.5f else 1f // Solma efekti
+                    )
+                    .clickable(enabled = isPlaying && !isStopped) {
+                        metinViewModel.stopMediaPlayer()
                         metinViewModel.stop()
-                        //textToSpeech?.stop()
-                        isPlaying = false
-
-                    }// İsteğe bağlı kenarlık
+                        isStopped = true // Pause tuşuna basıldığında
+                    }
             )
         }
 

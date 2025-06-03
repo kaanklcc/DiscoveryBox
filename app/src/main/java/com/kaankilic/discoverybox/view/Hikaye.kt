@@ -384,21 +384,6 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                                         " Length: ${uzunlukText}" +
                                         ".but at the beginning of the story, there shouldn't be an AI-related sentence — for example, no sentences like 'here is a story for you.' It should start directly with the story"
 
-
-                                // imageGenerate= "Draw me a picture.. let the subject be ${konu.text} and the place be ${mekan.text}. let the theme be $temaText. "
-                             /*   imageGenerate=  """
-      A semi-photorealistic illustration from a children's storybook, showing a vivid and emotional scene of "$konu" happening in $mekan. 
-The theme is $temaText. 
-Characters are mid-action and expressive, with joyful emotions and lifelike facial expressions, natural human proportions, and realistic lighting.
-Show dynamic movement, genuine interaction, and rich emotional depth.
-Instead of watercolor, use detailed digital painting with soft brushwork and gentle texture, but with realistic lighting, shadows, and material reflections.
-Warm natural tones dominate the scene, with nuanced lighting and soft depth-of-field effect to give photographic realism.
-The environment is immersive and richly detailed, with atmospheric perspective and spatial depth.
-Color palette: realistic soft colors with some pastel influence for charm, but not flat or cartoonish.
-Layout is horizontal, like a two-page spread in a high-end children's storybook. 
-Ultra-high detail, 1024x1024 resolution.
-
-    """.trimIndent()*/
                                 imageGenerate =  """
 A photorealistic digital painting in the style of a high-end children’s storybook illustration. 
 Depict a vivid and emotionally rich scene of "$konu" taking place in $mekan.
@@ -441,12 +426,12 @@ Layout: wide horizontal (storybook spread), ultra-high detail, rendered at 1024x
                                 if (isPro){
                                     hikayeViewModel.generateStory(generatedStory)
                                     metinViewModel.queryTextToImage(imageGenerate, isPro = true, context = context)
-                                    dbRepo.markUsedFreeTrialIfNeeded(userId)
+                                   // dbRepo.markUsedFreeTrialIfNeeded(userId)
                                     navController.navigate("metin/${konu.text}")
                                 } else {
                                     hikayeViewModel.generateStory(generatedStory)
                                     metinViewModel.queryTextToImage(imageGenerate, isPro = false, context = context)
-                                    dbRepo.markUsedFreeTrialIfNeeded(userId)
+                                   // dbRepo.markUsedFreeTrialIfNeeded(userId)
 
                                     dbRepo.decrementChatGptUseIfNotPro(userId, false) { success ->
                                         if (!success) {

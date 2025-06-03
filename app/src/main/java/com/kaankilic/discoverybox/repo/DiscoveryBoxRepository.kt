@@ -38,13 +38,20 @@ class DiscoveryBoxRepository {
         return dbds.generateGPTTTS(context, apiKey, text)
     }
 
-    suspend fun isUserPremium(): Pair<Boolean, Long> {
-        val user = FirebaseAuth.getInstance().currentUser ?: return false to 0
+
+    suspend fun isUserPremium(): Triple<Boolean, Boolean, Long> {
+        val user = FirebaseAuth.getInstance().currentUser ?: return Triple(false, false, 0)
         val doc = FirebaseFirestore.getInstance().collection("users").document(user.uid).get().await()
+
         val premium = doc.getBoolean("premium") ?: false
+        val usedFreeTrial = doc.getBoolean("usedFreeTrial") ?: false
         val remaining = doc.getLong("remainingChatgptUses") ?: 0
-        return premium to remaining
+
+        return Triple(premium, usedFreeTrial, remaining)
     }
+
+
+
 
     suspend fun queryTextToImage(prompt: String, isPro: Boolean, context: Context): Bitmap? {
         return if (isPro) {

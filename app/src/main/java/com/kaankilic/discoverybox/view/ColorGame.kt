@@ -73,17 +73,21 @@ fun GameScreen(viewModel: GameViewModel) {
         mediaPlayer.setOnCompletionListener { it.release() }
     }
 
-    DisposableEffect(key1 = context) {
-
+    DisposableEffect(key1 = currentLang) {
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
-                // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("en", "US"))
+                val locale = when (currentLang) {
+                    "tr" -> Locale("tr", "TR")
+                    "en" -> Locale("en", "US")
+                    else -> Locale.getDefault()
+                }
+
+                val result = textToSpeech?.setLanguage(locale)
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    Log.e("TextToSpeech", "Dil desteklenmiyor.")
+                    Log.e("TextToSpeech", "Dil desteklenmiyor: ${locale.displayLanguage}")
                 }
             } else {
-                Log.e("TextToSpeech", "Başlatma başarısız.")
+                Log.e("TextToSpeech", "TTS başlatma başarısız.")
             }
         }
 

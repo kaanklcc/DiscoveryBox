@@ -89,17 +89,21 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
 
 
 
-    DisposableEffect(key1 = context) {
-
+    DisposableEffect(key1 = currentLang) {
         textToSpeech = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
-                // Türkçe dilini ayarla
-                val result = textToSpeech?.setLanguage(Locale("en", "US"))
+                val locale = when (currentLang) {
+                    "tr" -> Locale("tr", "TR")
+                    "en" -> Locale("en", "US")
+                    else -> Locale.getDefault()
+                }
+
+                val result = textToSpeech?.setLanguage(locale)
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    Log.e("TextToSpeech", "Dil desteklenmiyor.")
+                    Log.e("TextToSpeech", "Dil desteklenmiyor: ${locale.displayLanguage}")
                 }
             } else {
-                Log.e("TextToSpeech", "Başlatma başarısız.")
+                Log.e("TextToSpeech", "TTS başlatma başarısız.")
             }
         }
 
@@ -138,7 +142,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = /*"MATCHING GAME"*/stringResource(R.string.MATCHINGGAME),
+                        text = stringResource(R.string.MATCHINGGAME),
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
