@@ -34,9 +34,9 @@ import java.util.Locale
 
 
 
-class DiscoveryBoxDataSource {
-    val firestore = FirebaseFirestore.getInstance()
-    val auth: FirebaseAuth = FirebaseAuth.getInstance()
+class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: FirebaseAuth ) {
+    //val firestore = FirebaseFirestore.getInstance()
+    //val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var tts: TextToSpeech? = null
     private var mediaPlayer: MediaPlayer? = null
     suspend fun GetAllGame(): List<Story> = withContext(Dispatchers.IO){

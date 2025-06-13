@@ -12,8 +12,9 @@ import com.kaankilic.discoverybox.entitiy.Hikaye
 import kotlinx.coroutines.tasks.await
 
 
-class DiscoveryBoxRepository {
-    var dbds= DiscoveryBoxDataSource()
+class DiscoveryBoxRepository(val dbds :DiscoveryBoxDataSource) {
+
+    //var dbds= DiscoveryBoxDataSource()
     private val firestore = FirebaseFirestore.getInstance()
 
 

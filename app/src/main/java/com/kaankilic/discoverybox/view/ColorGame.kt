@@ -258,8 +258,8 @@ fun getLocalizedColorName(color: String, lang: String): String {
 }
 
 @Composable
-fun GameApp() {
-    val viewModel: GameViewModel = viewModel()
+fun GameApp(viewModel: GameViewModel ) {
+   // val viewModel: GameViewModel = viewModel()
 
     LaunchedEffect(Unit) {
         viewModel.loadNewData()

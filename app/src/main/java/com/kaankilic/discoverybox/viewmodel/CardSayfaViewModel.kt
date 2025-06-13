@@ -7,11 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kaankilic.discoverybox.entitiy.Word
+import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class CardSayfaViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
+@HiltViewModel
+class CardSayfaViewModel @Inject constructor(val firestore : FirebaseFirestore)  : ViewModel() {
+   // private val firestore = FirebaseFirestore.getInstance()
     val words = mutableStateListOf<Word>()
 
     // Karıştırılmış kelimeler ve görseller

@@ -8,10 +8,14 @@ import com.google.firebase.auth.AuthCredential
 
 import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
 import com.kaankilic.discoverybox.util.GoogleAuthViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class KayitSayfaViewModel : ViewModel(),GoogleAuthViewModel {
-    var dbRepo= DiscoveryBoxRepository()
+@HiltViewModel
+
+class KayitSayfaViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : ViewModel(),GoogleAuthViewModel {
+   // var dbRepo= DiscoveryBoxRepository()
     val signUpResult = MutableLiveData<Pair<Boolean, String?>>()
     val saveUserResult = MutableLiveData<Pair<Boolean, String?>>()
     val googleSignInResult = MutableLiveData<Pair<Boolean, String?>>()

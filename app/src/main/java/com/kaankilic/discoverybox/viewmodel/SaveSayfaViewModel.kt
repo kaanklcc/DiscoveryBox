@@ -5,12 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.kaankilic.discoverybox.entitiy.Hikaye
 import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SaveSayfaViewModel:ViewModel() {
-    var dbRepo= DiscoveryBoxRepository()
+@HiltViewModel
+
+class SaveSayfaViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository):ViewModel() {
+    //var dbRepo= DiscoveryBoxRepository()
     val stories = MutableLiveData<List<Hikaye>>()
     val deleteStatus = MutableLiveData<Boolean>() // Silme işlemi durumu için LiveData
 

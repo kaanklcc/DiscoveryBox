@@ -498,7 +498,8 @@ fun Metin(navController: NavController,
 @Composable
 fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinViewModel: MetinViewModel,  onClose: () -> Unit) {
     val hikayeyiOlustur by hikayeViewModel.hikayeOlustur.observeAsState("")
-    var dbRepo= DiscoveryBoxRepository()
+    //var dbRepo= DiscoveryBoxRepository()
+    val dbRepo = hikayeViewModel.dbRepo
     val context = LocalContext.current
     val generatedImage by metinViewModel.imageBitmap.observeAsState(null)
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }

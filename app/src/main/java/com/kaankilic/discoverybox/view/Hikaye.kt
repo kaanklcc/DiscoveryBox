@@ -66,7 +66,8 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
     val delbold= FontFamily(Font(R.font.delbold))
     var showDialogPay by remember { mutableStateOf(false) }
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-    var dbRepo= DiscoveryBoxRepository()
+    //var dbRepo= DiscoveryBoxRepository()
+    val dbRepo = hikayeViewModel.dbRepo
 
 
 
@@ -157,8 +158,6 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     unfocusedTextColor = Color.White,
                     focusedLabelColor =  Color(0xFF21324A),
                     unfocusedLabelColor = Color.White,
-
-
 
                 ),
                 modifier = Modifier
@@ -405,8 +404,6 @@ Environment is immersive, filled with small details like dust particles in light
 
 Layout: wide horizontal (storybook spread), ultra-high detail, rendered at 1024x1024 resolution or higher.
 """.trimIndent()
-
-
                                 if (isPro){
                                     hikayeViewModel.generateStory(generatedStory)
                                     metinViewModel.queryTextToImage(imageGenerate, isPro = true, context = context)
@@ -415,23 +412,16 @@ Layout: wide horizontal (storybook spread), ultra-high detail, rendered at 1024x
                                 } else {
                                     hikayeViewModel.generateStory(generatedStory)
                                     metinViewModel.queryTextToImage(imageGenerate, isPro = false, context = context)
-
-
                                     dbRepo.decrementChatGptUseIfNotPro(userId, false) { success ->
                                         if (!success) {
-                                            Toast.makeText(context, "Hakkı güncelleme başarısız", Toast.LENGTH_SHORT).show()
-                                        } else {
-                                            navController.navigate("metin/${konu.text}") // HAK eksiltme başarılıysa yönlendir
+                                            Toast.makeText(context, "Hak güncelleme başarısız", Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 }
-
+                                navController.navigate("metin/${konu.text}") // HAK eksiltme başarılıysa yönlendir
                             }
                         }
-
                     }
-
-
 
                 },
             ) {

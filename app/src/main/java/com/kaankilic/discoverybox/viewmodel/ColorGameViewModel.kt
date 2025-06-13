@@ -4,12 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.kaankilic.discoverybox.entitiy.Word
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GameViewModel : ViewModel() {
-    private val firestore = FirebaseFirestore.getInstance()
+@HiltViewModel
+class GameViewModel @Inject constructor (val firestore: FirebaseFirestore) : ViewModel() {
+    //private val firestore = FirebaseFirestore.getInstance()
 
     private val _currentData = MutableStateFlow<Pair<String, List<Word>>?>(null)
     val currentData: StateFlow<Pair<String, List<Word>>?> = _currentData

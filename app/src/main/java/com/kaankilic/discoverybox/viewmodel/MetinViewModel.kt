@@ -12,12 +12,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import javax.inject.Inject
 
+@HiltViewModel
 
-class MetinViewModel : ViewModel() {
+class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : ViewModel() {
     private var currentImage: String = ""
-    var dbRepo= DiscoveryBoxRepository()
+    //var dbRepo= DiscoveryBoxRepository()
     var imageBitmap = MutableLiveData<Bitmap?>()
     val imageSaved = MutableLiveData<Boolean>()
     val storySaved = MutableLiveData<Boolean>()

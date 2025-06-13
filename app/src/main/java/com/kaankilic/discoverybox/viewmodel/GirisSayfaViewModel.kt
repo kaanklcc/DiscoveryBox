@@ -5,9 +5,13 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.AuthCredential
 import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
 import com.kaankilic.discoverybox.util.GoogleAuthViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class GirisSayfaViewModel : ViewModel(),GoogleAuthViewModel {
-    var dbRepo= DiscoveryBoxRepository()
+@HiltViewModel
+
+class GirisSayfaViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : ViewModel(),GoogleAuthViewModel {
+    //var dbRepo= DiscoveryBoxRepository()
 
     val loginResult = MutableLiveData<Pair<Boolean, String?>>()
 

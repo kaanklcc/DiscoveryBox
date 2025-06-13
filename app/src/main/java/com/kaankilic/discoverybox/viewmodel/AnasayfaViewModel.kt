@@ -9,13 +9,15 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.kaankilic.discoverybox.entitiy.Story
 import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class AnasayfaViewModel : ViewModel() {
-    var dbRepo= DiscoveryBoxRepository()
+@HiltViewModel
+class AnasayfaViewModel @Inject constructor(val dbRepo: DiscoveryBoxRepository) : ViewModel() {
+   // var dbRepo= DiscoveryBoxRepository()
     var konular = MutableLiveData<List<Story>>()
 
     init {

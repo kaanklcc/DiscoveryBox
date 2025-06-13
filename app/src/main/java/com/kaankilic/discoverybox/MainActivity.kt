@@ -23,8 +23,9 @@ import com.kaankilic.discoverybox.viewmodel.KayitSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
 import com.kaankilic.discoverybox.viewmodel.NumberGameViewModel
 import com.kaankilic.discoverybox.viewmodel.SaveSayfaViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
-
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     val anasayfaViewModel : AnasayfaViewModel by viewModels()
@@ -73,7 +74,9 @@ class MainActivity : ComponentActivity() {
                     kayitSayfaViewModel,
                    saveSayfaViewModel,
                    cardSayfaViewModel,
-                   numberGameViewModel
+                   numberGameViewModel,
+                   gameViewModel
+
 
                 )
             }

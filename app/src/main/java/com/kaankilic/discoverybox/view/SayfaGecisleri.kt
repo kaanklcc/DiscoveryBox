@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.DilViewModel
+import com.kaankilic.discoverybox.viewmodel.GameViewModel
 import com.kaankilic.discoverybox.viewmodel.GirisSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.KayitSayfaViewModel
@@ -27,7 +28,8 @@ fun SayfaGecisleri(
     kayitSayfaViewModel: KayitSayfaViewModel,
     saveSayfaViewModel: SaveSayfaViewModel,
     cardSayfaViewModel: CardSayfaViewModel,
-    numberGameViewModel: NumberGameViewModel
+    numberGameViewModel: NumberGameViewModel,
+    gameViewModel: GameViewModel
 
 
     ) {
@@ -46,7 +48,7 @@ fun SayfaGecisleri(
             MatchGameScreen(cardSayfaViewModel,false)
         }
         composable("colorGame"){
-            GameApp()
+            GameApp(gameViewModel)
 
         }
         composable("hikayeGecis"){

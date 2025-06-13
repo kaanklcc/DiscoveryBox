@@ -59,6 +59,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
 import com.kaankilic.discoverybox.R
+import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
 import com.kaankilic.discoverybox.util.GoogleSignInHelper
 import com.kaankilic.discoverybox.viewmodel.GirisSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.KayitSayfaViewModel
@@ -250,14 +251,15 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
         }
 
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun PreviewGirisSayfa() {
+
     val fakeNavController = rememberNavController() // Fake NavController oluştur
     val fakeViewModel = GirisSayfaViewModel() // Eğer içinde canlı veri yoksa direkt oluşturulabilir
 
     GirisSayfa(navController = fakeNavController, GirisSayfaViewModel = fakeViewModel)
-}
+}*/
 
 @Composable
 fun LanguageSwitcher(context: Context) {
