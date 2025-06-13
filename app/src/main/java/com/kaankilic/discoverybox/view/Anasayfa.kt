@@ -2,6 +2,9 @@ package com.kaankilic.discoverybox.view
 
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -61,6 +64,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import kotlinx.coroutines.launch
@@ -82,6 +88,8 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     val wrongPassword = stringResource(R.string.WrongPassword)
     val delbold= FontFamily(Font(R.font.delbold))
     val context = LocalContext.current
+    var showMembershipChoiceDialog by remember { mutableStateOf(false) }
+
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
@@ -184,6 +192,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         confirmButton = {
                             Button(onClick = {
                                 showDialogPay = false
+                                showMembershipChoiceDialog = true // üyelik seçim dialogunu aç
                                 // Üyelik alma ekranına yönlendirme veya işlemi
                                 //navController.navigate("uyelikSayfasi")
                             }) {
@@ -200,6 +209,50 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         }
                     )
                 }
+                if (showMembershipChoiceDialog) {
+                    AlertDialog(
+                        onDismissRequest = {},
+                        title = { Text("Üyelik Seçin") },
+                        text = {
+                            Column {
+                                Text("Bir üyelik tipi seçin:")
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = {
+                                        showMembershipChoiceDialog = false
+                                        updatePremiumForTest(7, 14, context) // Haftalık (7 gün, 14 hak)
+                                    }
+                                ) {
+                                    Text("Haftalık (7 gün, 14 hak)")
+                                }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+
+                                Button(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = {
+                                        showMembershipChoiceDialog = false
+                                        updatePremiumForTest(30, 60, context) // Aylık (30 gün, 60 hak)
+                                    }
+                                ) {
+                                    Text("Aylık (30 gün, 60 hak)")
+                                }
+                            }
+                        },
+                        confirmButton = {},
+                        dismissButton = {
+                            OutlinedButton(onClick = {
+                                showMembershipChoiceDialog = false
+                            }) {
+                                Text("İptal")
+                            }
+                        }
+                    )
+                }
+
 
 
 
@@ -350,6 +403,27 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
 
     }
 }
+
+fun updatePremiumForTest(durationDays: Int, totalUses: Int, context: Context) {
+    val userId = Firebase.auth.currentUser?.uid ?: return
+    val userRef = Firebase.firestore.collection("users").document(userId)
+
+    userRef.update(
+        mapOf(
+            "premium" to true,
+            "premiumStartDate" to com.google.firebase.Timestamp.now(),
+            "premiumDurationDays" to durationDays,
+            "remainingChatgptUses" to totalUses
+        )
+    ).addOnSuccessListener {
+        Toast.makeText(context, "Premium üyelik başlatıldı: $durationDays gün, $totalUses hak", Toast.LENGTH_LONG).show()
+        Log.d("PremiumUpdate", "Premium güncellendi: $durationDays gün, $totalUses hak")
+    }.addOnFailureListener { e ->
+        Toast.makeText(context, "Premium güncelleme hatası: ${e.message}", Toast.LENGTH_LONG).show()
+        Log.e("PremiumUpdate", "Premium güncelleme hatası: ${e.message}")
+    }
+}
+
 
 
 

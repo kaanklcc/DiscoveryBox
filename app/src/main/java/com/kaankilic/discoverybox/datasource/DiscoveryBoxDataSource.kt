@@ -26,10 +26,8 @@ import com.kaankilic.discoverybox.retrofit.api
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.Locale
@@ -310,13 +308,23 @@ class DiscoveryBoxDataSource {
 
                     userRef.get().addOnSuccessListener { document ->
                         if (!document.exists()) {
-                            val userData = hashMapOf(
+                           /* val userData = hashMapOf(
                                 "ad" to (user.displayName ?: ""),
                                 "soyad" to "",
                                 "email" to (user.email ?: ""),
                                 "usedFreeTrial" to false,
                                 "premium" to false,
                                 "remainingChatgptUses" to 0
+                            )*/
+                            val userData = hashMapOf(
+                                "ad" to (user.displayName ?: ""),
+                                "soyad" to "",
+                                "email" to (user.email ?: ""),
+                                "usedFreeTrial" to false,
+                                "premium" to false,
+                                "remainingChatgptUses" to 0,
+                                "premiumStartDate" to null,      // yeni eklendi
+                                "premiumDurationDays" to 0L      // yeni eklendi
                             )
 
                             userRef.set(userData)
@@ -396,7 +404,7 @@ class DiscoveryBoxDataSource {
 
     }
 
-    fun decrementChatGptUse(userId: String, onComplete: (Boolean) -> Unit) {
+    /*fun decrementChatGptUse(userId: String, onComplete: (Boolean) -> Unit) {
         val userRef = firestore.collection("users").document(userId)
 
 
@@ -412,7 +420,25 @@ class DiscoveryBoxDataSource {
         }.addOnFailureListener {
             onComplete(false)
         }
-    }
+    }*/
+    fun decrementChatGptUse(userId: String, onComplete: (Boolean) -> Unit) {
+        val userRef = firestore.collection("users").document(userId)
 
+        firestore.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+            val currentUses = snapshot.getLong("remainingChatgptUses") ?: 0
+
+            if (currentUses > 0) {
+                transaction.update(userRef, "remainingChatgptUses", currentUses - 1)
+                true // işlem yapıldı
+            } else {
+                false // hak zaten yoktu
+            }
+        }.addOnSuccessListener { success ->
+            onComplete(success)
+        }.addOnFailureListener {
+            onComplete(false)
+        }
+    }
 
 }

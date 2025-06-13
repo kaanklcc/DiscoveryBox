@@ -189,7 +189,7 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                                     horizontalArrangement = Arrangement.Center
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.google), // Google logosunu eklemelisin
+                                        painter = painterResource(id = R.drawable.google),
                                         contentDescription = "Google Sign-In",
                                         modifier = Modifier
                                             .size(20.dp), tint = Color.Black

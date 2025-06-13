@@ -407,31 +407,15 @@ Layout: wide horizontal (storybook spread), ultra-high detail, rendered at 1024x
 """.trimIndent()
 
 
-
-                                /* if (isPro){
-                                     hikayeViewModel.generateStory(generatedStory)
-                                     metinViewModel.queryTextToImage(imageGenerate, isPro = true, context = context)
-
-                                 }else{
-                                     hikayeViewModel.generateStory(generatedStory)
-                                     metinViewModel.queryTextToImage(imageGenerate, isPro = false, context = context)
-                                     dbRepo.decrementChatGptUseIfNotPro(userId, false) { success ->
-                                         if (!success) {
-                                             Toast.makeText(context, "Hakkı güncelleme başarısız", Toast.LENGTH_SHORT).show()
-                                         }
-                                     }
-                                 }
-                                 navController.navigate("metin/${konu.text}")*/
-
                                 if (isPro){
                                     hikayeViewModel.generateStory(generatedStory)
                                     metinViewModel.queryTextToImage(imageGenerate, isPro = true, context = context)
-                                   // dbRepo.markUsedFreeTrialIfNeeded(userId)
+
                                     navController.navigate("metin/${konu.text}")
                                 } else {
                                     hikayeViewModel.generateStory(generatedStory)
                                     metinViewModel.queryTextToImage(imageGenerate, isPro = false, context = context)
-                                   // dbRepo.markUsedFreeTrialIfNeeded(userId)
+
 
                                     dbRepo.decrementChatGptUseIfNotPro(userId, false) { success ->
                                         if (!success) {

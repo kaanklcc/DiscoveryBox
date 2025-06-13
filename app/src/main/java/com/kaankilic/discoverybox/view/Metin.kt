@@ -67,7 +67,6 @@ import com.kaankilic.discoverybox.viewmodel.MetinViewModel
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.DONUT)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Metin(navController: NavController,
           hikayeViewModel: HikayeViewModel,
@@ -79,20 +78,15 @@ fun Metin(navController: NavController,
     val context = LocalContext.current
     val kaan by hikayeViewModel.hikaye.observeAsState(Hikaye())
     val generatedImage by metinViewModel.imageBitmap.observeAsState(null)
-    var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     var audioVisible by remember { mutableStateOf(false) }
     var audioVisibleStory by remember { mutableStateOf(false) }
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
     val itim= FontFamily(Font(R.font.itim))
     val zen= FontFamily(Font(R.font.zen))
-    val delbold= FontFamily(Font(R.font.delbold))
-    val saveMessage = stringResource(R.string.Storyandimagesavedsuccessfully)
-    val saveFail = stringResource(R.string.UserSessionMessage)
     val language = stringResource(R.string.language)
     val country = stringResource(R.string.country)
     var hasTrial by remember { mutableStateOf(false) }
     var isPremium by remember { mutableStateOf(false) }
-    val generatedImageUrl by metinViewModel.generatedImage.observeAsState()
     var showSuccessAnimation by remember { mutableStateOf(false) }
     var isSaved by remember { mutableStateOf(false) }
 

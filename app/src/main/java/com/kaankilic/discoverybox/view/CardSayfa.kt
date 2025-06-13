@@ -368,8 +368,6 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                                         isGameOver,
                                                         currentTargetWord,
                                                         context
-
-
                                                     )
                                                 },
                                             contentScale = ContentScale.Fit // Crop yerine Cover ya da Fit dene

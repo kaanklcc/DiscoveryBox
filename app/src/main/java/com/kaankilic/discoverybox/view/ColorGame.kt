@@ -3,7 +3,7 @@ package com.kaankilic.discoverybox.view
 import android.media.MediaPlayer
 import android.speech.tts.TextToSpeech
 import android.util.Log
-import android.widget.Toast
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
