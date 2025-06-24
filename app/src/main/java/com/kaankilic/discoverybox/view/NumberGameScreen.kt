@@ -21,8 +21,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -41,6 +45,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
@@ -81,7 +86,20 @@ fun NumberGameScreen(navController: NavController, numberGameViewModel: NumberGa
                     containerColor = Color(0xFFEF2D81), // Dinamik renk burada
                     titleContentColor = Color.White, // Başlık rengi
                     actionIconContentColor = Color.Transparent // İkon rengi (varsa)
-                )
+                ),
+                navigationIcon  = {
+                    IconButton(modifier = Modifier.padding(start = 8.dp) .size(55.dp), onClick = {
+                        navController.navigate("gameMain")
+                    }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = "Back",
+                            contentScale = ContentScale.Crop,
+
+                            )
+
+                    }
+                }
             )
 
         }

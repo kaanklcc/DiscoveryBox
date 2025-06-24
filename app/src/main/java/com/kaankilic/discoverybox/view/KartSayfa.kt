@@ -29,9 +29,13 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -57,6 +61,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Word
@@ -66,7 +71,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun MeyveKartSirali(navController: NavController,viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val wordList = remember { viewModel.words } // Tüm kelimeler
     var currentIndex by remember { mutableStateOf(0) } // Şu anki kartın indeksi
     var isFlipped by remember { mutableStateOf(false) } // Kartın dönme durumu
@@ -127,6 +132,19 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                     Color.White,
                     Color.White
                 ),
+                navigationIcon  = {
+                    IconButton(modifier = Modifier.padding(start = 8.dp) .size(55.dp), onClick = {
+                        navController.navigate("gameMain")
+                    }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = "Back",
+                            contentScale = ContentScale.Crop,
+
+                            )
+
+                    }
+                }
 
             )
         },

@@ -68,13 +68,13 @@ fun SayfaGecisleri(
                 GameMain(navController,anasayfaViewModel)
             }
             composable("wordGame"){
-                MeyveKartSirali(cardSayfaViewModel)
+                MeyveKartSirali(navController,cardSayfaViewModel)
             }
             composable("matchingGame"){
-                MatchGameScreen(cardSayfaViewModel,false)
+                MatchGameScreen(navController,cardSayfaViewModel,false)
             }
             composable("colorGame"){
-                GameApp(gameViewModel)
+                GameApp(navController,gameViewModel)
 
             }
             composable("hikayeGecis"){

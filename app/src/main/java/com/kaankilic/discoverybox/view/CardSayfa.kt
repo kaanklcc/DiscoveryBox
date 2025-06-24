@@ -30,8 +30,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
@@ -61,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Word
@@ -70,7 +75,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) {
+fun MatchGameScreen(navController: NavController,cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) {
     val words = cardSayfaViewModel.words
     val shuffledWords = cardSayfaViewModel.shuffledWords
     val shuffledImages = cardSayfaViewModel.shuffledImages
@@ -144,10 +149,11 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                 title = {
                     Text(
                         text = stringResource(R.string.MATCHINGGAME),
-                        fontSize = 40.sp,
+                        fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        fontFamily = sandtitle
+                        fontFamily = sandtitle,
+
                     )
                 },
                 modifier = Modifier.background(Color.Transparent),
@@ -157,7 +163,20 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                     Color(0xFF34909a),
                     Color.White,
                     Color.White
-                )
+                ),
+                navigationIcon  = {
+                    IconButton(modifier = Modifier.padding(start = 8.dp) .size(55.dp), onClick = {
+                        navController.navigate("gameMain")
+                    }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = "Back",
+                            contentScale = ContentScale.Crop,
+
+                            )
+
+                    }
+                }
             )
         },
         containerColor = Color.DarkGray,

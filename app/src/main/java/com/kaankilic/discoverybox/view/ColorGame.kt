@@ -20,8 +20,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,6 +54,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberImagePainter
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.viewmodel.GameViewModel
@@ -58,7 +65,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreen(viewModel: GameViewModel) {
+fun GameScreen(navController: NavController,viewModel: GameViewModel) {
     val context = LocalContext.current
     val currentData by viewModel.currentData.collectAsState()
     val andikabody= FontFamily(Font(R.font.andikabody))
@@ -109,7 +116,20 @@ fun GameScreen(viewModel: GameViewModel) {
                         containerColor = getColorFromName(currentColour), // Dinamik renk burada
                         titleContentColor = Color.Black, // Başlık rengi
                         actionIconContentColor = Color.White // İkon rengi (varsa)
-                    )
+                    ),
+                    navigationIcon  = {
+                        IconButton(modifier = Modifier.padding(start = 8.dp) .size(55.dp), onClick = {
+                            navController.navigate("gameMain")
+                        }) {
+                            Image(
+                                painter = painterResource(id = R.drawable.back),
+                                contentDescription = "Back",
+                                contentScale = ContentScale.Crop,
+
+                                )
+
+                        }
+                    }
                 )
 
             }
@@ -260,14 +280,15 @@ fun getLocalizedColorName(color: String, lang: String): String {
 }
 
 @Composable
-fun GameApp(viewModel: GameViewModel ) {
+fun GameApp(navController: NavController,viewModel: GameViewModel ) {
    // val viewModel: GameViewModel = viewModel()
+
 
     LaunchedEffect(Unit) {
         viewModel.loadNewData()
     }
 
-    GameScreen(viewModel = viewModel)
+    GameScreen(navController = navController, viewModel = viewModel)
 }
 
 

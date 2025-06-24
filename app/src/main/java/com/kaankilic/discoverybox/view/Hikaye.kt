@@ -4,6 +4,7 @@ package com.kaankilic.discoverybox.view
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.Image
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,6 +44,8 @@ import com.google.accompanist.flowlayout.FlowRow
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.firebase.auth.FirebaseAuth
 import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
@@ -102,18 +105,17 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
             },
                 colors = TopAppBarColors(Color(0xFFd5e0fe),Color.DarkGray,Color.Gray,Color(0xFF353BA4),Color(0xFF353BA4)),
                 navigationIcon  = {
-                IconButton(modifier = Modifier.padding(start = 8.dp), onClick = {
-                    navController.navigate("hikayeGecis")
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Logout",
-                        tint =Color(0xFF353BA4) ,
-                        modifier = Modifier.size(60.dp),
+                    IconButton(modifier = Modifier.padding(start = 8.dp) .size(55.dp), onClick = {
+                        navController.navigate("hikayeGecis")
+                    }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = "Back",
+                            contentScale = ContentScale.Crop,
 
-                        )
+                            )
 
-                }
+                    }
             }
         )
         },

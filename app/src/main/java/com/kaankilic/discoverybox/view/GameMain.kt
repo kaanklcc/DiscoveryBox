@@ -15,8 +15,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -54,7 +58,21 @@ fun GameMain(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(title = { Text(text =stringResource(R.string.GameScreen), fontSize = 40.sp, fontFamily = sandtitle, textAlign = TextAlign.Center) },
-                colors = TopAppBarColors( Color(0xFFE3F2FD), Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF353BA4),  Color(0xFF353BA4)),)
+                colors = TopAppBarColors( Color(0xFFE3F2FD), Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF353BA4),  Color(0xFF353BA4)),
+                navigationIcon  = {
+                    IconButton(modifier = Modifier.padding(start = 8.dp) .size(55.dp), onClick = {
+                        navController.navigate("anasayfa")
+                    }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = "Back",
+                            contentScale = ContentScale.Crop,
+
+                            )
+
+                    }
+                }
+                )
         }
     ) { paddingValues ->
 

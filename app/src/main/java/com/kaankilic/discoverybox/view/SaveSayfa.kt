@@ -2,6 +2,7 @@ package com.kaankilic.discoverybox.view
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,6 +42,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -64,21 +67,11 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
     val stories by saveSayfaViewModel.stories.observeAsState(emptyList())
     val sandtitle= FontFamily(Font(R.font.sandtitle))
 
-
-
-   /* val gradientBrush = Brush.linearGradient(
-        colors = listOf(
-            Color.Black,
-            Color(0xFF2A3E52), // Dark Green
-            Color(0xFF03F6079)
-        )
-    )*/
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
             Color(0xFFd5e0fe),
             Color(0xFFfbdceb), // Sarı
 
-            // Açık Mavi
         )
     )
 
@@ -94,7 +87,21 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(title = { Text(text =stringResource(R.string.YOURSTORY), fontSize = 40.sp, textAlign = TextAlign.Center,fontFamily = sandtitle)},
-                colors = TopAppBarColors( Color(0xFFd5e0fe), Color(0xFF2A3E52), Color(0xFF2A3E52), Color(0xFF353BA4), Color(0xFF353BA4))
+                colors = TopAppBarColors( Color(0xFFd5e0fe), Color(0xFF2A3E52), Color(0xFF2A3E52), Color(0xFF353BA4), Color(0xFF353BA4)),
+
+                navigationIcon  = {
+                    IconButton(modifier = Modifier.padding(start = 8.dp) .size(55.dp), onClick = {
+                        navController.navigate("hikayeGecis")
+                    }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.back),
+                            contentDescription = "Back",
+                            contentScale = ContentScale.Crop,
+
+                        )
+
+                    }
+                }
             )
 
         }
