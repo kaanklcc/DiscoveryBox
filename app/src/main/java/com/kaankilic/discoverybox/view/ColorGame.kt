@@ -61,7 +61,8 @@ import java.util.Locale
 fun GameScreen(viewModel: GameViewModel) {
     val context = LocalContext.current
     val currentData by viewModel.currentData.collectAsState()
-    val delbold= FontFamily(Font(R.font.delbold))
+    val andikabody= FontFamily(Font(R.font.andikabody))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
     val currentLang = context.resources.configuration.locales[0].language
 
 
@@ -103,7 +104,7 @@ fun GameScreen(viewModel: GameViewModel) {
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text(text =stringResource(R.string.COLORMATCHINGGAME), fontSize = 30.sp, textAlign = TextAlign.Center,fontFamily = delbold) },
+                    title = { Text(text =stringResource(R.string.COLORMATCHINGGAME), fontSize = 30.sp, textAlign = TextAlign.Center,fontFamily = sandtitle) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = getColorFromName(currentColour), // Dinamik renk burada
                         titleContentColor = Color.Black, // Başlık rengi
@@ -157,8 +158,9 @@ fun GameScreen(viewModel: GameViewModel) {
                                     text = stringResource(R.string.ColorWelcomeMessage),
                                     style = TextStyle(
                                         color = Color.Black,
-                                        fontSize = 14.sp
-                                    ),fontFamily = delbold
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 16.sp
+                                    ),fontFamily = sandtitle
                                 )
                             }
                         }
@@ -168,10 +170,10 @@ fun GameScreen(viewModel: GameViewModel) {
                     Text(
                         text =  getLocalizedColorName(currentColour, currentLang),
                         color = Color.Black,
-                        fontSize = 55.sp,
+                        fontSize = 65.sp,
                         fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.offset(y=(-45).dp),fontFamily = delbold
+                        //fontWeight = FontWeight.Bold,
+                        modifier = Modifier.offset(y=(-45).dp),fontFamily = andikabody
 
                     )
                     // Seslendirme İkonu
@@ -180,7 +182,7 @@ fun GameScreen(viewModel: GameViewModel) {
                         contentDescription = "hizlandir icon",
                         modifier = Modifier
                             .offset(y=(-35).dp)
-                            .size(80.dp) // İkonun boyutunu ayarlamak için
+                            .size(100.dp) // İkonun boyutunu ayarlamak için
                             .clip(CircleShape) // Yuvarlak yapmak için CircleShape kullanılır
                             .background(Color.LightGray) // İsteğe bağlı arka plan rengi
                             .clickable {

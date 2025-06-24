@@ -82,7 +82,8 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     val context = LocalContext.current
     val isGameOver = remember { mutableStateOf(false) }
-    val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
+    val andikabody= FontFamily(Font(R.font.andikabody))
     val currentLang = context.resources.configuration.locales[0].language
 
 
@@ -143,10 +144,10 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                 title = {
                     Text(
                         text = stringResource(R.string.MATCHINGGAME),
-                        fontSize = 30.sp,
+                        fontSize = 40.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        fontFamily = delbold
+                        fontFamily = sandtitle
                     )
                 },
                 modifier = Modifier.background(Color.Transparent),
@@ -172,11 +173,11 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text =/* "Congratulations, Game is Over!"*/stringResource(R.string.CongratulationsGameisOver),
+                    text =stringResource(R.string.CongratulationsGameisOver),
                     color = Color.White,
-                    fontSize = 32.sp,
+                    fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = delbold
+                    fontFamily = sandtitle
                 )
             }
         } else {
@@ -250,8 +251,9 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                         text = stringResource(R.string.matchWelcomeMessage),
                                         style = TextStyle(
                                             color = Color.Black,
-                                            fontSize = 12.sp,
-                                            fontFamily = delbold
+                                            fontSize = 16.sp,
+                                            fontFamily = sandtitle,
+                                            textAlign = TextAlign.Center
                                         )
                                     )
                                 }
@@ -312,9 +314,11 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                                 Text(
                                                     text = displayText,
                                                     color = Color.White,
-                                                    fontSize = 70.sp,
+                                                    fontSize = 58.sp,
                                                     fontStyle = FontStyle.Italic,
-                                                    textAlign = TextAlign.Center
+                                                    textAlign = TextAlign.Center,
+                                                    fontFamily = andikabody
+
                                                 )
 
                                                 Spacer(modifier = Modifier.height(8.dp))
@@ -323,7 +327,7 @@ fun MatchGameScreen(cardSayfaViewModel: CardSayfaViewModel, isEnglish: Boolean) 
                                                     painter = painterResource(id = R.drawable.greenvoice),
                                                     contentDescription = "voice image",
                                                     modifier = Modifier
-                                                        .size(100.dp)
+                                                        .size(80.dp)
                                                         .clip(CircleShape)
                                                         //.background(Color.LightGray)
                                                         .clickable {
@@ -443,7 +447,7 @@ fun CelebrationAnimation(
 
     // Animasyon süresi boyunca gösterim
     LaunchedEffect(Unit) {
-        kotlinx.coroutines.delay(3000) // 3 saniye gösterim
+        kotlinx.coroutines.delay(2000) // 3 saniye gösterim
         onAnimationEnd() // Animasyon bitince çağır
         if (!isGameOver.value) { // Eğer oyun bitmemişse
             onAnimationEnd()

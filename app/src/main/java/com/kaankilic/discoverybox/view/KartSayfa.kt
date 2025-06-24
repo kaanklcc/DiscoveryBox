@@ -72,7 +72,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
     var isFlipped by remember { mutableStateOf(false) } // Kartın dönme durumu
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     val context = LocalContext.current
-    val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
     val currentLang = context.resources.configuration.locales[0].language
 
 
@@ -114,9 +114,9 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                 title = {
                     androidx.compose.material3.Text(
                         text = stringResource(R.string.WordQuiz),
-                        fontSize = 32.sp,
+                        fontSize = 44.sp,
                         fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,fontFamily = delbold
+                        textAlign = TextAlign.Center,fontFamily = sandtitle
                     )
                 },
                 modifier = Modifier.background(Color.Transparent),
@@ -195,8 +195,9 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                         text = stringResource(R.string.WordLearnWelcomeMessage),
                                         style = TextStyle(
                                             color = Color.Black,
-                                            fontSize = 12.sp
-                                        ),fontFamily = delbold
+                                            fontSize = 16.sp,
+                                            textAlign = TextAlign.Center
+                                        ),fontFamily = sandtitle
                                     )
                                 }
 
@@ -243,7 +244,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                                 currentIndex = (currentIndex + 1) % wordList.size
                             }
                         ) {
-                            Text("Next", fontSize = 22.sp, color = Color.White,fontFamily = delbold)
+                            Text("Next", fontSize = 26.sp, color = Color.White,fontFamily = sandtitle)
                         }
                     }
                 } else {
@@ -254,7 +255,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
                             .background(Color.White),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = /*"Cards Are Loading..."*/stringResource(R.string.CardsAreLoading___),fontFamily = delbold)
+                        Text(text = stringResource(R.string.CardsAreLoading___),fontFamily = sandtitle)
                     }
                 }
             }
@@ -266,6 +267,7 @@ fun MeyveKartSirali(viewModel: CardSayfaViewModel = androidx.lifecycle.viewmodel
 
 @Composable
 fun FrontCardContent(word: Word) {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -290,7 +292,7 @@ fun FrontCardContent(word: Word) {
 fun BackCardContent(word: Word, flipped: Boolean = false) {
     var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     val context = LocalContext.current
-    val delbold= FontFamily(Font(R.font.delbold))
+    val andikabody= FontFamily(Font(R.font.andikabody))
     val currentLang = context.resources.configuration.locales[0].language
     val displayText = if (currentLang == "tr") word.nameTr else word.nameEn
 
@@ -346,9 +348,8 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
         Text(
             text = displayText,
             color = Color.White,
-            fontSize = 45.sp,
-            fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold,fontFamily = delbold
+            fontSize = 55.sp,
+            fontFamily = andikabody
 
         )
 
@@ -359,7 +360,7 @@ fun BackCardContent(word: Word, flipped: Boolean = false) {
             painter = painterResource(id = R.drawable.greenvoice),
             contentDescription = "hizlandir icon",
             modifier = Modifier
-                .size(100.dp) // İkonun boyutunu ayarlamak için
+                .size(90.dp) // İkonun boyutunu ayarlamak için
                 .clip(CircleShape) // Yuvarlak yapmak için CircleShape kullanılır
                 .background(Color.LightGray) // İsteğe bağlı arka plan rengi
                 .clickable {

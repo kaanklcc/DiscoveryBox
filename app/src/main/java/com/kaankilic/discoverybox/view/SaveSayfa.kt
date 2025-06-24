@@ -1,19 +1,23 @@
 package com.kaankilic.discoverybox.view
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
@@ -31,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -57,14 +62,23 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
     val userId = auth.currentUser?.uid
     val stories by saveSayfaViewModel.stories.observeAsState(emptyList())
-    val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
 
 
-    val gradientBrush = Brush.linearGradient(
+
+   /* val gradientBrush = Brush.linearGradient(
         colors = listOf(
             Color.Black,
             Color(0xFF2A3E52), // Dark Green
             Color(0xFF03F6079)
+        )
+    )*/
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFd5e0fe),
+            Color(0xFFfbdceb), // Sarı
+
+            // Açık Mavi
         )
     )
 
@@ -79,8 +93,8 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text =stringResource(R.string.YOURSTORY), fontSize = 35.sp, textAlign = TextAlign.Center,fontFamily = delbold)},
-                colors = TopAppBarColors( Color(0xFF2A3E52), Color(0xFF2A3E52), Color(0xFF2A3E52), Color.White, Color.White)
+            CenterAlignedTopAppBar(title = { Text(text =stringResource(R.string.YOURSTORY), fontSize = 40.sp, textAlign = TextAlign.Center,fontFamily = sandtitle)},
+                colors = TopAppBarColors( Color(0xFFd5e0fe), Color(0xFF2A3E52), Color(0xFF2A3E52), Color(0xFF353BA4), Color(0xFF353BA4))
             )
 
         }
@@ -108,52 +122,68 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
     }
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun StoryItem(hikaye: Hikaye, navController: NavController, saveSayfaViewModel: SaveSayfaViewModel,hikayeViewModel: HikayeViewModel) {
     var deletemessage= stringResource(R.string.HikayeSİlindi)
     val context = LocalContext.current
-    val delbold= FontFamily(Font(R.font.delbold))
-        Card(
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
+    val gradientBrush = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFd5e0fe),
+            Color(0xFFfbdceb), // Sarı
+
+            // Açık Mavi
+        )
+    )
+
+    Card(
             modifier = Modifier
                 .fillMaxWidth()
 
                 .padding(8.dp)
                 .clickable {
                     navController.navigate("metin/${hikaye.id}")
-                }, colors = CardDefaults.cardColors(Color(0xFFcfcfcf))
+                },//colors = CardDefaults.cardColors(Color(0xFFcfcfcf)) //colors = CardDefaults.cardColors(Color(0xFFcfcfcf))
 
         ) {
-            Row(modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround) {
-                AsyncImage(
-                    model = hikaye.imageUrl,
-                    contentDescription = "Hikaye Resmi",
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color(0xFFcfcfcf))
+                .padding(16.dp) // İçerik için boşluk
+        ) {
+            Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(
                     modifier = Modifier
-                        .size(120.dp)
-                        .aspectRatio(1f),
+                        .fillMaxWidth()
+                        .padding(2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(modifier = Modifier.weight(1f)) // Solda boşluk
 
-                    contentScale = ContentScale.Crop // Orijinal oranı koruyarak sığdırır
+                    Text(
+                        text = hikaye.title,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.Center,
+                        fontFamily = sandtitle,
+                        modifier = Modifier.weight(2f) // Ortada yer kaplasın
+                    )
 
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally) {
-
-                    Text(text = hikaye.title, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center,fontFamily = delbold)
-                    Text(text = hikaye.content.take(100) + "...",fontFamily = delbold)
                     IconButton(
-                        modifier = Modifier.align(Alignment.End),
                         onClick = {
                             val userId = FirebaseAuth.getInstance().currentUser?.uid
                             if (userId != null) {
                                 saveSayfaViewModel.deleteStory(userId, hikaye.id)
                                 Toast.makeText(
                                     context,
-                                   deletemessage,
+                                    deletemessage,
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
-                        }
+                        },
+                        modifier = Modifier.weight(1f) // Sağda kalsın
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
@@ -163,7 +193,28 @@ fun StoryItem(hikaye: Hikaye, navController: NavController, saveSayfaViewModel: 
                         )
                     }
                 }
+
+
+                AsyncImage(
+                    model = hikaye.imageUrl,
+                    contentDescription = "Hikaye Resmi",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(250.dp)
+                        .padding(12.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+
+                    contentScale = ContentScale.Crop // Orijinal oranı koruyarak sığdırır
+
+                )
+                //Spacer(modifier = Modifier.width(16.dp))
+
+
             }
+
+        }
+
+
         }
 
 

@@ -66,14 +66,14 @@ fun GradientBackground(colors:List<Color>,modifier: Modifier = Modifier) {
 
 @Composable
 fun LoginSplashScreen(navController: NavController) {
-    val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
     LaunchedEffect(Unit) {
         delay(3000) // 3 saniye bekle
         navController.navigate("anasayfa")
     }
 
     Box(modifier = Modifier.fillMaxSize()){
-        GradientBackground(listOf(Color(0xFFC857DA), Color(0xFFF6A79E)))
+        GradientBackground(listOf(Color(0xFFd5e0fe), Color(0xFFfbdceb)))
 
         Column(
             modifier = Modifier
@@ -103,7 +103,7 @@ fun LoginSplashScreen(navController: NavController) {
 
             }
             Spacer(modifier = Modifier.height(30.dp))
-            Text("DISCOVERY BOX", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 40.sp,fontFamily = delbold)
+            Text("DISCOVERY BOX", color = Color(0xFF353BA4), fontWeight = FontWeight.ExtraBold, fontSize = 44.sp,fontFamily = sandtitle)
 
         }
 
@@ -113,6 +113,8 @@ fun LoginSplashScreen(navController: NavController) {
 
 @Composable
 fun SplashScreen1(navController: NavController) {
+    val andikabody= FontFamily(Font(R.font.andikabody))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
     val delbold= FontFamily(Font(R.font.delbold))
 
     Scaffold(
@@ -148,10 +150,10 @@ fun SplashScreen1(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(40.dp))
 
-                Text(stringResource(R.string.storyfriend), lineHeight = 40.sp, modifier = Modifier.padding(start = 20.dp), fontWeight = FontWeight.ExtraBold, fontSize = 32.sp, color = Color.DarkGray,fontFamily = delbold)
+                Text(stringResource(R.string.storyfriend), lineHeight = 40.sp, modifier = Modifier.align(Alignment.CenterHorizontally), fontWeight = FontWeight.ExtraBold, fontSize = 36.sp, color = Color.DarkGray,fontFamily = sandtitle)
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Text(stringResource(R.string.wherestory), fontWeight = FontWeight.Normal, fontSize = 17.sp,fontFamily = delbold, modifier = Modifier.padding(start = 3.dp, end = 3.dp))
+                Text(stringResource(R.string.wherestory), fontWeight = FontWeight.Normal, fontSize = 22.sp,fontFamily = andikabody, modifier = Modifier.padding(start = 3.dp, end = 3.dp))
                 Spacer(modifier = Modifier.height(60.dp))
 
                 PageIndicator(3,0)
@@ -191,7 +193,8 @@ fun SplashScreen1(navController: NavController) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SplashScreen2(navController: NavController) {
-    val delbold= FontFamily(Font(R.font.delbold))
+    val andikabody= FontFamily(Font(R.font.andikabody))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
     Scaffold(
 
     ) { paddingValues ->
@@ -212,11 +215,11 @@ fun SplashScreen2(navController: NavController) {
                 Text(
                     stringResource(R.string.ogrenoyunla),
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 22.sp,
-                    color = Color.Black,fontFamily = delbold, modifier = Modifier.padding(start = 4.dp, end = 4.dp)
+                    fontSize = 28.sp,
+                    color = Color.Black,fontFamily = sandtitle, modifier = Modifier.padding(start = 4.dp, end = 4.dp)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
-                Text(stringResource(R.string.fungames), fontWeight = FontWeight.Medium, fontSize = 14.sp,fontFamily = delbold)
+                Text(stringResource(R.string.fungames), fontWeight = FontWeight.Medium, fontSize = 20.sp,fontFamily = andikabody)
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Row(
@@ -337,6 +340,8 @@ fun SplashScreen2(navController: NavController) {
 
 @Composable
 fun SplashScreen3(navController: NavController) {
+    val andikabody= FontFamily(Font(R.font.andikabody))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
     val delbold= FontFamily(Font(R.font.delbold))
 
 
@@ -397,18 +402,18 @@ fun SplashScreen3(navController: NavController) {
                 Text(
                     stringResource(R.string.get),
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 32.sp,
-                    color = Color.DarkGray,fontFamily = delbold
+                    fontSize = 36.sp,
+                    color = Color.DarkGray,fontFamily = sandtitle
                 )
                 Text(
                     stringResource(R.string.started),
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 32.sp,
-                    color = Color.DarkGray,fontFamily = delbold
+                    fontSize = 36.sp,
+                    color = Color.DarkGray,fontFamily = sandtitle
                 )
                 Spacer(Modifier.height(10.dp))
-                Text(stringResource(R.string.touch), fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
-                Text(stringResource(R.string.Advanturemacera), fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
+                Text(stringResource(R.string.touch), fontWeight = FontWeight.Normal, fontSize = 22.sp,fontFamily = andikabody)
+                Text(stringResource(R.string.Advanturemacera), fontWeight = FontWeight.Normal, fontSize = 22.sp,fontFamily = andikabody)
                 Spacer(Modifier.height(40.dp))
                 Button(
                     modifier = Modifier.size(230.dp, 55.dp),
@@ -423,7 +428,7 @@ fun SplashScreen3(navController: NavController) {
 
                     }
                 ) {
-                    Text(stringResource(R.string.StartNow), fontWeight = FontWeight.Normal, fontSize = 16.sp,fontFamily = delbold)
+                    Text(stringResource(R.string.StartNow), fontWeight = FontWeight.Normal, fontSize = 22.sp,fontFamily = sandtitle)
                 }
                 Spacer(Modifier.height(20.dp))
                 PageIndicator(3, 2)

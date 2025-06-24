@@ -2,6 +2,7 @@ package com.kaankilic.discoverybox.viewmodel
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
@@ -9,6 +10,10 @@ import com.kaankilic.discoverybox.entitiy.NumberItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.State
 
 
 class NumberGameViewModel : ViewModel() {
@@ -24,6 +29,10 @@ class NumberGameViewModel : ViewModel() {
 
     private val _numberItems = mutableStateListOf<String>()
     val numberItems: List<String> get() = _numberItems
+
+    private val _showCelebration = mutableStateOf(false)
+    val showCelebration: State<Boolean> get() = _showCelebration
+
 
     init {
         fetchDataFromFirebase()
@@ -81,6 +90,9 @@ class NumberGameViewModel : ViewModel() {
 
             }
     }
+    fun setShowCelebration(value: Boolean) {
+        _showCelebration.value = value
+    }
 
 
 
@@ -94,11 +106,12 @@ class NumberGameViewModel : ViewModel() {
             // Eğer 3 eşleşme tamamlandıysa yeni veri getir
             if (hiddenNumbers.size == 3) {
                 Log.d("DragDrop", "🎉 Tüm rakamlar eşleşti! Yeni veri getiriliyor...")
-                resetGame()
+                _showCelebration.value=true
+                //resetGame()
             }
         }
     }
-    private fun resetGame() {
+    fun resetGame() {
         // Listeleri temizle
         hiddenNumbers.clear()
         droppedCorrectly.clear()

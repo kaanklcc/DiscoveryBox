@@ -54,13 +54,28 @@ class DiscoveryBoxRepository(val dbds :DiscoveryBoxDataSource) {
 
 
 
-    suspend fun queryTextToImage(prompt: String, isPro: Boolean, context: Context): Bitmap? {
+    /*suspend fun queryTextToImage(prompt: String, isPro: Boolean, context: Context): Bitmap? {
         return if (isPro) {
             dbds.generateImageWithGpt(prompt) ?: dbds.getDefaultImage(context)
         } else {
             dbds.getDefaultImage(context)
         }
+    }*/
+    suspend fun queryTextToImage(prompt: String, isPro: Boolean, context: Context): Bitmap? {
+        return if (isPro) {
+            val bitmap = dbds.generateImageWithGpt(prompt)
+            if (bitmap != null) {
+                dbds.decrementRemainingChatgptUses() // ✅ Hak azalt
+                return bitmap
+            } else {
+                return dbds.getDefaultImage(context)
+            }
+        } else {
+            dbds.getDefaultImage(context)
+        }
     }
+
+
 
 
 

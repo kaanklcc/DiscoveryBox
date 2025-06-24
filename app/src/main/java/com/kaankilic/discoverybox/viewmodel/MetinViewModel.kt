@@ -33,7 +33,9 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
     fun handleTTS(context: Context, apiKey: String, text: String) {
         viewModelScope.launch {
             val (premium, usedFreeTrial, remaining) = dbRepo.isUserPremium()
-            val canUseGPTTTS = premium || !usedFreeTrial || remaining > 0
+            //val canUseGPTTTS = premium || !usedFreeTrial || remaining > 0
+            val canUseGPTTTS = premium || (!usedFreeTrial && remaining > 0)
+
 
             if (canUseGPTTTS) {
                 val result = dbRepo.generateGPTTTS(context, apiKey, text)

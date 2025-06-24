@@ -23,13 +23,21 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemColors
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -52,6 +60,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -65,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.firebase.Firebase
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.kaankilic.discoverybox.R
@@ -89,32 +99,40 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     val delbold= FontFamily(Font(R.font.delbold))
     val context = LocalContext.current
     var showMembershipChoiceDialog by remember { mutableStateOf(false) }
+    val andikabody= FontFamily(Font(R.font.andikabody))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
+
+
+
+
 
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
-            Color(0xFFFCD7D7), // Sarı
-            Color(0xFFB0D2FD), // Açık Mavi
-            // Color(0xFFFF8A80)  // Pembe
-        )
-    )
-    val gradientBrush2 = Brush.linearGradient(
-        colors = listOf(
-            Color(0xFFC5FCC6), // Sarı
-            Color(0xFFFCC1FC), // Açık Mavi
-            //Color(0xFF353BA4)  // Pembe
+            Color(0xFFd5e0fe),
+            Color(0xFFfbdceb), // Sarı
+
+             // Açık Mavi
         )
     )
 
+
+
+    val gradientBrush2 = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFfbdceb), // Sarı
+            Color(0xFFd5e0fe),
+             // Açık Mavi
+
+        )
+    )
     LaunchedEffect(Unit) {
         anasayfaViewModel.checkUserAccess { hasTrial, isPremium ,usedFreeTrial ->
-            if (!hasTrial || !isPremium) {
+            if (!hasTrial && !isPremium) {
                 showDialogPay = true
             }
         }
     }
-
-
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
@@ -124,13 +142,12 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                 title = {
                     Text(
                         text = stringResource(R.string.DiscoveryBox),
-                        fontSize = 29.sp,
+                        fontSize = 34.sp,
                         textAlign = TextAlign.Center,
-                        fontFamily = delbold
+                        fontFamily = sandtitle
                     )
                 },
-                colors = TopAppBarColors( Color(0xFFE2EFFC), Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF353BA4),  Color(0xFF353BA4)),
-
+                colors = TopAppBarColors( Color(0xFFE3F2FD), Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF353BA4),  Color(0xFF353BA4)),
 
                 actions = {
                     IconButton(onClick = {
@@ -165,7 +182,8 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
             )
 
 
-        }
+        },
+
     ) { paddingValues ->
 
         if (konular.isEmpty()) {
@@ -175,10 +193,14 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                 textAlign = TextAlign.Center
             )
         } else {
-            Column(modifier = Modifier.fillMaxSize()
-                .padding(paddingValues).
-                background(Color(0xFFE2EFFC)
-            ),
+
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(
+                    Color(0xFFE3F2FD)
+                    //background(Color(0xFFE2EFFC)
+                ),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -279,8 +301,8 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             stringResource(R.string.EducationalGames),
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Left,
-                            fontSize = 24.sp
-                            , fontFamily = delbold,
+                            fontSize = 26.sp
+                            , fontFamily = sandtitle,
 
                             color =  Color(0xFFF454a94),
                             modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
@@ -289,7 +311,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
 
                             stringResource(R.string.Learnwhileplaying),
                             textAlign = TextAlign.Left,
-                            fontSize = 16.sp, fontFamily = delbold,
+                            fontSize = 20.sp, fontFamily = andikabody,
                             modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
                         )
                         Image(
@@ -347,15 +369,16 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         Text(
                            stringResource(R.string.CreateStorieswithAI),
                             fontWeight = FontWeight.Bold,
+                            lineHeight = 30.sp,
                             textAlign = TextAlign.Left,
-                            fontSize = 24.sp, fontFamily = delbold,
+                            fontSize = 26.sp, fontFamily = sandtitle,
                             color =  Color(0xFFF454a94),
                             modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
                         )
                         Text(
                             stringResource(R.string.Letyourimaginationfly),
                             textAlign = TextAlign.Left,
-                            fontSize = 16.sp, fontFamily = delbold,
+                            fontSize = 20.sp, fontFamily = andikabody,
                             modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
                         )
                         Image(
@@ -383,7 +406,9 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                 }
 
 
-                Row(modifier = Modifier.fillMaxWidth(),
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 7.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Absolute.Center)
                 {
@@ -394,7 +419,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
 
                         )
                     Spacer(Modifier.width(3.dp))
-                    Text("Safe for Kids", fontFamily = delbold)
+                    Text("Safe for Kids", fontFamily = sandtitle, fontSize = 18.sp)
                 }
 
 
@@ -411,7 +436,7 @@ fun updatePremiumForTest(durationDays: Int, totalUses: Int, context: Context) {
     userRef.update(
         mapOf(
             "premium" to true,
-            "premiumStartDate" to com.google.firebase.Timestamp.now(),
+            "premiumStartDate" to Timestamp.now(),
             "premiumDurationDays" to durationDays,
             "remainingChatgptUses" to totalUses
         )
@@ -423,6 +448,11 @@ fun updatePremiumForTest(durationDays: Int, totalUses: Int, context: Context) {
         Log.e("PremiumUpdate", "Premium güncelleme hatası: ${e.message}")
     }
 }
+
+data class NavItem(
+    val label:String,
+    val icon:ImageVector
+)
 
 
 

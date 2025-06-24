@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,6 +28,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -46,15 +48,18 @@ import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 @Composable
 fun GameMain(navController: NavController, anasayfaViewModel: AnasayfaViewModel) {
     val konular by anasayfaViewModel.konular.observeAsState(emptyList()) // Boş bir liste ile başlatıyoruz
-    val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
+
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text =stringResource(R.string.GameScreen), fontSize = 34.sp, fontFamily = delbold, textAlign = TextAlign.Center) })
+            CenterAlignedTopAppBar(title = { Text(text =stringResource(R.string.GameScreen), fontSize = 40.sp, fontFamily = sandtitle, textAlign = TextAlign.Center) },
+                colors = TopAppBarColors( Color(0xFFE3F2FD), Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF353BA4),  Color(0xFF353BA4)),)
         }
     ) { paddingValues ->
 
         Column( modifier = Modifier
+            .background(Color(0xFFE3F2FD))
             .fillMaxSize()
             .padding(paddingValues),
             verticalArrangement = Arrangement.Top,
@@ -62,14 +67,14 @@ fun GameMain(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
 
             Spacer(modifier = Modifier.height(12.dp)) // Üstten biraz boşluk
             Text(
-                stringResource(R.string.play), fontSize = 28.sp,
+                stringResource(R.string.play), fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
-                fontFamily = delbold)
+                fontFamily = sandtitle)
             Spacer(modifier = Modifier.height(15.dp)) // Üstten biraz boşluk
-            Text(stringResource(R.string.andmore), fontSize = 19.sp)
+            Text(stringResource(R.string.andmore), fontSize = 20.sp,fontFamily = sandtitle, textAlign = TextAlign.Center)
             Spacer(modifier = Modifier.height(25.dp)) // Üstten biraz boşluk
             if (konular.isEmpty()){
-                Text(text = stringResource(R.string.NoStoryMessage), fontFamily = delbold)
+                Text(text = stringResource(R.string.NoStoryMessage), fontFamily = sandtitle)
             } else{
                 LazyVerticalGrid(
                     modifier = Modifier
@@ -95,12 +100,13 @@ fun GameMain(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
 
 @Composable
 fun GameItem(story: Story, navController: NavController) {
-    val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
+
     // Hikaye öğesinin görünümü
     Column(
         modifier = Modifier
             .padding(vertical = 20.dp, horizontal = 14.dp)
-            .background(MaterialTheme.colorScheme.surface)
+            .background(Color.Transparent)
             .clickable {
                 when (story.category) {
                     "wordGame" -> navController.navigate("wordGame")
@@ -118,7 +124,7 @@ fun GameItem(story: Story, navController: NavController) {
             modifier = Modifier.size(150.dp).clip(RoundedCornerShape(25.dp)), contentScale = ContentScale.Crop)
         Spacer(modifier = Modifier.height(6.dp)) // Üstten biraz boşluk
         Text(story.title, fontWeight = FontWeight.Bold,
-            fontFamily = delbold, fontSize = 16.sp)
+            fontFamily = sandtitle, fontSize = 19.sp)
 
     }
 }

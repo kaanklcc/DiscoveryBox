@@ -41,6 +41,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import com.google.accompanist.flowlayout.FlowRow
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ExitToApp
+import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.firebase.auth.FirebaseAuth
 import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
 import com.kaankilic.discoverybox.util.isInternetAvailable
@@ -63,7 +66,8 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
     val context = LocalContext.current
     val snackbarHostState= remember { SnackbarHostState() }
     var focusState by remember { mutableStateOf(false) }
-    val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
+    val andikabody= FontFamily(Font(R.font.andikabody))
     var showDialogPay by remember { mutableStateOf(false) }
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     //var dbRepo= DiscoveryBoxRepository()
@@ -74,21 +78,44 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
 
     val gradientBrush = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF21324A),
-            Color(0xFF6BB7C0), // Üstteki renk
-            // Alttaki renk
+            Color(0xFFd5e0fe),
+            Color(0xFFfbdceb),
+
+
+
         ),
         startY = 0f,
-        endY = 3500f// eğeri ekran yüksekliğine göre ayarlayabilirsiniz.
+        endY =
+            1500f// eğeri ekran yüksekliğine göre ayarlayabilirsiniz.
     )
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = /*"Story"*/stringResource(R.string.Story), fontSize = 42.sp, textAlign = TextAlign.Center, fontFamily = delbold) },
-                modifier = Modifier.background(gradientBrush),
-                colors = TopAppBarColors(Color(0xFF21324A),Color.DarkGray,Color.Gray,Color.White,Color.White)// Apply gradient to top bar
-            )
+            title = {
+                Text(
+                    text = stringResource(R.string.Story),
+                    fontSize = 48.sp,
+                    textAlign = TextAlign.Center,
+                    fontFamily = sandtitle
+                )
+            },
+                colors = TopAppBarColors(Color(0xFFd5e0fe),Color.DarkGray,Color.Gray,Color(0xFF353BA4),Color(0xFF353BA4)),
+                navigationIcon  = {
+                IconButton(modifier = Modifier.padding(start = 8.dp), onClick = {
+                    navController.navigate("hikayeGecis")
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "Logout",
+                        tint =Color(0xFF353BA4) ,
+                        modifier = Modifier.size(60.dp),
+
+                        )
+
+                }
+            }
+        )
         },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
@@ -113,21 +140,22 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 25.dp, start = 15.dp),
-                fontSize = 18.sp,
-                color = Color.White, fontFamily = delbold
+                fontSize = 22.sp,
+                color = Color(0xFF353BA4), fontFamily = sandtitle
             )
             TextField(
                 value = konu,
                 onValueChange = { konu = it },
                 colors = TextFieldDefaults.textFieldColors(
-                    cursorColor = Color.White,
-                    containerColor = Color.Black,
+                    cursorColor = Color.Black,
+                    //containerColor =Color.DarkGray,
+                    containerColor = Color(0xFF969696),
                     focusedIndicatorColor = Color.White,
                     unfocusedIndicatorColor = Color.White,
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     focusedLabelColor =  Color(0xFF21324A),
-                    unfocusedLabelColor = Color.White
+                    unfocusedLabelColor = Color.Black
 
 
 
@@ -136,56 +164,56 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = stringResource(R.string.SubjectExp), fontSize = 12.sp, fontFamily = delbold) }
+                label = { Text(text = stringResource(R.string.SubjectExp), fontSize = 14.sp, fontFamily = andikabody) }
             )
             Text(
                 text = stringResource(R.string.Location),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
-                fontSize = 18.sp,
-                color = Color.White, fontFamily = delbold
+                fontSize = 22.sp,
+                color = Color(0xFF353BA4), fontFamily = sandtitle
             )
             TextField(
                 value = mekan,
                 onValueChange = { mekan = it },
                 colors = TextFieldDefaults.textFieldColors(
                     cursorColor = Color.White,
-                    containerColor = Color.Black,
+                    containerColor = Color(0xFF969696),
                     focusedIndicatorColor = Color.White,
                     unfocusedIndicatorColor = Color.White,
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     focusedLabelColor =  Color(0xFF21324A),
-                    unfocusedLabelColor = Color.White,
+                    unfocusedLabelColor =Color.Black,
 
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text =stringResource(R.string.LocationExp), fontSize = 12.sp, fontFamily = delbold) }
+                label = { Text(text =stringResource(R.string.LocationExp), fontSize = 14.sp, fontFamily = andikabody) }
             )
             Text(
                 text = stringResource(R.string.MainCharacter),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
-                fontSize = 18.sp,
-                color = Color.White, fontFamily = delbold
+                fontSize = 22.sp,
+                color =Color(0xFF353BA4), fontFamily = sandtitle
             )
             TextField(
                 value = anaKarakter,
                 onValueChange = { anaKarakter = it },
                 colors = TextFieldDefaults.textFieldColors(
                     cursorColor = Color.White,
-                    containerColor = Color.Black,
+                    containerColor =  Color(0xFF969696),
                     focusedIndicatorColor = Color.White,
                     unfocusedIndicatorColor = Color.White,
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     focusedLabelColor =  Color(0xFF21324A),
-                    unfocusedLabelColor = Color.White,
+                    unfocusedLabelColor = Color.Black,
 
 
 
@@ -194,15 +222,15 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = stringResource(R.string.MainCharacterExp), fontSize = 12.sp, fontFamily = delbold) }
+                label = { Text(text = stringResource(R.string.MainCharacterExp), fontSize = 14.sp, fontFamily = andikabody) }
             )
             Text(
                 text = stringResource(R.string.MinorCharacter),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
-                fontSize = 18.sp,
-                color = Color.White, fontFamily = delbold
+                fontSize = 22.sp,
+                color =Color(0xFF353BA4), fontFamily = sandtitle
             )
             Column {
                 yanKarakterler.forEachIndexed { index, text ->
@@ -221,13 +249,13 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                             },
                             colors = TextFieldDefaults.textFieldColors(
                                 cursorColor = Color.White,
-                                containerColor = Color.Black,
+                                containerColor = Color(0xFF969696),
                                 focusedIndicatorColor = Color.White,
                                 unfocusedIndicatorColor = Color.White,
                                 focusedTextColor = Color.White,
                                 unfocusedTextColor = Color.White,
                                 focusedLabelColor =  Color(0xFF21324A),
-                                unfocusedLabelColor = Color.White
+                                unfocusedLabelColor = Color.Black
 
 
 
@@ -236,7 +264,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                                 .weight(1f) // fillMaxWidth yerine weight kullan
                                 .padding(start = 10.dp, top = 10.dp, bottom = 25.dp)
                                 .onFocusChanged { focusState = it.isFocused },
-                            label = { Text(text = stringResource(R.string.MinorCharacterExp), fontSize = 12.sp, fontFamily = delbold) }
+                            label = { Text(text = stringResource(R.string.MinorCharacterExp), fontSize = 14.sp, fontFamily = andikabody) }
                         )
 
                         Icon(
@@ -257,21 +285,21 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
-                fontSize = 18.sp,
-                color = Color.White, fontFamily = delbold
+                fontSize = 22.sp,
+                color =Color(0xFF353BA4), fontFamily = sandtitle
             )
             TextField(
                 value = anaKarakterOzellik,
                 onValueChange = { anaKarakterOzellik = it },
                 colors = TextFieldDefaults.textFieldColors(
                     cursorColor = Color.White,
-                    containerColor = Color.Black,
+                    containerColor =  Color(0xFF969696),
                     focusedIndicatorColor = Color.White,
                     unfocusedIndicatorColor = Color.White,
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
                     focusedLabelColor =  Color(0xFF21324A),
-                    unfocusedLabelColor = Color.White
+                    unfocusedLabelColor = Color.Black
 
 
 
@@ -280,15 +308,15 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
                     .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text =stringResource(R.string.MainCharacterCharacteristicExp), fontSize = 12.sp, fontFamily = delbold) }
+                label = { Text(text =stringResource(R.string.MainCharacterCharacteristicExp), fontSize = 14.sp, fontFamily = andikabody) }
             )
             Text(
                 text = stringResource(R.string.StoryLength) ,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
-                fontSize = 18.sp,
-                color = Color.White, fontFamily = delbold
+                fontSize = 22.sp,
+                color = Color(0xFF353BA4), fontFamily = sandtitle
             )
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -302,9 +330,9 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
 
                         selected = secilenChip == option,
                         onClick = { ayarSecilenChip(option) },
-                        label = { Text(text = option, color = Color.White) },
+                        label = { Text(text = option, color = Color.Black, fontFamily = andikabody) },
                         colors = FilterChipDefaults.filterChipColors(
-                            containerColor = Color.Black, // Varsayılan arka plan rengi
+                            containerColor =Color(0xFF969696), // Varsayılan arka plan rengi
                             selectedContainerColor = Color(0xFF21324A), // Seçili olduğunda arka plan rengi
                             labelColor = Color.Black, // Varsayılan yazı rengi
                             selectedLabelColor = Color.Black // Seçili olduğunda yazı rengi
@@ -320,13 +348,13 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 15.dp),
-                fontSize = 18.sp,
-                color = Color.White, fontFamily = delbold
+                fontSize = 22.sp,
+                color = Color(0xFF353BA4), fontFamily = sandtitle
             )
             Spacer(modifier = Modifier.height(2.dp))
 
             FlowRow(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(), mainAxisAlignment = FlowMainAxisAlignment.SpaceEvenly,
                 mainAxisSpacing = 5.dp,
                 crossAxisSpacing = 5.dp
             ) {
@@ -337,16 +365,17 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                         label = {
                             Text(
                                 text = option,
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                textAlign = TextAlign.Center
+                                fontSize = 12.sp,
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                fontFamily = andikabody
                             )
                         },
                         colors = FilterChipDefaults.filterChipColors(
-                            containerColor = Color.Black,
+                            containerColor =Color(0xFF969696),
                             selectedContainerColor = Color(0xFF21324A),
-                            labelColor = Color.White,
-                            selectedLabelColor = Color.White
+                            labelColor = Color.Black,
+                            selectedLabelColor = Color.Black
                         ),
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
@@ -373,7 +402,7 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                                 val temaText = if (selectedChip.isNotEmpty()) "Tema: $selectedChip" else ""
                                 val uzunlukText = if (secilenChip.isNotEmpty()) "Uzunluk: $secilenChip" else ""
 
-                                generatedStory = "Write me a story. " +
+                                /*generatedStory = "Write me a story. " +
                                         "Topic: ${konu.text}," +
                                         " Location: ${mekan.text}," +
                                         " Main character: ${anaKarakter.text}," +
@@ -381,7 +410,32 @@ fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinVi
                                         " Supporting characters: ${yanKarakterlerText}, " +
                                         "Theme: ${temaText}," +
                                         " Length: ${uzunlukText}" +
-                                        ".but at the beginning of the story, there shouldn't be an AI-related sentence — for example, no sentences like 'here is a story for you.' It should start directly with the story"
+                                        ".but at the beginning of the story, there shouldn't be an AI-related sentence — for example, no sentences like 'here is a story for you.' It should start directly with the story"*/
+                                val containsTurkishChars = listOf(konu.text, mekan.text, anaKarakter.text, anaKarakterOzellik.text).any {
+                                    it.contains(Regex("[çÇğĞıİöÖşŞüÜ]"))
+                                }
+
+                                generatedStory = if (containsTurkishChars) {
+                                    "Bana bir hikaye yaz. " +
+                                            "Konu: ${konu.text}, " +
+                                            "Mekan: ${mekan.text}, " +
+                                            "Ana karakter: ${anaKarakter.text}, " +
+                                            "Ana karakter özelliği: ${anaKarakterOzellik.text}, " +
+                                            "Yardımcı karakterler: $yanKarakterlerText, " +
+                                            "Tema: $temaText, " +
+                                            "Uzunluk: $uzunlukText. " +
+                                            "Ama hikayenin başında 'işte sana bir hikaye' gibi yapay zeka ile ilgili cümleler olmasın. Hikaye doğrudan başlasın."
+                                } else {
+                                    "Write me a story. " +
+                                            "Topic: ${konu.text}," +
+                                            " Location: ${mekan.text}," +
+                                            " Main character: ${anaKarakter.text}," +
+                                            " Main character trait: ${anaKarakterOzellik.text}," +
+                                            " Supporting characters: ${yanKarakterlerText}, " +
+                                            "Theme: ${temaText}," +
+                                            " Length: ${uzunlukText}" +
+                                            ". But at the beginning of the story, there shouldn't be an AI-related sentence — for example, no sentences like 'here is a story for you.' It should start directly with the story"
+                                }
 
                                 imageGenerate =  """
 A photorealistic digital painting in the style of a high-end children’s storybook illustration. 
@@ -425,7 +479,7 @@ Layout: wide horizontal (storybook spread), ultra-high detail, rendered at 1024x
 
                 },
             ) {
-                Text(text = stringResource(R.string.CreatetheStory))
+                Text(text = stringResource(R.string.CreatetheStory), fontFamily = sandtitle, fontSize = 16.sp)
             }
             if (showDialogPay) {
                 AlertDialog(

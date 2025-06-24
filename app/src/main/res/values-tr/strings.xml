@@ -17,26 +17,26 @@
     <string name="Adventure">Macera</string>
     <string name="Action">Aksiyon</string>
     <string name="Love">Sevgi</string>
-    <string name="Friendship">Arkadaslık</string>
+    <string name="Friendship">Arkadaşlık</string>
     <string name="Family">Aile</string>
     <string name="Short">Kısa</string>
     <string name="Medium">Orta</string>
     <string name="Long">Uzun</string>
 
 
-    <string name="MATCHINGGAME">ESLESTİRME OYUNU</string>
+    <string name="MATCHINGGAME">EŞLESTİRME OYUNU</string>
     <string name="CongratulationsGameisOver">Tebrikler, Oyun Bitti!</string>
-    <string name="matchWelcomeMessage">"Hosgeldin!Haydi Kelimeleri Eslestirelim</string>
-    <string name="Congratulations">TEbrikler</string>
+    <string name="matchWelcomeMessage">"Hosgeldin! Haydi Kelimeleri Eşleştirelim</string>
+    <string name="Congratulations">Tebrikler</string>
 
-    <string name="COLORMATCHINGGAME">RENK ESLESTİRME OYUNUE</string>
-    <string name="ColorWelcomeMessage">"Hosgeldin!Haydi Dogru Renkleri Bulalım"</string>
+    <string name="COLORMATCHINGGAME">RENK EŞLEŞTİRME OYUNU</string>
+    <string name="ColorWelcomeMessage">"Hoşgeldin! Haydi Doğru Renkleri Bulalım"</string>
     <string name="Right">Doğru!</string>
     <string name="Wrong">Yanlış!</string>
 
-    <string name="GameScreen">Oyun Ekranı</string>
+    <string name="GameScreen">Oyunlar</string>
 
-    <string name="WelcomeToMagicWorld">Sihir Dünyasına Hosgeldin</string>
+    <string name="WelcomeToMagicWorld">Sihir Dünyasına Hoşgeldin</string>
     <string name="Email">Email</string>
     <string name="LoginSuccesful">Giriş Başarılı</string>
     <string name="LoginFailed">Giriş Başarısız:</string>
@@ -46,7 +46,7 @@
 
 
     <string name="Subject">Konu</string>
-    <string name="SubjectExp">Örn: Uzay Yolculugu, arkadaslıgın önemi</string>
+    <string name="SubjectExp">Örn: Uzay Yolculuğu, arkadaşlığın önemi</string>
     <string name="Location">Konum</string>
     <string name="LocationExp">Örn: Çöl, Okul, Orman</string>
     <string name="MainCharacter">Ana Karakter</string>
@@ -55,34 +55,34 @@
     <string name="MinorCharacterExp">Örn: Shrek, Anıl, Zeynep</string>
     <string name="MainCharacterCharacteristic">Ana Karakter Özellik</string>
     <string name="MainCharacterCharacteristicExp">Örn: Yaramaz, Sevimli, Dürüst</string>
-    <string name="StoryLength">Hikaye Uzunlugu</string>
+    <string name="StoryLength">Hikaye Uzunluğu</string>
     <string name="Theme">Tema</string>
     <string name="CreatetheStory">Hikaye Yarat</string>
 
 
-    <string name="SignIn">Giris Yap</string>
+    <string name="SignIn">Giriş Yap</string>
 
     <string name="MYSTORIES">HİKAYELERİM</string>
 
     <string name="WordQuiz">Kelime Testi</string>
-    <string name="WordLearnWelcomeMessage">"Hosgeldiniz !.Haydi kelimeleri ögrenelim"</string>
+    <string name="WordLearnWelcomeMessage">"Hosgeldiniz! Haydi kelimeleri öğrenelim"</string>
     <string name="Next">İleri</string>
     <string name="CardsAreLoading...">Kartlar Yükleniyor...</string>
 
-    <string name="WELCOMETO">HOSGELDİNİZ</string>
+    <string name="WELCOMETO">HOŞGELDİNİZ</string>
     <string name="DiscoveryBox">Discovery Box</string>
     <string name="Name">İsim</string>
     <string name="Surname">Soyisim</string>
 
-    <string name="Registrationsuccessful">Kayıt Basarılı</string>
-    <string name="Registrationfailed">Kayıt Basarılı:</string>
+    <string name="Registrationsuccessful">Kayıt Başarılı</string>
+    <string name="Registrationfailed">Kayıt Başarılı:</string>
 
 
 
     <string name="YOURSTORY">HİKAYELERİN</string>
     <string name="Storyisbeingcreated...">Hikaye Yaratılıyor...</string>
     <string name="Imageisbeingcreated..">Görsel Üretiliyor..</string>
-    <string name="Convertedtosound...">Sese Dönüstürülüyor...</string>
+    <string name="Convertedtosound...">Sese Dönüştürülüyor...</string>
     <string name="Couldnotgetimageurl">Görsel Urlsi alınamadı</string>
     <string name="Imagecouldnotbesaved">Görsel kaydedilemedi</string>
     <string name="Storyandimagesavedsuccessfully">Görsel ve hikaye başarıyla kaydedildi</string>
@@ -101,10 +101,10 @@
 
     <string name="default_web_client_id">764790962175-86cdpa0e5vi52scv1incbf4e7dph73m6.apps.googleusercontent.com</string>
 
-    <string name="EducationalGames">Egitici Oyunlar</string>
-    <string name="Learnwhileplaying">Oynarken Ögren!</string>
+    <string name="EducationalGames">Eğitici Oyunlar</string>
+    <string name="Learnwhileplaying">Oynarken Öğren!</string>
     <string name="CreateStorieswithAI">Yapay Zeka ile Hikaye Yarat!</string>
-    <string name="Letyourimaginationfly">Hayal Gücünün Serbest Bırak!</string>
+    <string name="Letyourimaginationfly">Hayal Gücünü Serbest Bırak!</string>
 
     <string name="HakkınızTükendi">Üyelik Hakkınız Tükendi!</string>
     <string name="haktükendiuzun">Devam etmek için üyelik alabilir veya ücretsiz sürüm ile devam edebilirsiniz.</string>
@@ -115,19 +115,19 @@
     <string name="HikayeSİlindi">Hikaye Silindi</string>
 
     <string name="DragAndDrop">Sürükle ve Bırak</string>
-    <string name="numaraeslestir">Dogru numaraları renklerle eslestir</string>
+    <string name="numaraeslestir">Doğru numaraları görsellerle eşleştirin</string>
 
-    <string name="storyfriend">Hikaye Arkadasları</string>
-    <string name="wherestory">Hikayelerin Canlandıgı Yer!</string>
-    <string name="ogrenoyunla">Oyunlarla Ögrenin!</string>
-    <string name="fungames">Eglenceli Ogretici Oyunlar</string>
+    <string name="storyfriend">Hikaye Arkadaşları</string>
+    <string name="wherestory">Hikayelerin Canlandığı Yer!</string>
+    <string name="ogrenoyunla">Oyunlarla Öğrenin!</string>
+    <string name="fungames">Eglenceli Öğretici Oyunlar</string>
     <string name="get">Haydi</string>
-    <string name="started">Baslayalım</string>
-    <string name="touch">Hikayene Baslamak icin</string>
+    <string name="started">Başlayalım</string>
+    <string name="touch">Hikayene Başlamak için</string>
     <string name="Advanturemacera">Tıkla!</string>
-    <string name="StartNow">Hemen Basla -></string>
+    <string name="StartNow">Hemen Başla -></string>
     <string name="learn">Oyna</string>
-    <string name="play">Oyna &amp; Ogren</string>
+    <string name="play">Oyna &amp; Öğren</string>
     <string name="andmore">Renkler, Kelimeler ve Daha Fazlası</string>
 
 

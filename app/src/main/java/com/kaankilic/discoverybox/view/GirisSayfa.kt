@@ -89,7 +89,8 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
     val context = LocalContext.current
     val loginResult by GirisSayfaViewModel.loginResult.observeAsState()
     val logsuc = stringResource(R.string.LoginSuccesful)
-    val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
+    val andikabody= FontFamily(Font(R.font.andikabody))
 
     val activity = context as Activity
 
@@ -118,7 +119,7 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
             modifier = Modifier
                 .fillMaxSize().padding(paddingValues)
         ) {
-            GradientBackgroundd(listOf( Color(0xFFFDEAF2),Color(0xFFD6F8FA)))
+            GradientBackgroundd(listOf( Color(0xFFfbdceb),Color(0xFFd5e0fe)))
 
             Column(
                 modifier = Modifier
@@ -159,11 +160,11 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                 Text(
                    stringResource(R.string.DiscoveryBox),
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 30.sp,
-                    color = Color.DarkGray, fontFamily = delbold
+                    fontSize = 40.sp,
+                    color = Color.DarkGray, fontFamily = sandtitle
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(stringResource(R.string.WelcomeToMagicWorld), fontWeight = FontWeight.Normal, fontSize = 20.sp, fontFamily = delbold,
+                Text(stringResource(R.string.WelcomeToMagicWorld), fontWeight = FontWeight.Normal, fontSize = 24.sp, fontFamily = andikabody,
                     modifier = Modifier.padding(start = 3.dp, end = 3.dp))
 
                         Column(
@@ -251,16 +252,6 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
         }
 
 
-/*@Preview(showBackground = true)
-@Composable
-fun PreviewGirisSayfa() {
-
-    val fakeNavController = rememberNavController() // Fake NavController oluştur
-    val fakeViewModel = GirisSayfaViewModel() // Eğer içinde canlı veri yoksa direkt oluşturulabilir
-
-    GirisSayfa(navController = fakeNavController, GirisSayfaViewModel = fakeViewModel)
-}*/
-
 @Composable
 fun LanguageSwitcher(context: Context) {
     var locale by remember { mutableStateOf(Locale.getDefault()) }
@@ -270,8 +261,8 @@ fun LanguageSwitcher(context: Context) {
         contentAlignment = Alignment.TopEnd
     ) {
         Button(onClick = { showMenu = true },
-            colors = ButtonDefaults.buttonColors(Color.DarkGray),) {
-            Text(text = "🌍")
+            colors = ButtonDefaults.buttonColors(Color.White),) {
+            Text(text = "\uD83C\uDDF9\uD83C\uDDF7 / \uD83C\uDDFA\uD83C\uDDF8" , color = Color.Black)
         }
 
         DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {

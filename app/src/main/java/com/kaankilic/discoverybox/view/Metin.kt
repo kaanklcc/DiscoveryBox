@@ -4,6 +4,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -64,7 +65,16 @@ import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
+import kotlinx.coroutines.delay
 import java.util.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.tween
+
 
 @RequiresApi(Build.VERSION_CODES.DONUT)
 @Composable
@@ -81,8 +91,8 @@ fun Metin(navController: NavController,
     var audioVisible by remember { mutableStateOf(false) }
     var audioVisibleStory by remember { mutableStateOf(false) }
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    val itim= FontFamily(Font(R.font.itim))
-    val zen= FontFamily(Font(R.font.zen))
+    val andikabody= FontFamily(Font(R.font.andikabody))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
     val language = stringResource(R.string.language)
     val country = stringResource(R.string.country)
     var hasTrial by remember { mutableStateOf(false) }
@@ -233,7 +243,7 @@ fun Metin(navController: NavController,
                     fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         lineHeight = 50.sp,
-                        fontFamily = zen
+                        fontFamily = sandtitle
 
                 )
                     Spacer(modifier = Modifier.height(6.dp))
@@ -249,7 +259,7 @@ fun Metin(navController: NavController,
                     color = Color.White,
                     textAlign = TextAlign.Justify,
                     fontSize = 25.sp,
-                   fontFamily = itim
+                   fontFamily = andikabody
 
                 )
 
@@ -258,34 +268,25 @@ fun Metin(navController: NavController,
                     navController.navigate("saveSayfa")
                 }, colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)), modifier = Modifier.padding(bottom = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // <-- bu eklendi
                 )) {
-                    Text(text = stringResource(R.string.MYSTORIES),fontSize = 22.sp, fontFamily = zen)
+                    Text(text = stringResource(R.string.MYSTORIES),fontSize = 22.sp, fontFamily = sandtitle)
 
                 }
                 //bitiş
             }else{
-                    if (hikayeyiOlustur.isEmpty() && generatedImage == null ) {
-                        Text(
-                            text = stringResource(R.string.Storyisbeingcreated___),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            fontSize = 22.sp,
-                            color = Color.White
-                        )
-                        Text(
-                            text =stringResource(R.string.Imageisbeingcreated__),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            fontSize = 22.sp,
-                            color = Color.White
-                        )
-                        Text(
-                            text = stringResource(R.string.Convertedtosound___),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            fontSize = 22.sp,
-                            color = Color.White
-                        )
-                        CircularProgressIndicator()
+                    if (hikayeyiOlustur.isEmpty() || generatedImage == null) {
+
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            AnimatedLoadingImages()
+                            Text("Yeni Bir Dünya Yaratılıyor...", fontFamily = andikabody, fontSize = 20.sp, color = Color.White)
+                            Text("Karakterler Canlandırılıyor...",fontFamily = andikabody, fontSize = 20.sp, color = Color.White)
+                            Text("Sesler Duyulmaya Başlanıyor...",fontFamily = andikabody, fontSize = 20.sp, color = Color.White)
+
+
+                        }
                     } else {
                         if (hikayeyiOlustur.isNotEmpty() && generatedImage != null) {
                             Row(modifier = Modifier.fillMaxWidth(),
@@ -302,8 +303,7 @@ fun Metin(navController: NavController,
                                             contentScale = ContentScale.Crop,
                                             modifier = Modifier
                                                 .fillMaxSize()
-                                                /*.aspectRatio(1f)
-                                                .padding(24.dp)*/
+
                                                 .clip(RoundedCornerShape(12.dp))
                                         )
                                         Box(
@@ -333,7 +333,7 @@ fun Metin(navController: NavController,
                                         alignment = Alignment.TopEnd,
                                         modifier = Modifier
                                             .align(Alignment.TopEnd)
-                                            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // <-- bu eklendi
+                                            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
                                                 end = 10.dp)
                                             .clickable {
                                                 audioVisible = true
@@ -436,7 +436,7 @@ fun Metin(navController: NavController,
                                 color = Color.White,
                                 textAlign = TextAlign.Justify,
                                 fontSize = 25.sp,
-                                fontFamily = itim)
+                                fontFamily = andikabody)
                             Button(onClick = {
                                 val prompt = hikayeViewModel.getCurrentPrompt()
                                 hikayeViewModel.generateStory(prompt)
@@ -444,7 +444,7 @@ fun Metin(navController: NavController,
                             },colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)),modifier = Modifier
                                 .padding(bottom = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // <-- bu eklendi
                                 ))  {
-                                Text(text =stringResource(R.string.Rebuild),fontSize = 22.sp, fontFamily = zen)
+                                Text(text =stringResource(R.string.Rebuild),fontSize = 22.sp, fontFamily = sandtitle)
                             }
 
                             Button(onClick = {
@@ -452,7 +452,7 @@ fun Metin(navController: NavController,
                             },colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)), modifier = Modifier
                                 .padding(bottom = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // <-- bu eklendi
                                 )) {
-                                Text(text = stringResource(R.string.MYSTORIES),fontSize = 22.sp, fontFamily = zen)
+                                Text(text = stringResource(R.string.MYSTORIES),fontSize = 22.sp, fontFamily = sandtitle)
                             }
 
                         }
@@ -567,7 +567,7 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                     .padding(end = 10.dp)
                     .clickable {
                         //textToSpeech?.shutdown()
-                        //onClose()
+                        onClose()
 
                     }// Sağ üst köşeye biraz boşluk ekler (isteğe bağlı)
             )
@@ -602,10 +602,10 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
         ) {
 
             Image(
-                painter = painterResource(id = R.drawable.playicon),
+                painter = painterResource(id = R.drawable.playbutton),
                 contentDescription = "hizlandir icon",
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(55.dp)
                     .clip(CircleShape)
                     .background(Color.LightGray)
                     .border(2.dp, Color.Gray, CircleShape)
@@ -628,10 +628,10 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
 
 
             Image(
-                painter = painterResource(id = R.drawable.pauseb),
+                painter = painterResource(id = R.drawable.pausebutton),
                 contentDescription = "play icon",
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(55.dp)
                     .clip(CircleShape)
                     .background(Color.LightGray)
                     .border(2.dp, Color.Gray, CircleShape)
@@ -705,6 +705,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
                     .align(Alignment.TopEnd)
                     .padding(end = 10.dp)
                     .clickable {
+                        onClose()
 
                     }
             )
@@ -740,27 +741,29 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
         ) {
 
             Image(
-                painter = painterResource(id = R.drawable.playicon),
+                painter = painterResource(id = R.drawable.playbutton),
                 contentDescription = "hizlandir icon",
                 modifier = Modifier
-                    .size(40.dp) // İkonun boyutunu ayarlamak için
+                    .size(55.dp) // İkonun boyutunu ayarlamak için
                     .clip(CircleShape) // Yuvarlak yapmak için CircleShape kullanılır
-                    .background(Color.LightGray) // İsteğe bağlı arka plan rengi
+                    .background(Color.Transparent) // İsteğe bağlı arka plan rengi
                     .border(2.dp, Color.Gray, CircleShape)
+
                     .clickable {
                         metinViewModel.speak(kaan.content)
                         isPlaying = true
 
-                    }
+                    },
+                contentScale = ContentScale.Crop
             )
 
             Image(
-                painter = painterResource(id = R.drawable.pauseb),
+                painter = painterResource(id = R.drawable.pausebutton),
                 contentDescription = "play icon",
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(55.dp)
                     .clip(CircleShape)
-                    .background(Color.LightGray)
+                    .background(Color.Transparent)
                     .border(2.dp, Color.Gray, CircleShape)
                     .clickable {
                         metinViewModel.stopMediaPlayer() // GPT TTS için
@@ -768,7 +771,9 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
                         //textToSpeech?.stop()
                         isPlaying = false
 
-                    }
+                    },
+                        contentScale = ContentScale.Crop
+
             )
 
 
@@ -789,4 +794,44 @@ fun AudioBar(height: Float, color: Color) {
 
     }
 }
+
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun AnimatedLoadingImages() {
+    val images = listOf(
+        R.drawable.anne,
+        R.drawable.ay,
+        R.drawable.sleepy
+    )
+
+    var currentIndex by remember { mutableStateOf(0) }
+
+    // Görselleri sırayla değiştirme
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1500) // her 1 saniyede bir değişsin
+            currentIndex = (currentIndex + 1) % images.size
+        }
+    }
+
+    // Geçiş animasyonu
+    AnimatedContent(
+        targetState = currentIndex,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(500)) togetherWith fadeOut(animationSpec = tween(500))
+        }
+    ) { targetIndex ->
+        Image(
+            painter = painterResource(id = images[targetIndex]),
+            contentDescription = "Yükleniyor",
+            modifier = Modifier
+                .size(230.dp)
+                .padding(12.dp)
+                .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
 

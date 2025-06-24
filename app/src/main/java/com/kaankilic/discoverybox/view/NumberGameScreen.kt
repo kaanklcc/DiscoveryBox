@@ -58,21 +58,25 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.kaankilic.discoverybox.R
+import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.NumberGameViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun NumberGameScreen(navController: NavController, numberGameViewModel: NumberGameViewModel) {
+fun NumberGameScreen(navController: NavController, numberGameViewModel: NumberGameViewModel,cardSayfaViewModel: CardSayfaViewModel) {
 
     val items by remember { derivedStateOf { numberGameViewModel.items } }
     val draggingState = remember { mutableStateOf<String?>(null) }
     val dropPosition = remember { mutableStateOf<Offset?>(null) }  // Bırakılma pozisyonu
     val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
+    val showCelebration by numberGameViewModel.showCelebration
+
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = stringResource(R.string.DragAndDrop), fontSize = 24.sp, textAlign = TextAlign.Center,fontFamily = delbold) },
+                title = { Text(text = stringResource(R.string.DragAndDrop), fontSize = 32.sp, textAlign = TextAlign.Center,fontFamily = sandtitle) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFEF2D81), // Dinamik renk burada
                     titleContentColor = Color.White, // Başlık rengi
@@ -89,85 +93,102 @@ fun NumberGameScreen(navController: NavController, numberGameViewModel: NumberGa
                 .padding(paddingValues)
         ){
             GradientBackgroundd(listOf(Color(0xFFEF2D81), Color(0xFF24D0EA)))
-            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally) {
+            if (showCelebration) {
+                CelebrationAnimation(
+                    onAnimationEnd = {
+                        numberGameViewModel.setShowCelebration(false)
+                        numberGameViewModel.resetGame()
+                    },
+                    cardSayfaViewModel = cardSayfaViewModel, // Opsiyonel
+                    currentGroupIndex = remember { mutableStateOf(0) },
+                    isGameOver = remember { mutableStateOf(false) }
+                )
+            }else{
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally) {
 
 
-                Box(
-                    modifier = Modifier.fillMaxWidth().height(150.dp)
-                ){
+                    Box(
+                        modifier = Modifier.fillMaxWidth().height(150.dp)
+                    ){
 
-                    Row(modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-
-
-                        Image(
-                            painter = painterResource(id = R.drawable.pars),
-                            contentDescription = "pars",
-                            modifier = Modifier.size(150.dp).offset(y=(-25).dp, x = (-20).dp)
-                                .align(Alignment.CenterVertically)
-
-                        )
-
-                        Box(
-                            modifier = Modifier.offset(y=(-65).dp, x = (-50).dp)
+                        Row(modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
 
 
-                                .background(
-                                    color = Color.LightGray,
-                                    shape = RoundedCornerShape(8.dp)
+                            Image(
+                                painter = painterResource(id = R.drawable.pars),
+                                contentDescription = "pars",
+                                modifier = Modifier.size(150.dp).offset(y=(-25).dp, x = (-20).dp)
+                                    .align(Alignment.CenterVertically)
+
+                            )
+
+                            Box(
+                                modifier = Modifier.offset(y=(-65).dp, x = (-50).dp)
+
+
+                                    .background(
+                                        color = Color.LightGray,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(16.dp)
+                                    .align(Alignment.CenterVertically)
+                            )
+                            {
+                                Text(
+                                    text = stringResource(R.string.numaraeslestir),
+                                    style = TextStyle(
+                                        color = Color.Black,
+                                        fontSize = 16.sp,fontFamily = sandtitle,
+                                        textAlign = TextAlign.Center,
+
+                                        )
                                 )
-                                .padding(16.dp)
-                                .align(Alignment.CenterVertically)
-                        )
-                        {
-                            Text(
-                                text = stringResource(R.string.numaraeslestir),
-                                style = TextStyle(
-                                    color = Color.Black,
-                                    fontSize = 14.sp,fontFamily = delbold
-                                )
+                            }
+                        }
+
+                    }
+
+                    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceAround
+                        , horizontalAlignment = Alignment.CenterHorizontally) {
+                        items.forEach { item ->
+                            DroppableImage(
+                                imageUrl = item.gorsel_Url,
+                                expectedNumber = item.numara,
+                                draggingState = draggingState,
+                                numberGameViewModel = numberGameViewModel,
+                                dropPosition = dropPosition,  // dropPosition'ı geçiyoruz
+                                onDrop = {
+                                    numberGameViewModel.removeItem(item.numara) // Doğru bırakıldığında sil
+                                }
                             )
                         }
                     }
 
-                }
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
 
-                Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceAround
-                    , horizontalAlignment = Alignment.CenterHorizontally) {
-                    items.forEach { item ->
-                        DroppableImage(
-                            imageUrl = item.gorsel_Url,
-                            expectedNumber = item.numara,
-                            draggingState = draggingState,
-                            numberGameViewModel = numberGameViewModel,
-                            dropPosition = dropPosition,  // dropPosition'ı geçiyoruz
-                            onDrop = {
-                                numberGameViewModel.removeItem(item.numara) // Doğru bırakıldığında sil
-                            }
-                        )
+                        numberGameViewModel.numberItems.forEach { number ->
+                            DraggableNumber(
+                                number = number,
+                                draggingState = draggingState,
+                                numberGameViewModel = numberGameViewModel,
+                                dropPosition = dropPosition
+                            )
+                        }
+
                     }
+
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
-               Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-
-                   numberGameViewModel.numberItems.forEach { number ->
-                       DraggableNumber(
-                           number = number,
-                           draggingState = draggingState,
-                           numberGameViewModel = numberGameViewModel,
-                           dropPosition = dropPosition
-                       )
-                   }
-
-               }
-
-
 
             }
+
+
         }
+
+
     }
 }
 

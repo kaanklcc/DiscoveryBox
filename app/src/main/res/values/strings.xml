@@ -26,7 +26,7 @@
     <string name="SignIn">Sign In</string>
 
 
-    <string name="GameScreen">Game Screen</string>
+    <string name="GameScreen">Games</string>
 
     <string name="WelcomeToMagicWorld">Welcome To Magic World</string>
     <string name="Email">Email</string>
@@ -64,7 +64,7 @@
 
 
 
-    <string name="MYSTORIES">MY STORIES</string>
+    <string name="MYSTORIES">My Stories</string>
 
 
     <string name="WordQuiz">Word Quiz</string>
@@ -126,7 +126,7 @@
     <string name="HikayeSİlindi">Story deleted</string>
 
     <string name="DragAndDrop">Drag And Drop</string>
-    <string name="numaraeslestir">Match the correct numbers with the correct colors</string>
+    <string name="numaraeslestir">Match the correct numbers with the correct images</string>
 
 
 
@@ -138,7 +138,7 @@
     <string name="started">Started!</string>
     <string name="touch">Touch to Begin Your</string>
     <string name="Advanturemacera">Adventure!</string>
-    <string name="StartNow">Start Now ->!</string>
+    <string name="StartNow">Start Now -></string>
     <string name="learn">Learn &amp; Play</string>
     <string name="play">Play</string>
     <string name="andmore">Colors, Words and More</string>

@@ -3,10 +3,14 @@ package com.kaankilic.discoverybox.view
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,108 +40,153 @@ import com.kaankilic.discoverybox.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HikayeGecis(navController: NavController) {
-    val delbold= FontFamily(Font(R.font.delbold))
+    val sandtitle= FontFamily(Font(R.font.sandtitle))
+
 
     val gradientBrush = Brush.linearGradient(
         colors = listOf(
-            Color(0xFFA5D6A7), // Nane Yeşili (rahatlatıcı ve doğayla bağlantılı)
-            Color(0xFF81D4FA), // Açık Mavi (huzur ve hayal gücü)
-            Color(0xFFFFAB91)  // Açık Şeftali Rengi (sıcaklık ve sevimlilik)
+            Color(0xFFE3F2FD), // Nane Yeşili (rahatlatıcı ve doğayla bağlantılı)
+
+        )
+    )
+
+    val gradientBrush1 = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFd5e0fe),
+            Color(0xFFfbdceb), // Sarı
+
+            // Açık Mavi
+        )
+    )
+    val gradientBrush2 = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFfbdceb), // Sarı
+            Color(0xFFd5e0fe),
+            // Açık Mavi
+
         )
     )
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(title = { Text(text = stringResource(R.string.Story), fontSize = 35.sp, textAlign = TextAlign.Center,fontFamily = delbold) }
-                ,colors = TopAppBarColors( Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF81D4FA), Color.White, Color.White))
+            CenterAlignedTopAppBar(title = { Text(text = stringResource(R.string.Story), fontSize = 42.sp, textAlign = TextAlign.Center,fontFamily = sandtitle) }
+                ,colors = TopAppBarColors( Color(0xFFE3F2FD), Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF353BA4), Color(0xFF353BA4)))
 
         }
     ){paddingValues ->
 
         Column(
             modifier = Modifier
+                .background(Color(0xFFE3F2FD))
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(gradientBrush)
         ) {
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(12.dp)
-                    .clip(RoundedCornerShape(60.dp))
-                    .clickable { navController.navigate("hikaye")
-
+                    .padding(17.dp)
+                    .clip(RoundedCornerShape(25.dp))
+                    .background(gradientBrush1)
+                    .wrapContentSize()
+                    .clickable {
+                        navController.navigate("hikaye")
                     }
-                    .background(Color.Transparent)
+
             ) {
-                Image(
-                    painter = painterResource(R.drawable.create),
-                    contentDescription = "Kaan Image",
-                    contentScale = ContentScale.Crop,
+                Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            shadowElevation = 8.dp.toPx()
-                            shape = RoundedCornerShape(30.dp)
-                            clip = true
-                        }
-                        .drawWithContent {
-                            drawContent()
-                            drawRect(
-                                color = Color.Black.copy(alpha = 0.1f),
-                                size = size
-                            )
-                        }
-                )
-                Text(
-                    text =stringResource(R.string.CreatetheStory),
-                    color = Color.White,
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = delbold,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter) // Yazıyı ortalar
-                        .padding(8.dp)
-                )
+                        .padding(16.dp)
+                        .fillMaxWidth(), // Tüm genişliği kaplasın ki TextAlign.Left etkili olsun
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.Start // Sola hizalama sağlandı
+                ) {
+                    Text(
+                        stringResource(R.string.CreatetheStory),
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        fontSize = 26.sp
+                        , fontFamily = sandtitle,
+
+                       // color =  Color(0xFFF454a94),
+                        modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.create),
+                        contentDescription = "Kaan Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp)
+                            .graphicsLayer {
+                               /* shadowElevation = 8.dp.toPx()
+                                shape = RoundedCornerShape(10.dp)
+                                clip = true*/
+                            }
+                            .drawWithContent {
+                                drawContent()
+                                drawRect(
+                                    color = Color.Transparent.copy(alpha = 0f),
+                                    size = size
+                                )
+                            }
+                    )
+
+                }
             }
+
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(12.dp)
-                    .clip(RoundedCornerShape(60.dp))
-                    .clickable { navController.navigate("saveSayfa") }
-                    .background(Color.Transparent)
+                    .padding(17.dp)
+                    .clip(RoundedCornerShape(25.dp))
+                    .background(gradientBrush2)
+                    .wrapContentSize()
+                    .clickable {
+                        navController.navigate("saveSayfa")
+                    }
+
             ) {
-                Image(
-                    painter = painterResource(R.drawable.savestory),
-                    contentDescription = "Kılıç Image",
-                    contentScale = ContentScale.Crop,
+                Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            shadowElevation = 8.dp.toPx()
-                            shape = RoundedCornerShape(30.dp)
-                            clip = true
-                        }
-                        .drawWithContent {
-                            drawContent()
-                            drawRect(
-                                color = Color.Black.copy(alpha = 0.1f),
-                                size = size
-                            )
-                        }
-                )
-                Text(
-                    text = stringResource(R.string.MYSTORIES),
-                    color = Color.White,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = delbold,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter) // Yazıyı ortalar
-                        .padding(8.dp)
-                )
+                        .padding(16.dp)
+                        .fillMaxWidth(), // Tüm genişliği kaplasın ki TextAlign.Left etkili olsun
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalAlignment = Alignment.Start // Sola hizalama sağlandı
+                ) {
+                    Text(
+                        stringResource(R.string.MYSTORIES),
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        fontSize = 26.sp
+                        , fontFamily = sandtitle,
+                        modifier = Modifier.fillMaxWidth(), // Text'in genişliğini doldurması için
+                    )
+
+                    Image(
+                        painter = painterResource(R.drawable.savestory),
+                        contentDescription = "Kaan Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp)
+                            .graphicsLayer {
+                                /* shadowElevation = 8.dp.toPx()
+                                 shape = RoundedCornerShape(10.dp)
+                                 clip = true*/
+                            }
+                            .drawWithContent {
+                                drawContent()
+                                drawRect(
+                                    color = Color.Transparent.copy(alpha = 0f),
+                                    size = size
+                                )
+                            }
+                    )
+
+                }
             }
+
         }
 
 

@@ -71,8 +71,21 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
             }
         }
     }
+    suspend fun decrementRemainingChatgptUses() {
+        val userId = auth.currentUser?.uid ?: return
+        val userRef = firestore.collection("users").document(userId)
 
-     fun getDefaultImage(context: Context): Bitmap {
+        firestore.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+            val current = snapshot.getLong("remainingChatgptUses") ?: 0
+            if (current > 0) {
+                transaction.update(userRef, "remainingChatgptUses", current - 1)
+            }
+        }.await()
+    }
+
+
+    fun getDefaultImage(context: Context): Bitmap {
         return BitmapFactory.decodeResource(context.resources, R.drawable.story)
     }
 
