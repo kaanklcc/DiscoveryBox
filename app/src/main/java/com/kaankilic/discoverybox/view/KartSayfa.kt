@@ -39,9 +39,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,6 +68,8 @@ import coil.compose.rememberAsyncImagePainter
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Word
 import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 
@@ -79,6 +83,8 @@ fun MeyveKartSirali(navController: NavController,viewModel: CardSayfaViewModel =
     val context = LocalContext.current
     val sandtitle= FontFamily(Font(R.font.sandtitle))
     val currentLang = context.resources.configuration.locales[0].language
+    val scope = rememberCoroutineScope()
+
 
 
     val gradientBackground = Brush.verticalGradient(
@@ -249,21 +255,22 @@ fun MeyveKartSirali(navController: NavController,viewModel: CardSayfaViewModel =
                                 BackCardContent(currentWord, flipped = true)
                             }
                         }
-
-                       // Spacer(modifier = Modifier.height(10.dp))
-
-                        // "Sonraki" Butonu
                         Button(
-                            modifier = Modifier.size(height = 52.dp, width = 120.dp)
+                            modifier = Modifier
+                                .size(height = 52.dp, width = 120.dp)
                                 .offset(y = (-20).dp),
                             colors = ButtonDefaults.buttonColors(Color(0xFFf6d162)),
                             onClick = {
                                 isFlipped = false
-                                currentIndex = (currentIndex + 1) % wordList.size
+                                scope.launch {
+                                    delay(300) // animasyon süresine göre ayarla
+                                    currentIndex = (currentIndex + 1) % wordList.size
+                                }
                             }
                         ) {
-                            Text("Next", fontSize = 26.sp, color = Color.White,fontFamily = sandtitle)
+                            Text("Next", fontSize = 26.sp, color = Color.White, fontFamily = sandtitle)
                         }
+
                     }
                 } else {
                     // Liste boşsa yüklenme mesajı

@@ -65,7 +65,7 @@ class DiscoveryBoxRepository(val dbds :DiscoveryBoxDataSource) {
         return if (isPro) {
             val bitmap = dbds.generateImageWithGpt(prompt)
             if (bitmap != null) {
-                dbds.decrementRemainingChatgptUses() // ✅ Hak azalt
+               // dbds.decrementRemainingChatgptUses() // ✅ Hak azalt
                 return bitmap
             } else {
                 return dbds.getDefaultImage(context)

@@ -1,4 +1,5 @@
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -74,8 +75,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.with
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
+@SuppressLint("SuspiciousIndentation")
 @RequiresApi(Build.VERSION_CODES.DONUT)
 @Composable
 fun Metin(navController: NavController,
@@ -99,6 +104,9 @@ fun Metin(navController: NavController,
     var isPremium by remember { mutableStateOf(false) }
     var showSuccessAnimation by remember { mutableStateOf(false) }
     var isSaved by remember { mutableStateOf(false) }
+    val imageSaved by metinViewModel.imageSaved.observeAsState()
+    val imageSavedUrl by metinViewModel.imageSavedUrl.observeAsState()
+
 
 
 
@@ -353,27 +361,36 @@ fun Metin(navController: NavController,
                                     val userId = getCurrentUserId()
                                     if (userId != null && generatedImage != null) {
                                         metinViewModel.saveImageToStorage(generatedImage!!, userId)
+                                    } else {
+                                        Toast.makeText(context, "Kayıt başarısız", Toast.LENGTH_SHORT).show()
+                                    }
+
+                                   /* if (userId != null && generatedImage != null) {
+                                        metinViewModel.saveImageToStorage(generatedImage!!, userId)
 
                                         metinViewModel.imageSaved.observe(context as LifecycleOwner) { saved ->
                                             if (saved) {
-                                                metinViewModel.imageSavedUrl.observe(context as LifecycleOwner) { imageUrl ->
-                                                    if (imageUrl != null) {
-                                                        metinViewModel.saveStoryForUser(
-                                                            hikayeId!!,
-                                                            hikayeyiOlustur,
-                                                            imageUrl,
-                                                            userId
-                                                        )
-                                                        isSaved = true // ✅ ikon artık sarı olacak
-                                                        showSuccessAnimation = true
-                                                        isAnimationPlaying = true
-                                                        Toast.makeText(
-                                                            context,
-                                                            "Hikaye Kaydedildi",
-                                                            Toast.LENGTH_LONG
-                                                        ).show()
+                                                CoroutineScope(Dispatchers.Main).launch{
+                                                    metinViewModel.imageSavedUrl.observe(context as LifecycleOwner) { imageUrl ->
+                                                        if (imageUrl != null) {
+                                                            metinViewModel.saveStoryForUser(
+                                                                hikayeId!!,
+                                                                hikayeyiOlustur,
+                                                                imageUrl,
+                                                                userId
+                                                            )
+                                                            isSaved = true // ✅ ikon artık sarı olacak
+                                                            showSuccessAnimation = true
+                                                            isAnimationPlaying = true
+                                                            Toast.makeText(
+                                                                context,
+                                                                "Hikaye Kaydedildi",
+                                                                Toast.LENGTH_LONG
+                                                            ).show()
+                                                        }
                                                     }
                                                 }
+
                                             }
                                         }
                                     } else {
@@ -382,7 +399,7 @@ fun Metin(navController: NavController,
                                             "Kayıt başarısız",
                                             Toast.LENGTH_SHORT
                                         ).show()
-                                    }
+                                    }*/
                                 }
                             ) {
                                 Icon(
@@ -392,6 +409,24 @@ fun Metin(navController: NavController,
                                     tint = if (isSaved) Color.Yellow else Color.Gray
                                 )
                             }
+                            LaunchedEffect(imageSaved, imageSavedUrl) {
+                                if (imageSaved == true && imageSavedUrl != null) {
+                                    val userId = getCurrentUserId()
+                                    if (userId != null) {
+                                        metinViewModel.saveStoryForUser(
+                                            hikayeId!!,
+                                            hikayeyiOlustur,
+                                            imageSavedUrl!!,
+                                            userId
+                                        )
+                                        isSaved = true
+                                        showSuccessAnimation = true
+                                        isAnimationPlaying = true
+                                        Toast.makeText(context, "Hikaye Kaydedildi", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+
                             if (showSuccessAnimation) {
                                 val scale by animateFloatAsState(
                                     targetValue = if (showSuccessAnimation) 1.2f else 0f,
@@ -508,6 +543,8 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
     val language = stringResource(R.string.language)
     val country = stringResource(R.string.country)
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    var isAudioLoading by remember { mutableStateOf(false) }
+
 
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -596,16 +633,15 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
         Spacer(modifier = Modifier.height(30.dp))
 
 
-        Row(modifier = Modifier.fillMaxWidth(),
+        /*Row(modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
-
             Image(
-                painter = painterResource(id = R.drawable.playbutton),
+                painter = painterResource(id = R.drawable.play),
                 contentDescription = "hizlandir icon",
                 modifier = Modifier
-                    .size(55.dp)
+                    .size(45.dp)
                     .clip(CircleShape)
                     .background(Color.LightGray)
                     .border(2.dp, Color.Gray, CircleShape)
@@ -613,25 +649,36 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                         alpha = if (isPlaying || isStopped) 0.5f else 1f // Solma efekti
                     )
                     .clickable(enabled = !isPlaying && !isStopped) {
-                        metinViewModel.handleTTS(context,
-                            BuildConfig.OPENAI_API_KEY,
-                            hikayeyiOlustur)
+                        isAudioLoading = true // 🎯 Yükleme başlasın
+                        metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, hikayeyiOlustur) {
+                            isAudioLoading = false // 🎯 Ses hazır
+                        }
                         dbRepo.markUsedFreeTrialIfNeeded(userId)
-
                         isPlaying = true
-                        Log.d("gpttts çağırdlı", "gpttts")
-
-
                     }
             )
+            if (isAudioLoading) {
+                Column(modifier = Modifier.size(100.dp)
+                , verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Sesler oluşturuluyor")
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .padding(start = 8.dp)
+                    )
+                }
+
+            }
+
 
 
 
             Image(
-                painter = painterResource(id = R.drawable.pausebutton),
+                painter = painterResource(id = R.drawable.pause),
                 contentDescription = "play icon",
                 modifier = Modifier
-                    .size(55.dp)
+                    .size(45.dp)
                     .clip(CircleShape)
                     .background(Color.LightGray)
                     .border(2.dp, Color.Gray, CircleShape)
@@ -644,7 +691,78 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                         isStopped = true // Pause tuşuna basıldığında
                     }
             )
+        }*/
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
+        ) {
+            // 🔊 Play butonu + yükleme
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(45.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
+                    .border(2.dp, Color.Gray, CircleShape)
+                    .clickable(enabled = !isPlaying && !isStopped) {
+                        isAudioLoading = true
+                        metinViewModel.handleTTS(
+                            context,
+                            BuildConfig.OPENAI_API_KEY,
+                            hikayeyiOlustur
+                        ) {
+                            isAudioLoading = false
+                        }
+                        dbRepo.markUsedFreeTrialIfNeeded(userId)
+                        isPlaying = true
+                    }
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.play),
+                    contentDescription = "play",
+                    modifier = Modifier.size(28.dp) 
+                )
+
+                if (isAudioLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(30.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.Gray
+                    )
+                }
+            }
+
+            // 🟠 Ses yükleniyor yazısı (isteğe bağlı)
+            if (isAudioLoading) {
+                Text(
+                    text = "Ses oluşturuluyor...",
+                    fontSize = 12.sp,
+                    color = Color.DarkGray
+                )
+            }
+
+            // ⏸️ Pause butonu
+            Image(
+                painter = painterResource(id = R.drawable.pause),
+                contentDescription = "pause",
+                modifier = Modifier
+                    .size(45.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
+                    .border(2.dp, Color.Gray, CircleShape)
+                    .graphicsLayer(
+                        alpha = if (isStopped) 0.5f else 1f
+                    )
+                    .clickable(enabled = isPlaying && !isStopped) {
+                        metinViewModel.stopMediaPlayer()
+                        metinViewModel.stop()
+                        isStopped = true
+                    }
+            )
         }
+
 
     }
 }
@@ -741,10 +859,10 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
         ) {
 
             Image(
-                painter = painterResource(id = R.drawable.playbutton),
+                painter = painterResource(id = R.drawable.play),
                 contentDescription = "hizlandir icon",
                 modifier = Modifier
-                    .size(55.dp) // İkonun boyutunu ayarlamak için
+                    .size(45.dp) // İkonun boyutunu ayarlamak için
                     .clip(CircleShape) // Yuvarlak yapmak için CircleShape kullanılır
                     .background(Color.Transparent) // İsteğe bağlı arka plan rengi
                     .border(2.dp, Color.Gray, CircleShape)
@@ -758,10 +876,10 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
             )
 
             Image(
-                painter = painterResource(id = R.drawable.pausebutton),
+                painter = painterResource(id = R.drawable.pause),
                 contentDescription = "play icon",
                 modifier = Modifier
-                    .size(55.dp)
+                    .size(45.dp)
                     .clip(CircleShape)
                     .background(Color.Transparent)
                     .border(2.dp, Color.Gray, CircleShape)

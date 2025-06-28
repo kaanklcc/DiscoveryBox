@@ -160,7 +160,11 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             if (sb == SnackbarResult.ActionPerformed) {
                                 snackbarHostState.showSnackbar(message = /*"exited the application"*/exitedApp)
                                 anasayfaViewModel.signOut(context){
-                                    navController.navigate("girisSayfa")
+                                    navController.navigate("girisSayfa"){
+                                        popUpTo("anasayfa"){inclusive=true}
+                                        launchSingleTop = true
+
+                                    }
                                 }
 
 
@@ -168,7 +172,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         }
 
 
-                    }) {
+                    }, modifier = Modifier.padding(end = 10.dp)) {
                         Icon(
                             imageVector = Icons.Default.ExitToApp,
                             contentDescription = "Logout",

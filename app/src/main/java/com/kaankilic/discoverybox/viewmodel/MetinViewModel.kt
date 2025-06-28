@@ -30,7 +30,7 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
     private var mediaPlayer: MediaPlayer? = null
     private var textToSpeech: TextToSpeech? = null
 
-    fun handleTTS(context: Context, apiKey: String, text: String) {
+    /*fun handleTTS(context: Context, apiKey: String, text: String) {
         viewModelScope.launch {
             val (premium, usedFreeTrial, remaining) = dbRepo.isUserPremium()
             //val canUseGPTTTS = premium || !usedFreeTrial || remaining > 0
@@ -47,8 +47,26 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
                 }
             }
         }
-    }
+    }*/
 
+    fun handleTTS(context: Context, apiKey: String, text: String, onDone: () -> Unit) {
+        viewModelScope.launch {
+            val (premium, usedFreeTrial, remaining) = dbRepo.isUserPremium()
+            val canUseGPTTTS = premium || (!usedFreeTrial && remaining > 0)
+
+            if (canUseGPTTTS) {
+                val result = dbRepo.generateGPTTTS(context, apiKey, text)
+                _ttsState.postValue(result)
+            } else {
+                dbRepo.generateGoogleTTS(context, text) { tts, result ->
+                    textToSpeech = tts
+                    _ttsState.postValue(result)
+                }
+            }
+
+            onDone() // 🎯 her iki durumda da callback çağrılır
+        }
+    }
 
 
     fun queryTextToImage(prompt: String, isPro: Boolean, context: Context) {

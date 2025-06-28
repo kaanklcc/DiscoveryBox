@@ -23,7 +23,9 @@ import com.kaankilic.discoverybox.entitiy.Story
 import com.kaankilic.discoverybox.entitiy.TTSRequest
 import com.kaankilic.discoverybox.entitiy.getAllGames
 import com.kaankilic.discoverybox.retrofit.api
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -184,6 +186,7 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
                         mediaPlayer = null
                     }
                 }
+                decrementRemainingChatgptUses()
 
                 return@withContext "GPT TTS başarıyla başlatıldı"
             }
@@ -228,27 +231,30 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
     }*/
 
     fun saveStoryForUser(title: String, story: String, imageUrl: String, userId: String, onResult: (Boolean) -> Unit) {
-        val storyData = mapOf(
+        CoroutineScope(Dispatchers.IO).launch {
+            val storyData = mapOf(
+                "title" to title,
+                "hikaye" to story,
+                "imageUrl" to imageUrl,
+                "timestamp" to FieldValue.serverTimestamp() // Zaman damgası
+            )
 
-            "title" to title,
-            "hikaye" to story,
-            "imageUrl" to imageUrl,
-            "timestamp" to FieldValue.serverTimestamp() // Zaman damgası
-        )
 
-        firestore.collection("users")
-            .document(userId) // Kullanıcının UID'si
-            .collection("hikayeler") // Kullanıcıya ait hikaye koleksiyonu
-            .add(storyData) // Hikayeyi kaydet
-            .addOnSuccessListener {
+            firestore.collection("users")
+                .document(userId) // Kullanıcının UID'si
+                .collection("hikayeler") // Kullanıcıya ait hikaye koleksiyonu
+                .add(storyData) // Hikayeyi kaydet
+                .addOnSuccessListener {
 
-                onResult(true)
-            }
-            .addOnFailureListener {e ->
-                Log.e("Firestore", "Hata: ${e.message}")
+                    onResult(true)
+                }
+                .addOnFailureListener {e ->
+                    Log.e("Firestore", "Hata: ${e.message}")
 
-                onResult(false)
-            }
+                    onResult(false)
+                }
+        }
+
     }
 
     fun signInWithEmail(email: String, password: String, onResult: (Boolean, String?) -> Unit) {
@@ -335,7 +341,7 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
                                 "email" to (user.email ?: ""),
                                 "usedFreeTrial" to false,
                                 "premium" to false,
-                                "remainingChatgptUses" to 0,
+                                "remainingChatgptUses" to 1,
                                 "premiumStartDate" to null,      // yeni eklendi
                                 "premiumDurationDays" to 0L      // yeni eklendi
                             )
