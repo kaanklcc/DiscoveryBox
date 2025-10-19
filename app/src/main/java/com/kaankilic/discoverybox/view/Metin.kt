@@ -144,13 +144,12 @@ fun Metin(navController: NavController,
         }
     }
 
-    val gradientBackground = Brush.verticalGradient(
+    val gradientBackground = Brush.horizontalGradient(
         colors = listOf(
-            Color(0xFF6BB7C0), // Üstteki renk
-            Color(0xFF21324A)  // Alttaki renk
-        ),
-        startY = 0f,
-        endY = 1800f // Bu değeri ekran yüksekliğine göre ayarlayabilirsiniz.
+            Color(0xFF4C1D95),
+            Color(0xFF6B21A8),
+            Color(0xFF7E22CE)
+        )
     )
 
     DisposableEffect(key1 = context) {
@@ -217,22 +216,26 @@ fun Metin(navController: NavController,
                                     )
                             )
 
-                            Image(
-                                painter = painterResource(id = R.drawable.mavidenemeee),
-                                contentDescription = null,
-                                alignment = Alignment.TopEnd,
+                            Box(
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
                                     .padding(
-                                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // <-- bu eklendi
-                                        end = 10.dp
+                                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                                        end = 16.dp
                                     )
-                                    .clickable {
-                                        audioVisibleStory = true
-                                    }
+                                    .size(56.dp)
                                     .clip(CircleShape)
-                                    .size(95.dp)
-                            )
+                                    .background(Color(0xFFFCD34D))
+                                    .clickable { audioVisibleStory = true },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.play),
+                                    contentDescription = "Play",
+                                    tint = Color(0xFF6B46C1),
+                                    modifier = Modifier.size(28.dp)
+                                )
+                            }
                         }
 
 
@@ -272,12 +275,17 @@ fun Metin(navController: NavController,
                 )
 
 
-                Button(onClick = {
-                    navController.navigate("saveSayfa")
-                }, colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)), modifier = Modifier.padding(bottom = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // <-- bu eklendi
-                )) {
-                    Text(text = stringResource(R.string.MYSTORIES),fontSize = 22.sp, fontFamily = sandtitle)
-
+                Button(
+                    onClick = { navController.navigate("saveSayfa") },
+                    colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D)),
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.MYSTORIES),
+                        fontSize = 22.sp,
+                        fontFamily = sandtitle,
+                        color = Color(0xFF6B46C1)
+                    )
                 }
                 //bitiş
             }else{
@@ -335,21 +343,26 @@ fun Metin(navController: NavController,
                                                 )
                                         )
                                     }
-                                    Image(
-                                        painter = painterResource(id = R.drawable.mavidenemeee),
-                                        contentDescription = "",
-                                        alignment = Alignment.TopEnd,
+                                    Box(
                                         modifier = Modifier
                                             .align(Alignment.TopEnd)
-                                            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-                                                end = 10.dp)
-                                            .clickable {
-                                                audioVisible = true
-                                            }
+                                            .padding(
+                                                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                                                end = 16.dp
+                                            )
+                                            .size(56.dp)
                                             .clip(CircleShape)
-                                            .size(95.dp)
-                                        // .padding(end = 10.dp)
-                                    )
+                                            .background(Color(0xFFFCD34D))
+                                            .clickable { audioVisible = true },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(R.drawable.play),
+                                            contentDescription = "Play",
+                                            tint = Color(0xFF6B46C1),
+                                            modifier = Modifier.size(28.dp)
+                                        )
+                                    }
                                 }
 
                             }
@@ -472,22 +485,33 @@ fun Metin(navController: NavController,
                                 textAlign = TextAlign.Justify,
                                 fontSize = 25.sp,
                                 fontFamily = andikabody)
-                            Button(onClick = {
-                                val prompt = hikayeViewModel.getCurrentPrompt()
-                                hikayeViewModel.generateStory(prompt)
-
-                            },colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)),modifier = Modifier
-                                .padding(bottom = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // <-- bu eklendi
-                                ))  {
-                                Text(text =stringResource(R.string.Rebuild),fontSize = 22.sp, fontFamily = sandtitle)
+                            Button(
+                                onClick = {
+                                    val prompt = hikayeViewModel.getCurrentPrompt()
+                                    hikayeViewModel.generateStory(prompt)
+                                },
+                                colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D)),
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.Rebuild),
+                                    fontSize = 22.sp,
+                                    fontFamily = sandtitle,
+                                    color = Color(0xFF6B46C1)
+                                )
                             }
 
-                            Button(onClick = {
-                                navController.navigate("saveSayfa")
-                            },colors = ButtonDefaults.buttonColors(Color(0xFF6BB7C0)), modifier = Modifier
-                                .padding(bottom = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(), // <-- bu eklendi
-                                )) {
-                                Text(text = stringResource(R.string.MYSTORIES),fontSize = 22.sp, fontFamily = sandtitle)
+                            Button(
+                                onClick = { navController.navigate("saveSayfa") },
+                                colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D)),
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.MYSTORIES),
+                                    fontSize = 22.sp,
+                                    fontFamily = sandtitle,
+                                    color = Color(0xFF6B46C1)
+                                )
                             }
 
                         }
@@ -533,25 +557,19 @@ fun Metin(navController: NavController,
 @Composable
 fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinViewModel: MetinViewModel,  onClose: () -> Unit) {
     val hikayeyiOlustur by hikayeViewModel.hikayeOlustur.observeAsState("")
-    //var dbRepo= DiscoveryBoxRepository()
     val dbRepo = hikayeViewModel.dbRepo
     val context = LocalContext.current
     val generatedImage by metinViewModel.imageBitmap.observeAsState(null)
-    var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     var isPlaying by remember { mutableStateOf(false) }
-    var isStopped by remember { mutableStateOf(false) }  // Pause sonrası durumu kontrol etmek için ekledik.
-    val language = stringResource(R.string.language)
-    val country = stringResource(R.string.country)
+    var isStopped by remember { mutableStateOf(false) }
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     var isAudioLoading by remember { mutableStateOf(false) }
-
-
 
     val infiniteTransition = rememberInfiniteTransition()
     val barHeights = List(6) { index ->
         infiniteTransition.animateFloat(
-            initialValue = if (isPlaying) (index * 10 + 10).toFloat() else 0f, // Oynatmada değilse animasyon başlamasın
-            targetValue = if (isPlaying) (index * 10 + 50).toFloat() else 0f, // Oynatmada değilse animasyon başlamasın
+            initialValue = if (isPlaying) (index * 10 + 10).toFloat() else 0f,
+            targetValue = if (isPlaying) (index * 10 + 50).toFloat() else 0f,
             animationSpec = infiniteRepeatable(
                 animation = tween(
                     durationMillis = 300 + (index * 100),
@@ -564,8 +582,8 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
 
     val barColors = List(6) {
         infiniteTransition.animateColor(
-            initialValue = Color(0xFF4CAF50),
-            targetValue = Color(0xFFFFC107),
+            initialValue = Color(0xFFFCD34D),
+            targetValue = Color(0xFFA855F7),
             animationSpec = infiniteRepeatable(
                 animation = tween(durationMillis = 850, easing = LinearEasing),
                 repeatMode = RepeatMode.Reverse
@@ -575,39 +593,47 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
 
     Column(
         modifier = Modifier
-            .size(250.dp, 400.dp)
-            .background(Color.LightGray.copy(alpha = 0.50f), shape = RectangleShape),
+            .size(320.dp, 450.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF8B5CF6), Color(0xFF6B46C1))
+                )
+            )
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Box(modifier = Modifier.size(300.dp,180.dp)) {
-            // Hikaye fotoğrafını ortalar
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        ) {
             generatedImage?.let { bitmap ->
-                val scaledBitmap = bitmap.scale(512, 512) // İstediğiniz boyuta göre ayarlayın
                 Image(
-                    bitmap = scaledBitmap.asImageBitmap(),
+                    bitmap = bitmap.asImageBitmap(),
                     contentDescription = "Generated Image",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(512.dp)
-                        .padding(2.dp)
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(16.dp))
                 )
             }
 
-            // Çarpı ikonunu sağ üst köşeye yerleştirir
-            Image(
-                painter = painterResource(id = R.drawable.baseline_close_24),
-                contentDescription = "",
+            IconButton(
+                onClick = { onClose() },
                 modifier = Modifier
-                    .size(48.dp)
-                    .align(Alignment.TopEnd) // Çarpıyı sağ üst köşeye hizalar
-                    .padding(end = 10.dp)
-                    .clickable {
-                        //textToSpeech?.shutdown()
-                        onClose()
-
-                    }// Sağ üst köşeye biraz boşluk ekler (isteğe bağlı)
-            )
+                    .align(Alignment.TopEnd)
+                    .size(36.dp)
+                    .background(Color.White.copy(0.9f), CircleShape)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_close_24),
+                    contentDescription = "Close",
+                    tint = Color(0xFF6B46C1)
+                )
+            }
         }
 
 
@@ -696,16 +722,14 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            // 🔊 Play butonu + yükleme
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .size(45.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
-                    .background(Color.LightGray)
-                    .border(2.dp, Color.Gray, CircleShape)
+                    .background(Color(0xFFFCD34D))
                     .clickable(enabled = !isPlaying && !isStopped) {
                         isAudioLoading = true
                         metinViewModel.handleTTS(
@@ -719,48 +743,48 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                         isPlaying = true
                     }
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.play),
-                    contentDescription = "play",
-                    modifier = Modifier.size(28.dp) 
-                )
-
                 if (isAudioLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(30.dp),
-                        strokeWidth = 2.dp,
-                        color = Color.Gray
+                        modifier = Modifier.size(32.dp),
+                        strokeWidth = 3.dp,
+                        color = Color(0xFF6B46C1)
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.play),
+                        contentDescription = "play",
+                        tint = Color(0xFF6B46C1),
+                        modifier = Modifier.size(32.dp)
                     )
                 }
             }
 
-            // 🟠 Ses yükleniyor yazısı (isteğe bağlı)
             if (isAudioLoading) {
                 Text(
                     text = "Ses oluşturuluyor...",
-                    fontSize = 12.sp,
-                    color = Color.DarkGray
+                    fontSize = 13.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Medium
                 )
             }
 
-            // ⏸️ Pause butonu
-            Image(
-                painter = painterResource(id = R.drawable.pause),
-                contentDescription = "pause",
+            IconButton(
+                onClick = {
+                    metinViewModel.stopMediaPlayer()
+                    metinViewModel.stop()
+                    isStopped = true
+                },
+                enabled = isPlaying && !isStopped,
                 modifier = Modifier
-                    .size(45.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
-                    .border(2.dp, Color.Gray, CircleShape)
-                    .graphicsLayer(
-                        alpha = if (isStopped) 0.5f else 1f
-                    )
-                    .clickable(enabled = isPlaying && !isStopped) {
-                        metinViewModel.stopMediaPlayer()
-                        metinViewModel.stop()
-                        isStopped = true
-                    }
-            )
+                    .size(56.dp)
+                    .background(Color.White.copy(if (isStopped) 0.3f else 0.9f), CircleShape)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.pause),
+                    contentDescription = "pause",
+                    tint = Color(0xFF6B46C1)
+                )
+            }
         }
 
 
@@ -769,19 +793,14 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
 
 @Composable
 fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, metinViewModel: MetinViewModel,  onClose: () -> Unit) {
-    val hikayeyiOlustur by hikayeViewModel.hikayeOlustur.observeAsState("")
-    val context = LocalContext.current
     val kaan by hikayeViewModel.hikaye.observeAsState(Hikaye())
-    var textToSpeech: TextToSpeech? by remember { mutableStateOf(null) }
     var isPlaying by remember { mutableStateOf(false) }
-    val language = stringResource(R.string.language)
-    val country = stringResource(R.string.country)
 
     val infiniteTransition = rememberInfiniteTransition()
     val barHeights = List(6) { index ->
         infiniteTransition.animateFloat(
-            initialValue = if (isPlaying) (index * 10 + 10).toFloat() else 0f, // Oynatmada değilse animasyon başlamasın
-            targetValue = if (isPlaying) (index * 10 + 50).toFloat() else 0f, // Oynatmada değilse animasyon başlamasın
+            initialValue = if (isPlaying) (index * 10 + 10).toFloat() else 0f,
+            targetValue = if (isPlaying) (index * 10 + 50).toFloat() else 0f,
             animationSpec = infiniteRepeatable(
                 animation = tween(
                     durationMillis = 300 + (index * 100),
@@ -794,8 +813,8 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
 
     val barColors = List(6) {
         infiniteTransition.animateColor(
-            initialValue = Color(0xFF4CAF50),
-            targetValue = Color(0xFFFFC107),
+            initialValue = Color(0xFFFCD34D),
+            targetValue = Color(0xFFA855F7),
             animationSpec = infiniteRepeatable(
                 animation = tween(durationMillis = 850, easing = LinearEasing),
                 repeatMode = RepeatMode.Reverse
@@ -805,29 +824,45 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
 
     Column(
         modifier = Modifier
-            .size(250.dp, 400.dp)
-            .background(Color.LightGray.copy(alpha = 0.50f), shape = RectangleShape),
+            .size(320.dp, 450.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF8B5CF6), Color(0xFF6B46C1))
+                )
+            )
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Box(modifier = Modifier.size(300.dp,180.dp)) {
-            AsyncImage(model = kaan.imageUrl, contentDescription = "", modifier = Modifier.size(512.dp,512.dp))
-
-
-            Image(
-                painter = painterResource(id = R.drawable.baseline_close_24),
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        ) {
+            AsyncImage(
+                model = kaan.imageUrl,
                 contentDescription = "",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(48.dp)
-                    .align(Alignment.TopEnd)
-                    .padding(end = 10.dp)
-                    .clickable {
-                        onClose()
-
-                    }
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(16.dp))
             )
 
+            IconButton(
+                onClick = { onClose() },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(36.dp)
+                    .background(Color.White.copy(0.9f), CircleShape)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_close_24),
+                    contentDescription = "Close",
+                    tint = Color(0xFF6B46C1)
+                )
+            }
         }
 
 
@@ -853,49 +888,43 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
         Spacer(modifier = Modifier.height(30.dp))
 
 
-        Row(modifier = Modifier.fillMaxWidth(),
+        Row(
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.play),
-                contentDescription = "hizlandir icon",
+            IconButton(
+                onClick = {
+                    metinViewModel.speak(kaan.content)
+                    isPlaying = true
+                },
                 modifier = Modifier
-                    .size(45.dp) // İkonun boyutunu ayarlamak için
-                    .clip(CircleShape) // Yuvarlak yapmak için CircleShape kullanılır
-                    .background(Color.Transparent) // İsteğe bağlı arka plan rengi
-                    .border(2.dp, Color.Gray, CircleShape)
+                    .size(56.dp)
+                    .background(Color(0xFFFCD34D), CircleShape)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.play),
+                    contentDescription = "Play",
+                    tint = Color(0xFF6B46C1)
+                )
+            }
 
-                    .clickable {
-                        metinViewModel.speak(kaan.content)
-                        isPlaying = true
-
-                    },
-                contentScale = ContentScale.Crop
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.pause),
-                contentDescription = "play icon",
+            IconButton(
+                onClick = {
+                    metinViewModel.stopMediaPlayer()
+                    metinViewModel.stop()
+                    isPlaying = false
+                },
                 modifier = Modifier
-                    .size(45.dp)
-                    .clip(CircleShape)
-                    .background(Color.Transparent)
-                    .border(2.dp, Color.Gray, CircleShape)
-                    .clickable {
-                        metinViewModel.stopMediaPlayer() // GPT TTS için
-                        metinViewModel.stop()
-                        //textToSpeech?.stop()
-                        isPlaying = false
-
-                    },
-                        contentScale = ContentScale.Crop
-
-            )
-
-
-
+                    .size(56.dp)
+                    .background(Color.White.copy(0.9f), CircleShape)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.pause),
+                    contentDescription = "Pause",
+                    tint = Color(0xFF6B46C1)
+                )
+            }
         }
 
     }
