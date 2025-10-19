@@ -9,11 +9,13 @@ import android.util.Log
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.kaankilic.discoverybox.BuildConfig
 import com.kaankilic.discoverybox.R
@@ -21,8 +23,9 @@ import com.kaankilic.discoverybox.entitiy.Hikaye
 import com.kaankilic.discoverybox.entitiy.ImageRequest
 import com.kaankilic.discoverybox.entitiy.Story
 import com.kaankilic.discoverybox.entitiy.TTSRequest
-import com.kaankilic.discoverybox.entitiy.getAllGames
+
 import com.kaankilic.discoverybox.retrofit.api
+import com.kaankilic.discoverybox.util.getTodayDateString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,9 +44,9 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
     //val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var tts: TextToSpeech? = null
     private var mediaPlayer: MediaPlayer? = null
-    suspend fun GetAllGame(): List<Story> = withContext(Dispatchers.IO){
+   /* suspend fun GetAllGame(): List<Story> = withContext(Dispatchers.IO){
         return@withContext getAllGames()
-    }
+    }*/
 
     private val generativeModel = GenerativeModel(
         modelName = "gemini-2.0-flash",
@@ -343,7 +346,13 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
                                 "premium" to false,
                                 "remainingChatgptUses" to 1,
                                 "premiumStartDate" to null,      // yeni eklendi
-                                "premiumDurationDays" to 0L      // yeni eklendi
+                                "premiumDurationDays" to 0L  ,
+
+
+                                "remainingFreeUses" to 1,
+                                "adsWatchedToday" to 0,
+                                "maxAdsPerDay" to 2,
+                                "lastFreeUseReset" to getTodayDateString()// yeni eklendi
                             )
 
                             userRef.set(userData)
@@ -364,6 +373,37 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
                 }
             }
     }
+
+    fun rewardAfterAd(userId: String, onComplete: (Boolean, String) -> Unit) {
+        val userRef = Firebase.firestore.collection("users").document(userId)
+        Firebase.firestore.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+            val today = getTodayDateString()
+            val lastReset = snapshot.getString("lastFreeUseReset") ?: ""
+            var adsWatchedToday = snapshot.getLong("adsWatchedToday") ?: 0
+            var remainingFreeUses = snapshot.getLong("remainingFreeUses") ?: 0
+
+            if (lastReset != today) {
+                adsWatchedToday = 0
+                remainingFreeUses = 1
+            }
+
+            if (adsWatchedToday >= 2) {
+                throw Exception("Max ad rewards reached.")
+            }
+
+            transaction.update(userRef, mapOf(
+                "adsWatchedToday" to adsWatchedToday + 1,
+                "remainingFreeUses" to remainingFreeUses + 1,
+                "lastFreeUseReset" to today
+            ))
+        }.addOnSuccessListener {
+            onComplete(true, "Yeni bir hak kazandınız!")
+        }.addOnFailureListener {
+            onComplete(false, "Bugün daha fazla reklam izleyemezsiniz.")
+        }
+    }
+
 
     fun getUserStories(userId: String, onResult: (List<Hikaye>) -> Unit) {
         firestore.collection("users")
@@ -423,23 +463,7 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
 
     }
 
-    /*fun decrementChatGptUse(userId: String, onComplete: (Boolean) -> Unit) {
-        val userRef = firestore.collection("users").document(userId)
 
-
-        firestore.runTransaction { transaction ->
-            val snapshot = transaction.get(userRef)
-            val currentUses = snapshot.getLong("remainingChatgptUses") ?: 0
-
-            if (currentUses > 0) {
-                transaction.update(userRef, "remainingChatgptUses", currentUses - 1)
-            }
-        }.addOnSuccessListener {
-            onComplete(true)
-        }.addOnFailureListener {
-            onComplete(false)
-        }
-    }*/
     fun decrementChatGptUse(userId: String, onComplete: (Boolean) -> Unit) {
         val userRef = firestore.collection("users").document(userId)
 

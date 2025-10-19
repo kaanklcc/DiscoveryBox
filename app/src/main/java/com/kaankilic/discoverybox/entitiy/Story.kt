@@ -7,7 +7,7 @@ data class Story(
     var imageRes: Int,
     val category: String
 )
-fun getAllGames(): List<Story>{
+/*fun getAllGames(): List<Story>{
     return listOf<Story>(
         Story("Words", R.drawable.words,"wordGame"),
         Story("Matching", R.drawable.matching,"matchingGame"),
@@ -15,4 +15,4 @@ fun getAllGames(): List<Story>{
         Story("Numbers", R.drawable.numbers,"numberGame"),
        // Story("duyuOrgan", R.drawable.sense,"diger"),
     )
-}
+}*/

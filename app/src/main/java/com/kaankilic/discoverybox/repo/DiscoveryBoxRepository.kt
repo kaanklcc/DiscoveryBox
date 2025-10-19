@@ -3,12 +3,17 @@ package com.kaankilic.discoverybox.repo
 import android.content.Context
 import android.graphics.Bitmap
 import android.speech.tts.TextToSpeech
+import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.kaankilic.discoverybox.entitiy.Story
 import com.kaankilic.discoverybox.datasource.DiscoveryBoxDataSource
 import com.kaankilic.discoverybox.entitiy.Hikaye
+import com.kaankilic.discoverybox.entitiy.UserData
+import com.kaankilic.discoverybox.util.UseStatus
+import com.kaankilic.discoverybox.util.getTodayDateString
 import kotlinx.coroutines.tasks.await
 
 
@@ -18,7 +23,7 @@ class DiscoveryBoxRepository(val dbds :DiscoveryBoxDataSource) {
     private val firestore = FirebaseFirestore.getInstance()
 
 
-    suspend fun getAllGame() : List<Story> = dbds.GetAllGame()
+   // suspend fun getAllGame() : List<Story> = dbds.GetAllGame()
 
 
    fun generateGoogleTTS(context: Context, text: String, onDone: (TextToSpeech?, String) -> Unit) {
@@ -125,13 +130,55 @@ class DiscoveryBoxRepository(val dbds :DiscoveryBoxDataSource) {
     suspend fun deleteStory(userId: String, storyId: String, onResult: (Boolean, String?) -> Unit) = dbds.deleteStory(userId,storyId,onResult)
     suspend fun reauthenticateUser(password: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) = dbds.reauthenticateUser(password,onSuccess,onFailure)
 
-    fun decrementChatGptUseIfNotPro(userId: String, isPro: Boolean, onComplete: (Boolean) -> Unit) {
+    /*fun decrementChatGptUseIfNotPro(userId: String, isPro: Boolean, onComplete: (Boolean) -> Unit) {
         if (!isPro) {
             dbds.decrementChatGptUse(userId, onComplete)
         } else {
             onComplete(true)
         }
+    }*/
+    fun decrementChatGptUseIfNotPro(
+        userId: String,
+        isPro: Boolean,
+        onComplete: (UseStatus) -> Unit
+    ) {
+        if (isPro) {
+            onComplete(UseStatus.SUCCESS)
+            return
+        }
+
+        val userRef = Firebase.firestore.collection("users").document(userId)
+        Firebase.firestore.runTransaction { transaction ->
+            val snapshot = transaction.get(userRef)
+            val currentDate = getTodayDateString()
+
+            val lastReset = snapshot.getString("lastFreeUseReset") ?: ""
+            var remainingFreeUses = snapshot.getLong("remainingFreeUses") ?: 0L
+
+            if (lastReset != currentDate) {
+                remainingFreeUses = 3 // Gün değiştiyse sıfırla
+            }
+
+            if (remainingFreeUses <= 0) {
+                throw Exception("No more free uses.")
+            }
+
+            transaction.update(userRef, mapOf(
+                "remainingFreeUses" to remainingFreeUses - 1,
+                "lastFreeUseReset" to currentDate
+            ))
+        }.addOnSuccessListener {
+            onComplete(UseStatus.SUCCESS)
+        }.addOnFailureListener { e ->
+            if (e.message?.contains("No more free uses") == true) {
+                onComplete(UseStatus.NO_FREE_USES)
+            } else {
+                onComplete(UseStatus.ERROR)
+            }
+        }
     }
+
+
     fun markUsedFreeTrialIfNeeded(userId: String) {
         val userRef = FirebaseFirestore.getInstance().collection("users").document(userId)
         userRef.get().addOnSuccessListener { document ->
@@ -143,6 +190,29 @@ class DiscoveryBoxRepository(val dbds :DiscoveryBoxDataSource) {
             }
         }
     }
+
+    fun getUserData(userId: String, onComplete: (UserData?) -> Unit) {
+        val userRef = Firebase.firestore.collection("users").document(userId)
+        userRef.get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val userData = UserData(
+                        adsWatchedToday = document.getLong("adsWatchedToday")?.toInt() ?: 0,
+                        maxAdsPerDay = document.getLong("maxAdsPerDay")?.toInt() ?: 2,
+                        remainingFreeUses = document.getLong("remainingFreeUses")?.toInt() ?: 0,
+                        lastFreeUseReset = document.getString("lastFreeUseReset") ?: "",
+                        premium = document.getBoolean("premium") ?: false
+                    )
+                    onComplete(userData)
+                } else {
+                    onComplete(null)
+                }
+            }
+            .addOnFailureListener {
+                onComplete(null)
+            }
+    }
+
 
 
 }

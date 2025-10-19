@@ -143,7 +143,7 @@ fun MainPage() {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally) {
 
-                Box(
+               /* Box(
                     modifier = Modifier
                         .padding(17.dp)
                         .clip(RoundedCornerShape(25.dp))
@@ -203,7 +203,7 @@ fun MainPage() {
                             Text("Game Side", fontWeight = FontWeight.Bold, fontSize = 22.sp)
                         }
                     }
-                }
+                }*/
 
                 Image(
                     painter = painterResource(R.drawable.robot),

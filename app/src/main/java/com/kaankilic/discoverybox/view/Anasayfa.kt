@@ -8,14 +8,21 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.core.*
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.offset
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -72,7 +79,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
+import androidx.room.util.TableInfo
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
@@ -85,378 +97,357 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel) {
-    val konular by anasayfaViewModel.konular.observeAsState(emptyList()) // Boş bir liste ile başlatıyoruz
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-    var showDialog by remember { mutableStateOf(false) }
-    var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var showDialogPay by remember { mutableStateOf(false) }
-    val message = stringResource(R.string.logOutMessage)
-    val actionLabel = stringResource(R.string.Yes)
-    val exitedApp = stringResource(R.string.exitMessage)
-    val wrongPassword = stringResource(R.string.WrongPassword)
-    val delbold= FontFamily(Font(R.font.delbold))
     val context = LocalContext.current
-    var showMembershipChoiceDialog by remember { mutableStateOf(false) }
-    val andikabody= FontFamily(Font(R.font.andikabody))
-    val sandtitle= FontFamily(Font(R.font.sandtitle))
-
-
-
-
-
-
-    val gradientBrush = Brush.linearGradient(
-        colors = listOf(
-            Color(0xFFd5e0fe),
-            Color(0xFFfbdceb), // Sarı
-
-             // Açık Mavi
-        )
+    var selectedTab by remember { mutableStateOf(0) }
+    val sandtitle = FontFamily(Font(R.font.sandtitle))
+    val andikabody = FontFamily(Font(R.font.andikabody))
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.05f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = ""
     )
 
-
-
-    val gradientBrush2 = Brush.linearGradient(
-        colors = listOf(
-            Color(0xFFfbdceb), // Sarı
-            Color(0xFFd5e0fe),
-             // Açık Mavi
-
-        )
-    )
-    LaunchedEffect(Unit) {
-        anasayfaViewModel.checkUserAccess { hasTrial, isPremium ,usedFreeTrial ->
-            if (!hasTrial && !isPremium) {
-                showDialogPay = true
+    Scaffold(
+        bottomBar = {
+            NavigationBar(
+                containerColor = Color(0xFF1E1B4B),
+                modifier = Modifier.height(90.dp)
+            ) {
+                NavigationBarItem(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    icon = {
+                        Icon(
+                            Icons.Default.Home,
+                            contentDescription = "Home",
+                            tint = if (selectedTab == 0) Color(0xFFC084FC) else Color(0xFFE9D5FF)
+                        )
+                    },
+                    label = { Text("Home", fontSize = 10.sp, color = Color(0xFFE9D5FF)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFC084FC),
+                        unselectedIconColor = Color(0xFFE9D5FF),
+                        indicatorColor = Color(0xFF7C3AED).copy(alpha = 0.2f)
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 1,
+                    onClick = {
+                        selectedTab = 1
+                        navController.navigate("hikaye")
+                    },
+                    icon = {
+                        Icon(
+                            Icons.Default.Create,
+                            contentDescription = "Create",
+                            tint = if (selectedTab == 1) Color(0xFFF472B6) else Color(0xFFFCE7F3)
+                        )
+                    },
+                    label = { Text("Create", fontSize = 10.sp, color = Color(0xFFFCE7F3)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFF472B6),
+                        unselectedIconColor = Color(0xFFFCE7F3),
+                        indicatorColor = Color(0xFFEC4899).copy(alpha = 0.2f)
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 2,
+                    onClick = {
+                        selectedTab = 2
+                        navController.navigate("saveSayfa")
+                    },
+                    icon = {
+                        Icon(
+                            Icons.Default.Favorite,
+                            contentDescription = "Saved",
+                            tint = if (selectedTab == 2) Color(0xFFFBBF24) else Color(0xFFFEF3C7)
+                        )
+                    },
+                    label = { Text("Saved", fontSize = 10.sp, color = Color(0xFFFEF3C7)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFFBBF24),
+                        unselectedIconColor = Color(0xFFFEF3C7),
+                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 3,
+                    onClick = { selectedTab = 3 },
+                    icon = {
+                        Icon(
+                            Icons.Default.ExitToApp,
+                            contentDescription = "Profile",
+                            tint = if (selectedTab == 3) Color(0xFF22D3EE) else Color(0xFFCFFAFE)
+                        )
+                    },
+                    label = { Text("Profile", fontSize = 10.sp, color = Color(0xFFCFFAFE)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFF22D3EE),
+                        unselectedIconColor = Color(0xFFCFFAFE),
+                        indicatorColor = Color(0xFF06B6D4).copy(alpha = 0.2f)
+                    )
+                )
             }
         }
-    }
-    Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.DiscoveryBox),
-                        fontSize = 34.sp,
-                        textAlign = TextAlign.Center,
-                        fontFamily = sandtitle
-                    )
-                },
-                colors = TopAppBarColors( Color(0xFFE3F2FD), Color(0xFF81D4FA), Color(0xFF81D4FA), Color(0xFF353BA4),  Color(0xFF353BA4)),
-
-                actions = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            val sb = snackbarHostState
-                                .showSnackbar(
-                                    message = /*"Do you want to log out?"*/message,
-                                    actionLabel = /*"Yes"*/actionLabel
-                                )
-                            if (sb == SnackbarResult.ActionPerformed) {
-                                snackbarHostState.showSnackbar(message = /*"exited the application"*/exitedApp)
-                                anasayfaViewModel.signOut(context){
-                                    navController.navigate("girisSayfa"){
-                                        popUpTo("anasayfa"){inclusive=true}
-                                        launchSingleTop = true
-
-                                    }
-                                }
-
-
-                            }
-                        }
-
-
-                    }, modifier = Modifier.padding(end = 10.dp)) {
-                        Icon(
-                            imageVector = Icons.Default.ExitToApp,
-                            contentDescription = "Logout",
-                            tint =Color(0xFF353BA4) ,
-                            modifier = Modifier.size(60.dp),
-
-                        )
-
-                    }
-                }
-            )
-
-
-        },
-
     ) { paddingValues ->
-
-        if (konular.isEmpty()) {
-            Text(
-                text = stringResource(R.string.NoStoryMessage),
-                modifier = Modifier.fillMaxSize(),
-                textAlign = TextAlign.Center
-            )
-        } else {
-
-            Column(modifier = Modifier
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .background(
-                    Color(0xFFE3F2FD)
-                    //background(Color(0xFFE2EFFC)
-                ),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally) {
-
-                if (showDialogPay) {
-                    AlertDialog(
-                        onDismissRequest = {},
-                        title = { Text(stringResource(R.string.HakkınızTükendi)) },
-                        text = { Text(
-                            stringResource(R.string.haktükendiuzun)
-                        ) },
-                        confirmButton = {
-                            Button(onClick = {
-                                showDialogPay = false
-                                showMembershipChoiceDialog = true // üyelik seçim dialogunu aç
-                                // Üyelik alma ekranına yönlendirme veya işlemi
-                                //navController.navigate("uyelikSayfasi")
-                            }) {
-                                Text(stringResource(R.string.ÜyelikAl))
-                            }
-                        },
-                        dismissButton = {
-                            OutlinedButton(onClick = {
-                                showDialogPay = false
-                                // Ücretsiz sürümle devam et
-                            }) {
-                                Text(stringResource(R.string.ÜcretsizDevamEt))
-                            }
-                        }
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            Color(0xFF4C1D95),
+                            Color(0xFF6B21A8),
+                            Color(0xFF7E22CE)
+                        )
                     )
-                }
-                if (showMembershipChoiceDialog) {
-                    AlertDialog(
-                        onDismissRequest = {},
-                        title = { Text("Üyelik Seçin") },
-                        text = {
-                            Column {
-                                Text("Bir üyelik tipi seçin:")
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Button(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    onClick = {
-                                        showMembershipChoiceDialog = false
-                                        updatePremiumForTest(7, 14, context) // Haftalık (7 gün, 14 hak)
-                                    }
-                                ) {
-                                    Text("Haftalık (7 gün, 14 hak)")
-                                }
-
-                                Spacer(modifier = Modifier.height(8.dp))
-
-                                Button(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    onClick = {
-                                        showMembershipChoiceDialog = false
-                                        updatePremiumForTest(30, 60, context) // Aylık (30 gün, 60 hak)
-                                    }
-                                ) {
-                                    Text("Aylık (30 gün, 60 hak)")
-                                }
-                            }
-                        },
-                        confirmButton = {},
-                        dismissButton = {
-                            OutlinedButton(onClick = {
-                                showMembershipChoiceDialog = false
-                            }) {
-                                Text("İptal")
-                            }
-                        }
-                    )
-                }
-
-
-
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(17.dp)
-                        .clip(RoundedCornerShape(25.dp))
-                        .background(gradientBrush)
-                        .wrapContentSize()
-                        .clickable {
-                            navController.navigate("gameMain")
-                        }
-
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(), // Tüm genişliği kaplasın ki TextAlign.Left etkili olsun
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        horizontalAlignment = Alignment.Start // Sola hizalama sağlandı
-                    ) {
-                        Text(
-                            stringResource(R.string.EducationalGames),
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Left,
-                            fontSize = 26.sp
-                            , fontFamily = sandtitle,
-
-                            color =  Color(0xFFF454a94),
-                            modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
-                        )
-                        Text(
-
-                            stringResource(R.string.Learnwhileplaying),
-                            textAlign = TextAlign.Left,
-                            fontSize = 20.sp, fontFamily = andikabody,
-                            modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
-                        )
-                        Image(
-                            painter = painterResource(R.drawable.child),
-                            contentDescription = "Kaan Image",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(150.dp)
-                                .graphicsLayer {
-                                    shadowElevation = 8.dp.toPx()
-                                    shape = RoundedCornerShape(10.dp)
-                                    clip = true
-                                }
-                                .drawWithContent {
-                                    drawContent()
-                                    drawRect(
-                                        color = Color.Black.copy(alpha = 0.1f),
-                                        size = size
-                                    )
-                                }
-                        )
-
-                    }
-                }
-
-
-
-                Image(
-                    painter = painterResource(R.drawable.robot),
-                    contentDescription = "Kaan Image",
-                    contentScale = ContentScale.Crop,
-
-                    )
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(17.dp)
-                        .clip(RoundedCornerShape(25.dp))
-                        .background(gradientBrush2)
-                        .wrapContentSize()
-                        .clickable {
-                            //showDialog = true
-                            navController.navigate("hikayeGecis")
-                        }
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(), // Tüm genişliği kaplasın ki TextAlign.Left etkili olsun
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        horizontalAlignment = Alignment.Start // Sola hizalama sağlandı
-                    ) {
-                        Text(
-                           stringResource(R.string.CreateStorieswithAI),
-                            fontWeight = FontWeight.Bold,
-                            lineHeight = 30.sp,
-                            textAlign = TextAlign.Left,
-                            fontSize = 26.sp, fontFamily = sandtitle,
-                            color =  Color(0xFFF454a94),
-                            modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
-                        )
-                        Text(
-                            stringResource(R.string.Letyourimaginationfly),
-                            textAlign = TextAlign.Left,
-                            fontSize = 20.sp, fontFamily = andikabody,
-                            modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
-                        )
-                        Image(
-                            painter = painterResource(R.drawable.parent),
-                            contentDescription = "Kaan Image",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(150.dp)
-                                .graphicsLayer {
-                                    shadowElevation = 8.dp.toPx()
-                                    shape = RoundedCornerShape(10.dp)
-                                    clip = true
-                                }
-                                .drawWithContent {
-                                    drawContent()
-                                    drawRect(
-                                        color = Color.Black.copy(alpha = 0.1f),
-                                        size = size
-                                    )
-                                }
-                        )
-
-                    }
-                }
-
-
-                Row(modifier = Modifier
+                )
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.Top
+        ) {
+            // Header
+            Row(
+                modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 7.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Absolute.Center)
-                {
-                    Image(
-                        painter = painterResource(R.drawable.img),
-                        contentDescription = "Kaan Image",
-                        contentScale = ContentScale.Crop,
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
 
-                        )
-                    Spacer(Modifier.width(3.dp))
-                    Text("Safe for Kids", fontFamily = sandtitle, fontSize = 18.sp)
+                    Text(
+                        "TaleTeller",
+                        color = Color.White,
+                        fontSize = 22.sp,
+                        fontFamily = sandtitle
+                    )
+                    Text(
+                        "Yapay zeka hikaye arkadaşın",
+                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 14.sp
+                    )
                 }
-
-
             }
+
+            // Mascot Section
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(40.dp))
+                            .background(Color(0xFFFBBF24))
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.pars),
+                            contentDescription = "Mascot",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .align(Alignment.TopEnd)
+                            .offset(x = 4.dp, y = (-4).dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFFBBF24)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("✨", fontSize = 14.sp)
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(topEnd = 20.dp, bottomEnd = 20.dp, bottomStart = 20.dp))
+                        .background(Color.White.copy(alpha = 0.95f))
+                        .padding(14.dp)
+                ) {
+                    Text(
+                        "Hoşgeldin, küçük hikaye kurdu!",
+                        color = Color(0xFF5B21B6),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = andikabody
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Start Creating Card
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                    }
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(0xFFA855F7),
+                                Color(0xFF8B5CF6),
+                                Color(0xFF7C3AED)
+                            )
+                        )
+                    )
+                    .clickable { navController.navigate("hikaye") }
+                    .padding(20.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painterResource(R.drawable.book),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Text("✨", fontSize = 24.sp)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        "Hikayeni Oluşturmaya Başla",
+                        color = Color.White,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = sandtitle
+                    )
+                    Text(
+                        "Hikayenin nasıl olacağına karar ver",
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 13.sp,
+                        fontFamily = andikabody
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color(0xFFFBBF24))
+                            .clickable { navController.navigate("hikaye") }
+                            .padding(vertical = 14.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "✨ Sihirli Hikaye Oluştur ✨",
+                            color = Color(0xFF5B21B6),
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = sandtitle
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Featured Stories
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        "Öne çıkan hikayeler",
+                        color = Color(0xFFE9D5FF),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = sandtitle
+                    )
+                    Text(
+                        "View All Stories",
+                        color = Color(0xFFE9D5FF),
+                        fontSize = 14.sp,
+                        modifier = Modifier.clickable { navController.navigate("saveSayfa") }
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                val stories = listOf(
+                    Pair(R.drawable.parent, "The Magical Forest"),
+                    Pair(R.drawable.robot, "Space Adventure"),
+                    Pair(R.drawable.parent, "Ocean Tales"),
+                    Pair(R.drawable.robot, "Dream World")
+                )
+                
+                stories.chunked(2).forEach { rowStories ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        rowStories.forEach { (image, title) ->
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .aspectRatio(0.75f)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(Color(0xFF1E293B))
+                                    .clickable { navController.navigate("saveSayfa") }
+                            ) {
+                                Image(
+                                    painter = painterResource(image),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(
+                                            Brush.verticalGradient(
+                                                colors = listOf(
+                                                    Color.Transparent,
+                                                    Color.Black.copy(alpha = 0.7f)
+                                                )
+                                            )
+                                        )
+                                )
+                                Text(
+                                    title,
+                                    color = Color.White,
+                                    fontSize = 10.sp,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomStart)
+                                        .padding(8.dp)
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(100.dp))
         }
 
     }
 }
 
-fun updatePremiumForTest(durationDays: Int, totalUses: Int, context: Context) {
-    val userId = Firebase.auth.currentUser?.uid ?: return
-    val userRef = Firebase.firestore.collection("users").document(userId)
 
-    userRef.update(
-        mapOf(
-            "premium" to true,
-            "premiumStartDate" to Timestamp.now(),
-            "premiumDurationDays" to durationDays,
-            "remainingChatgptUses" to totalUses
-        )
-    ).addOnSuccessListener {
-        Toast.makeText(context, "Premium üyelik başlatıldı: $durationDays gün, $totalUses hak", Toast.LENGTH_LONG).show()
-        Log.d("PremiumUpdate", "Premium güncellendi: $durationDays gün, $totalUses hak")
-    }.addOnFailureListener { e ->
-        Toast.makeText(context, "Premium güncelleme hatası: ${e.message}", Toast.LENGTH_LONG).show()
-        Log.e("PremiumUpdate", "Premium güncelleme hatası: ${e.message}")
-    }
-}
 
-data class NavItem(
-    val label:String,
-    val icon:ImageVector
-)
 
 
 

@@ -35,14 +35,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
-import com.kaankilic.discoverybox.viewmodel.CardSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.DilViewModel
-import com.kaankilic.discoverybox.viewmodel.GameViewModel
 import com.kaankilic.discoverybox.viewmodel.GirisSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.KayitSayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
-import com.kaankilic.discoverybox.viewmodel.NumberGameViewModel
 import com.kaankilic.discoverybox.viewmodel.SaveSayfaViewModel
 
 @Composable
@@ -54,32 +51,14 @@ fun SayfaGecisleri(
     metinViewModel: MetinViewModel,
     girisSayfaViewModel: GirisSayfaViewModel,
     kayitSayfaViewModel: KayitSayfaViewModel,
-    saveSayfaViewModel: SaveSayfaViewModel,
-    cardSayfaViewModel: CardSayfaViewModel,
-    numberGameViewModel: NumberGameViewModel,
-    gameViewModel: GameViewModel
+    saveSayfaViewModel: SaveSayfaViewModel
     ) {
         // val navController = rememberNavController()
         NavHost(navController = navController, startDestination = "splashScreen1" ){
             composable("anasayfa"){
                 Anasayfa(navController = navController, anasayfaViewModel = anasayfaViewModel)
             }
-            composable("gameMain"){
-                GameMain(navController,anasayfaViewModel)
-            }
-            composable("wordGame"){
-                MeyveKartSirali(navController,cardSayfaViewModel)
-            }
-            composable("matchingGame"){
-                MatchGameScreen(navController,cardSayfaViewModel,false)
-            }
-            composable("colorGame"){
-                GameApp(navController,gameViewModel)
 
-            }
-            composable("hikayeGecis"){
-                HikayeGecis(navController)
-            }
             composable("hikaye"){
                 Hikaye(navController = navController,hikayeViewModel,metinViewModel,anasayfaViewModel)
             }
@@ -113,11 +92,6 @@ fun SayfaGecisleri(
                 LoginSplashScreen(navController)
 
             }
-            composable("numberGame"){
-                NumberGameScreen(navController,numberGameViewModel,cardSayfaViewModel)
-
-            }
-
         }
 
 

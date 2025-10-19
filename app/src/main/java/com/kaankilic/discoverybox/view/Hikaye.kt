@@ -1,36 +1,35 @@
-@file:OptIn(ExperimentalLayoutApi::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.kaankilic.discoverybox.view
 
 import android.annotation.SuppressLint
-import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
-
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -38,480 +37,546 @@ import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.MetinViewModel
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import com.google.accompanist.flowlayout.FlowRow
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import com.google.accompanist.flowlayout.FlowMainAxisAlignment
-import com.google.firebase.auth.FirebaseAuth
-import com.kaankilic.discoverybox.repo.DiscoveryBoxRepository
-import com.kaankilic.discoverybox.util.isInternetAvailable
 
-@SuppressLint("SuspiciousIndentation")
-@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Hikaye(navController: NavController,hikayeViewModel: HikayeViewModel,metinViewModel: MetinViewModel,anasayfaViewModel: AnasayfaViewModel) {
+fun Hikaye(
+    navController: NavController,
+    hikayeViewModel: HikayeViewModel,
+    metinViewModel: MetinViewModel,
+    anasayfaViewModel: AnasayfaViewModel
+) {
+    val context = LocalContext.current
+    val sandtitle = FontFamily(Font(R.font.sandtitle))
+    val andikabody = FontFamily(Font(R.font.andikabody))
+    val coroutineScope = rememberCoroutineScope()
+
     var konu by remember { mutableStateOf(TextFieldValue("")) }
     var mekan by remember { mutableStateOf(TextFieldValue("")) }
     var anaKarakter by remember { mutableStateOf(TextFieldValue("")) }
     var anaKarakterOzellik by remember { mutableStateOf(TextFieldValue("")) }
-    val (yanKarakterler, setTextFields) = remember { mutableStateOf(listOf("")) }
-    val (selectedChip, setSelectedChip) = remember { mutableStateOf("") }
-    val chipOptions = listOf(stringResource(R.string.Adventure),stringResource(R.string.Love),stringResource(R.string.Friendship),stringResource(R.string.Family),stringResource(R.string.Action))
-    val(secilenChip , ayarSecilenChip) = remember { mutableStateOf("") }
-    var chipAyar = listOf(stringResource(R.string.Short),stringResource(R.string.Medium),stringResource(R.string.Long))
-    var generatedStory by remember { mutableStateOf("") }
-    var imageGenerate by remember { mutableStateOf("") }
-    val context = LocalContext.current
-    val snackbarHostState= remember { SnackbarHostState() }
-    var focusState by remember { mutableStateOf(false) }
-    val sandtitle= FontFamily(Font(R.font.sandtitle))
-    val andikabody= FontFamily(Font(R.font.andikabody))
-    var showDialogPay by remember { mutableStateOf(false) }
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-    //var dbRepo= DiscoveryBoxRepository()
-    val dbRepo = hikayeViewModel.dbRepo
+    var yanKarakterler by remember { mutableStateOf(listOf("")) }
+    var selectedTheme by remember { mutableStateOf("") }
+    var selectedLength by remember { mutableStateOf("") }
 
+    var themeExpanded by remember { mutableStateOf(true) }
+    var lengthExpanded by remember { mutableStateOf(false) }
+    var supportingExpanded by remember { mutableStateOf(false) }
 
-
-
-    val gradientBrush = Brush.verticalGradient(
-        colors = listOf(
-            Color(0xFFd5e0fe),
-            Color(0xFFfbdceb),
-
-
-
-        ),
-        startY = 0f,
-        endY =
-            1500f// eğeri ekran yüksekliğine göre ayarlayabilirsiniz.
+    val themes = listOf(
+        stringResource(R.string.Adventure),
+        stringResource(R.string.Love),
+        stringResource(R.string.Friendship),
+        stringResource(R.string.Family),
+        stringResource(R.string.Action)
+    )
+    val lengths = listOf(
+        stringResource(R.string.Short),
+        stringResource(R.string.Medium),
+        stringResource(R.string.Long)
     )
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.Story),
-                    fontSize = 48.sp,
-                    textAlign = TextAlign.Center,
-                    fontFamily = sandtitle
-                )
-            },
-                colors = TopAppBarColors(Color(0xFFd5e0fe),Color.DarkGray,Color.Gray,Color(0xFF353BA4),Color(0xFF353BA4)),
-                navigationIcon  = {
-                    IconButton(modifier = Modifier.padding(start = 8.dp) .size(55.dp), onClick = {
-                        navController.navigate("hikayeGecis")
-                    }) {
-                        Image(
-                            painter = painterResource(id = R.drawable.back),
-                            contentDescription = "Back",
-                            contentScale = ContentScale.Crop,
+                title = {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row {
+                            Image(
+                                painterResource(R.drawable.pencil),"pencil",
+
 
                             )
+                            Text(
+                                "Create Your Story",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = sandtitle,
+                                color = Color.White
+                            )
 
-                    }
-            }
-        )
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
+                        }
 
-        containerColor = Color.DarkGray,
-        modifier = Modifier.background(gradientBrush)
-    ) { paddingValues ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(state = rememberScrollState())
-                .background(gradientBrush), // Apply gradient background to the content
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-
-            Text(
-                text = stringResource(R.string.Subject),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 25.dp, start = 15.dp),
-                fontSize = 22.sp,
-                color = Color(0xFF353BA4), fontFamily = sandtitle
-            )
-            TextField(
-                value = konu,
-                onValueChange = { konu = it },
-                colors = TextFieldDefaults.textFieldColors(
-                    cursorColor = Color.Black,
-                    //containerColor =Color.DarkGray,
-                    containerColor = Color(0xFF969696),
-                    focusedIndicatorColor = Color.White,
-                    unfocusedIndicatorColor = Color.White,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedLabelColor =  Color(0xFF21324A),
-                    unfocusedLabelColor = Color.Black
-
-
-
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
-                    .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = stringResource(R.string.SubjectExp), fontSize = 14.sp, fontFamily = andikabody) }
-            )
-            Text(
-                text = stringResource(R.string.Location),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp),
-                fontSize = 22.sp,
-                color = Color(0xFF353BA4), fontFamily = sandtitle
-            )
-            TextField(
-                value = mekan,
-                onValueChange = { mekan = it },
-                colors = TextFieldDefaults.textFieldColors(
-                    cursorColor = Color.White,
-                    containerColor = Color(0xFF969696),
-                    focusedIndicatorColor = Color.White,
-                    unfocusedIndicatorColor = Color.White,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedLabelColor =  Color(0xFF21324A),
-                    unfocusedLabelColor =Color.Black,
-
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
-                    .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text =stringResource(R.string.LocationExp), fontSize = 14.sp, fontFamily = andikabody) }
-            )
-            Text(
-                text = stringResource(R.string.MainCharacter),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp),
-                fontSize = 22.sp,
-                color =Color(0xFF353BA4), fontFamily = sandtitle
-            )
-            TextField(
-                value = anaKarakter,
-                onValueChange = { anaKarakter = it },
-                colors = TextFieldDefaults.textFieldColors(
-                    cursorColor = Color.White,
-                    containerColor =  Color(0xFF969696),
-                    focusedIndicatorColor = Color.White,
-                    unfocusedIndicatorColor = Color.White,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedLabelColor =  Color(0xFF21324A),
-                    unfocusedLabelColor = Color.Black,
-
-
-
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
-                    .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text = stringResource(R.string.MainCharacterExp), fontSize = 14.sp, fontFamily = andikabody) }
-            )
-            Text(
-                text = stringResource(R.string.MinorCharacter),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp),
-                fontSize = 22.sp,
-                color =Color(0xFF353BA4), fontFamily = sandtitle
-            )
-            Column {
-                yanKarakterler.forEachIndexed { index, text ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextField(
-                            value = text,
-                            onValueChange = { newText ->
-                                val newTextFields = yanKarakterler.toMutableList()
-                                newTextFields[index] = newText
-                                setTextFields(newTextFields)
-                            },
-                            colors = TextFieldDefaults.textFieldColors(
-                                cursorColor = Color.White,
-                                containerColor = Color(0xFF969696),
-                                focusedIndicatorColor = Color.White,
-                                unfocusedIndicatorColor = Color.White,
-                                focusedTextColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                focusedLabelColor =  Color(0xFF21324A),
-                                unfocusedLabelColor = Color.Black
-
-
-
-                            ),
-                            modifier = Modifier
-                                .weight(1f) // fillMaxWidth yerine weight kullan
-                                .padding(start = 10.dp, top = 10.dp, bottom = 25.dp)
-                                .onFocusChanged { focusState = it.isFocused },
-                            label = { Text(text = stringResource(R.string.MinorCharacterExp), fontSize = 14.sp, fontFamily = andikabody) }
+                        Text(
+                            "Let your imagination come to life!",
+                            fontSize = 12.sp,
+                            fontFamily = andikabody,
+                            color = Color.White.copy(alpha = 0.9f)
                         )
-
+                    }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Ekle",
-                            modifier = Modifier
-                                .padding(end = 7.dp)
-                                .size(34.dp)
-                                .clickable { setTextFields(yanKarakterler + "") },
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
                             tint = Color.White
                         )
                     }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color(0xFF6B46C1)
+                )
+            )
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF6B46C1))
+                .padding(it)
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Theme Section (Accordion)
+            AccordionCard(
+                title = "Theme",
+                subtitle = if (selectedTheme.isNotEmpty()) selectedTheme else "Select a theme",
+                icon = R.drawable.theme,
+                expanded = themeExpanded,
+                onExpandChange = { themeExpanded = !themeExpanded }
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ThemeButton(
+                        text = themes[0],
+                        icon = "🏰",
+                        color = Color(0xFFEC4899),
+                        selected = selectedTheme == themes[0],
+                        modifier = Modifier.weight(1f)
+                    ) { selectedTheme = themes[0] }
+                    ThemeButton(
+                        text = themes[1],
+                        icon = "🚀",
+                        color = Color(0xFF06B6D4),
+                        selected = selectedTheme == themes[1],
+                        modifier = Modifier.weight(1f)
+                    ) { selectedTheme = themes[1] }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ThemeButton(
+                        text = themes[2],
+                        icon = "🌲",
+                        color = Color(0xFF10B981),
+                        selected = selectedTheme == themes[2],
+                        modifier = Modifier.weight(1f)
+                    ) { selectedTheme = themes[2] }
+                    ThemeButton(
+                        text = themes[3],
+                        icon = "👻",
+                        color = Color(0xFF8B5CF6),
+                        selected = selectedTheme == themes[3],
+                        modifier = Modifier.weight(1f)
+                    ) { selectedTheme = themes[3] }
+                }
+                if (themes.size > 4) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        ThemeButton(
+                            text = themes[4],
+                            icon = "⚡",
+                            color = Color(0xFFF59E0B),
+                            selected = selectedTheme == themes[4],
+                            modifier = Modifier.weight(0.5f)
+                        ) { selectedTheme = themes[4] }
+                    }
                 }
             }
 
-            Text(
-                text =stringResource(R.string.MainCharacterCharacteristic),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp),
-                fontSize = 22.sp,
-                color =Color(0xFF353BA4), fontFamily = sandtitle
-            )
-            TextField(
-                value = anaKarakterOzellik,
-                onValueChange = { anaKarakterOzellik = it },
-                colors = TextFieldDefaults.textFieldColors(
-                    cursorColor = Color.White,
-                    containerColor =  Color(0xFF969696),
-                    focusedIndicatorColor = Color.White,
-                    unfocusedIndicatorColor = Color.White,
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    focusedLabelColor =  Color(0xFF21324A),
-                    unfocusedLabelColor = Color.Black
-
-
-
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 25.dp)
-                    .onFocusChanged { focusState = it.isFocused },
-                label = { Text(text =stringResource(R.string.MainCharacterCharacteristicExp), fontSize = 14.sp, fontFamily = andikabody) }
-            )
-            Text(
-                text = stringResource(R.string.StoryLength) ,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp),
-                fontSize = 22.sp,
-                color = Color(0xFF353BA4), fontFamily = sandtitle
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+            // Story Length Section (Accordion)
+            AccordionCard(
+                title = "Story Length",
+                subtitle = if (selectedLength.isNotEmpty()) selectedLength else "Select story length",
+                icon = R.drawable.book,
+                expanded = lengthExpanded,
+                onExpandChange = { lengthExpanded = !lengthExpanded }
             ) {
-                chipAyar.forEach { option ->
-                    FilterChip(
-
-                        selected = secilenChip == option,
-                        onClick = { ayarSecilenChip(option) },
-                        label = { Text(text = option, color = Color.Black, fontFamily = andikabody) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor =Color(0xFF969696), // Varsayılan arka plan rengi
-                            selectedContainerColor = Color(0xFF21324A), // Seçili olduğunda arka plan rengi
-                            labelColor = Color.Black, // Varsayılan yazı rengi
-                            selectedLabelColor = Color.Black // Seçili olduğunda yazı rengi
-                        ),
-                        modifier = Modifier
-                            .clickable {}
-                            .padding(bottom = 10.dp)
-                    )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    lengths.forEachIndexed { index, length ->
+                        val colors = listOf(
+                            Color(0xFFEC4899),
+                            Color(0xFF8B5CF6),
+                            Color(0xFF06B6D4)
+                        )
+                        val icons = listOf("📖", "📚", "📕")
+                        ThemeButton(
+                            text = length,
+                            icon = icons.getOrElse(index) { "📖" },
+                            color = colors.getOrElse(index) { Color(0xFF8B5CF6) },
+                            selected = selectedLength == length,
+                            modifier = Modifier.weight(1f)
+                        ) { selectedLength = length }
+                    }
                 }
             }
-            Text(
-                text = stringResource(R.string.Theme),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp),
-                fontSize = 22.sp,
-                color = Color(0xFF353BA4), fontFamily = sandtitle
-            )
-            Spacer(modifier = Modifier.height(2.dp))
 
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(), mainAxisAlignment = FlowMainAxisAlignment.SpaceEvenly,
-                mainAxisSpacing = 5.dp,
-                crossAxisSpacing = 5.dp
+            // Setting Section
+            InputCard(
+                title = "Konu",
+                icon = R.drawable.topic,
+                placeholder = "A magical kingdom in the clouds...",
+                value = konu,
+                onValueChange = { konu = it }
+            )
+
+            // Main Character Section
+            InputCard(
+                title = "Main Character",
+                icon = R.drawable.main_cha,
+                placeholder = "Enter your hero's name",
+                value = anaKarakter,
+                onValueChange = { anaKarakter = it }
+            )
+
+            // Supporting Characters Section (Accordion)
+            AccordionCard(
+                title = "Supporting Characters",
+                subtitle = "Add characters",
+                icon =R.drawable.sup_cha,
+                expanded = supportingExpanded,
+                onExpandChange = { supportingExpanded = !supportingExpanded }
             ) {
-                chipOptions.forEach { option ->
-                    FilterChip(
-                        selected = selectedChip == option,
-                        onClick = { setSelectedChip(option) },
-                        label = {
-                            Text(
-                                text = option,
-                                fontSize = 12.sp,
-                                color = Color.Black,
-                                textAlign = TextAlign.Center,
-                                fontFamily = andikabody
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    yanKarakterler.forEachIndexed { index, character ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextField(
+                                value = character,
+                                onValueChange = { newValue ->
+                                    yanKarakterler = yanKarakterler.toMutableList().apply {
+                                        this[index] = newValue
+                                    }
+                                },
+                                placeholder = { Text("Add a character...", fontSize = 14.sp, color = Color(0xFF9CA3AF)) },
+                                modifier = Modifier.weight(1f),
+                                colors = TextFieldDefaults.colors(
+                                    focusedTextColor = Color(0xFF1F2937),
+                                    unfocusedTextColor = Color(0xFF1F2937),
+                                    cursorColor = Color(0xFF6B46C1),
+                                    focusedContainerColor = Color.White,
+                                    unfocusedContainerColor = Color.White,
+                                    focusedIndicatorColor = Color.Transparent,
+                                    unfocusedIndicatorColor = Color.Transparent
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                textStyle = androidx.compose.ui.text.TextStyle(
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 14.sp
+                                )
                             )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor =Color(0xFF969696),
-                            selectedContainerColor = Color(0xFF21324A),
-                            labelColor = Color.Black,
-                            selectedLabelColor = Color.Black
-                        ),
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                }
-            }
-
-
-            Button(
-                colors = ButtonDefaults.buttonColors(Color.DarkGray),
-                modifier = Modifier.padding(bottom = 22.dp),
-                enabled = konu.text.isNotEmpty() && mekan.text.isNotEmpty(),
-
-                onClick = {
-                    if (!isInternetAvailable(context = context)){
-                        Toast.makeText(context,"Internet connection error!",Toast.LENGTH_LONG).show()
-                    }else{
-                        anasayfaViewModel.checkUserAccess { hasTrial, isPremium, usedFreeTrial ->
-                            val isPro = isPremium || hasTrial
-
-
-                            MainScope().launch {
-
-                                val yanKarakterlerText = yanKarakterler.joinToString(", ") { it }
-                                val temaText = if (selectedChip.isNotEmpty()) "Tema: $selectedChip" else ""
-                                val uzunlukText = if (secilenChip.isNotEmpty()) "Uzunluk: $secilenChip" else ""
-
-                                /*generatedStory = "Write me a story. " +
-                                        "Topic: ${konu.text}," +
-                                        " Location: ${mekan.text}," +
-                                        " Main character: ${anaKarakter.text}," +
-                                        " Main character trait: ${anaKarakterOzellik.text}," +
-                                        " Supporting characters: ${yanKarakterlerText}, " +
-                                        "Theme: ${temaText}," +
-                                        " Length: ${uzunlukText}" +
-                                        ".but at the beginning of the story, there shouldn't be an AI-related sentence — for example, no sentences like 'here is a story for you.' It should start directly with the story"*/
-                                val containsTurkishChars = listOf(konu.text, mekan.text, anaKarakter.text, anaKarakterOzellik.text).any {
-                                    it.contains(Regex("[çÇğĞıİöÖşŞüÜ]"))
+                            if (index == yanKarakterler.size - 1) {
+                                IconButton(
+                                    onClick = {
+                                        yanKarakterler = yanKarakterler + ""
+                                    },
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(RoundedCornerShape(24.dp))
+                                        .background(Color(0xFF10B981))
+                                ) {
+                                    Icon(
+                                        Icons.Default.Add,
+                                        contentDescription = "Add",
+                                        tint = Color.White
+                                    )
                                 }
-
-                                generatedStory = if (containsTurkishChars) {
-                                    "Bana bir hikaye yaz. " +
-                                            "Konu: ${konu.text}, " +
-                                            "Mekan: ${mekan.text}, " +
-                                            "Ana karakter: ${anaKarakter.text}, " +
-                                            "Ana karakter özelliği: ${anaKarakterOzellik.text}, " +
-                                            "Yardımcı karakterler: $yanKarakterlerText, " +
-                                            "Tema: $temaText, " +
-                                            "Uzunluk: $uzunlukText. " +
-                                            "Ama hikayenin başında 'işte sana bir hikaye' gibi yapay zeka ile ilgili cümleler olmasın. Hikaye doğrudan başlasın."
-                                } else {
-                                    "Write me a story. " +
-                                            "Topic: ${konu.text}," +
-                                            " Location: ${mekan.text}," +
-                                            " Main character: ${anaKarakter.text}," +
-                                            " Main character trait: ${anaKarakterOzellik.text}," +
-                                            " Supporting characters: ${yanKarakterlerText}, " +
-                                            "Theme: ${temaText}," +
-                                            " Length: ${uzunlukText}" +
-                                            ". But at the beginning of the story, there shouldn't be an AI-related sentence — for example, no sentences like 'here is a story for you.' It should start directly with the story"
-                                }
-
-                                imageGenerate =  """
-A photorealistic digital painting in the style of a high-end children’s storybook illustration. 
-Depict a vivid and emotionally rich scene of "$konu" taking place in $mekan.
-The theme is $temaText.
-
-Characters are captured mid-action with lifelike gestures and natural expressions — full of joy, curiosity, and warmth. 
-Human anatomy is realistic and age-appropriate, with fine skin details, light reflections in eyes, and dynamic postures.
-
-Use cinematic, realistic lighting with global illumination, soft shadows, subtle reflections, and ambient occlusion.
-Textures such as skin, hair, fabric, and nature are richly detailed and physically accurate.
-Materials reflect light based on their real properties (e.g., soft cloth, shiny eyes, moist lips, natural wood).
-
-Camera style: shallow depth of field, slightly blurred background for realism and focus, gentle bokeh highlights.
-Atmospheric perspective enhances spatial depth, with misty or sunlit air particles adding realism.
-Warm natural tones dominate the palette, with pastel undertones used only subtly for charm — not cartoonish.
-
-Avoid watercolor or flat 2D styles; emphasize rich brushstroke simulation with physically-based rendering.
-Environment is immersive, filled with small details like dust particles in light, texture on walls or grass, and dynamic natural elements.
-
-Layout: wide horizontal (storybook spread), ultra-high detail, rendered at 1024x1024 resolution or higher.
-""".trimIndent()
-                                if (isPro){
-                                    hikayeViewModel.generateStory(generatedStory)
-                                    metinViewModel.queryTextToImage(imageGenerate, isPro = true, context = context)
-
-                                    navController.navigate("metin/${konu.text}")
-                                } else {
-                                    hikayeViewModel.generateStory(generatedStory)
-                                    metinViewModel.queryTextToImage(imageGenerate, isPro = false, context = context)
-                                    dbRepo.decrementChatGptUseIfNotPro(userId, false) { success ->
-                                        if (!success) {
-                                            Toast.makeText(context, "Hak güncelleme başarısız", Toast.LENGTH_SHORT).show()
+                            }
+                            if (yanKarakterler.size > 1) {
+                                IconButton(
+                                    onClick = {
+                                        yanKarakterler = yanKarakterler.toMutableList().apply {
+                                            removeAt(index)
                                         }
                                     }
+                                ) {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = "Remove",
+                                        tint = Color(0xFFEF4444)
+                                    )
                                 }
-                                navController.navigate("metin/${konu.text}") // HAK eksiltme başarılıysa yönlendir
                             }
                         }
                     }
-
-                },
-            ) {
-                Text(text = stringResource(R.string.CreatetheStory), fontFamily = sandtitle, fontSize = 16.sp)
+                }
             }
-            if (showDialogPay) {
-                AlertDialog(
-                    onDismissRequest = {},
-                    title = { Text("Hakkınız Tükenmiş") },
-                    text = { Text("Ücretli üyelik hakkınız bulunmamaktadır. Ücretsiz hikaye üretebilirsiniz. Veya " +
-                            "daha kaliteli hikaye,görsel ve ses için ücretli plana geçiş yapabilirsiniz.") },
-                    confirmButton = {
-                        Button(onClick = {
-                            showDialogPay = false
-                            // Üyelik alma ekranına yönlendirme veya işlemi
-                            //navController.navigate("uyelikSayfasi")
-                        }) {
-                            Text("Üyelik Al")
-                        }
-                    },
-                    dismissButton = {
-                        androidx.compose.material.OutlinedButton(onClick = {
-                            showDialogPay = false
-                            // Ücretsiz sürümle devam et
-                        }) {
-                            Text("Ücretsiz Sürüm ile Hikaye Üret")
-                        }
+
+            // Location Section
+            InputCard(
+                title = "Location",
+                icon = R.drawable.location,
+                placeholder = "The Enchanted Forest",
+                value = mekan,
+                onValueChange = { mekan = it }
+            )
+
+            // Character Trait Section
+            InputCard(
+                title = "Main Character Trait",
+                icon = R.drawable.trait,
+                placeholder = stringResource(R.string.MainCharacterCharacteristicExp),
+                value = anaKarakterOzellik,
+                onValueChange = { anaKarakterOzellik = it }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Generate Button
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        val yanKarakterlerText = yanKarakterler.filter { it.isNotBlank() }.joinToString(", ")
+                        val temaText = if (selectedTheme.isNotEmpty()) "Tema: $selectedTheme" else ""
+                        val uzunlukText = if (selectedLength.isNotEmpty()) "Uzunluk: $selectedLength" else ""
+
+                        val generatedStory = "Bana bir hikaye yaz. " +
+                                "Konu: ${konu.text}, " +
+                                "Mekan: ${mekan.text}, " +
+                                "Ana karakter: ${anaKarakter.text}, " +
+                                "Ana karakter özelliği: ${anaKarakterOzellik.text}, " +
+                                "Yardımcı karakterler: $yanKarakterlerText, " +
+                                "$temaText, " +
+                                "$uzunlukText. " +
+                                "Hikaye doğrudan başlasın."
+
+                        val imageGenerate = "A magical scene of ${konu.text} in ${mekan.text}"
+
+                        hikayeViewModel.generateStory(generatedStory)
+                        metinViewModel.queryTextToImage(imageGenerate, isPro = false, context = context)
+                        navController.navigate("metin/${konu.text}")
                     }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFCD34D)
+                ),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Icon(painter = painterResource(R.drawable.pencil), contentDescription = null, tint = Color(0xFF6B46C1))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    stringResource(R.string.CreatetheStory),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = sandtitle,
+                    color = Color(0xFF6B46C1)
                 )
             }
 
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }
 
+@Composable
+fun AccordionCard(
+    title: String,
+    subtitle: String,
+    icon: Int,
+    expanded: Boolean,
+    onExpandChange: () -> Unit,
+    content: @Composable (() -> Unit)
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, Color.White, RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF8B5CF6).copy(alpha = 0.3f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onExpandChange() },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = icon),
+                        contentDescription = null,
+                        tint = Color(0xFFFCD34D),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Column {
+                        Text(
+                            title,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            subtitle,
+                            fontSize = 12.sp,
+                            color = Color.White.copy(alpha = 0.9f)
+                        )
+                    }
+                }
+                Icon(
+                    if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = null,
+                    tint = Color(0xFFFCD34D)
+                )
+            }
+            AnimatedVisibility(
+                visible = expanded,
+                enter = expandVertically(),
+                exit = shrinkVertically()
+            ) {
+                Column(modifier = Modifier.padding(top = 16.dp)) {
+                    content()
+                }
+            }
+        }
+    }
+}
 
+@Composable
+fun ThemeButton(
+    text: String,
+    icon: String,
+    color: Color,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .aspectRatio(0.8f)
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (selected) color else color.copy(alpha = 0.3f))
+            .clickable { onClick() }
+            .padding(12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(icon, fontSize = 28.sp)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (selected) Color.White else Color.White.copy(alpha = 0.9f)
+            )
+        }
+    }
+}
 
+@Composable
+fun LengthOption(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (selected) Color(0xFFEDE9FE) else Color.Transparent)
+            .clickable { onClick() }
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text,
+            fontSize = 14.sp,
+            color = if (selected) Color(0xFF7C3AED) else Color(0xFF6B7280),
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+        )
+        if (selected) {
+            Icon(
+                Icons.Default.Check,
+                contentDescription = null,
+                tint = Color(0xFF7C3AED),
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun InputCard(
+    title: String,
+    icon: Int,
+    placeholder: String,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(1.dp, Color.White, RoundedCornerShape(16.dp)),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF8B5CF6).copy(alpha = 0.3f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = icon),
+                    contentDescription = null,
+                    tint = Color(0xFFFCD34D),
+                    modifier = Modifier.size(24.dp)
+                )
+                Text(
+                    title,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            TextField(
+                value = value,
+                onValueChange = onValueChange,
+                placeholder = { Text(placeholder, fontSize = 14.sp, color = Color(0xFF9CA3AF)) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = Color(0xFF1F2937),
+                    unfocusedTextColor = Color(0xFF1F2937),
+                    cursorColor = Color(0xFF6B46C1),
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(12.dp),
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                )
+            )
+        }
+    }
+}

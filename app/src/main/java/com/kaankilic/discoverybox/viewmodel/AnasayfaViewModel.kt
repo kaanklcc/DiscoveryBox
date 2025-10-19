@@ -20,17 +20,17 @@ class AnasayfaViewModel @Inject constructor(val dbRepo: DiscoveryBoxRepository) 
    // var dbRepo= DiscoveryBoxRepository()
     var konular = MutableLiveData<List<Story>>()
 
-    init {
+  /*  init {
         konulariYukle()
 
-    }
-    fun konulariYukle(){
+    }*/
+    /*fun konulariYukle(){
         CoroutineScope(Dispatchers.Main).launch {
             konular.value= dbRepo.getAllGame()
         }
 
 
-    }
+    }*/
 
     fun signOut(context: Context, onSignedOut: () -> Unit) {
         viewModelScope.launch {

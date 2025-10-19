@@ -120,6 +120,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-flowlayout:0.30.1")
 
 
+    implementation ("com.google.android.gms:play-services-ads:23.0.0") // güncel sürüm olabilir
+
+
 
 
 

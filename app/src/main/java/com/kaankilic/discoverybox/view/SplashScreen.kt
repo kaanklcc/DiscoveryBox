@@ -212,7 +212,7 @@ fun SplashScreen2(navController: NavController) {
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
+              /*  Text(
                     stringResource(R.string.ogrenoyunla),
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 28.sp,
@@ -220,9 +220,9 @@ fun SplashScreen2(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(stringResource(R.string.fungames), fontWeight = FontWeight.Medium, fontSize = 20.sp,fontFamily = andikabody)
-                Spacer(modifier = Modifier.height(40.dp))
+                Spacer(modifier = Modifier.height(40.dp))*/
 
-                Row(
+               /* Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -261,10 +261,10 @@ fun SplashScreen2(navController: NavController) {
                         )
                     }
 
-                }
+                }*/
                 Spacer(modifier = Modifier.height(70.dp))
 
-                Row(
+                /*Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -305,7 +305,7 @@ fun SplashScreen2(navController: NavController) {
                     }
 
 
-                }
+                }*/
                 Spacer(modifier = Modifier.height(10.dp))
                 PageIndicator(3, 1)
                 Spacer(modifier = Modifier.height(10.dp))

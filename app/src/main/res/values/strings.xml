@@ -11,22 +11,8 @@
     <string name="WrongPassword">Wrong Password</string>
     <string name="Verify">Verify</string>
     <string name="Cancel">Cancel</string>
-    <string name="Game">Game</string>
 
-
-    <string name="MATCHINGGAME">MATCHING GAME</string>
-    <string name="CongratulationsGameisOver">Congratulations, Game is Over!</string>
-    <string name="matchWelcomeMessage">"Welcome!.Let's match the words</string>
-    <string name="Congratulations">Congratulations</string>
-
-    <string name="COLORMATCHINGGAME">COLOR MATCHING GAME</string>
-    <string name="ColorWelcomeMessage">"Welcome!Let's find the right colors"</string>
-    <string name="Right">Right!</string>
-    <string name="Wrong">Wrong!</string>
     <string name="SignIn">Sign In</string>
-
-
-    <string name="GameScreen">Games</string>
 
     <string name="WelcomeToMagicWorld">Welcome To Magic World</string>
     <string name="Email">Email</string>
@@ -66,15 +52,6 @@
 
     <string name="MYSTORIES">My Stories</string>
 
-
-    <string name="WordQuiz">Word Quiz</string>
-    <string name="WordLearnWelcomeMessage">"Welcome !.Let's learn the words"</string>
-    <string name="Next">Next</string>
-    <string name="CardsAreLoading...">Cards Are Loading...</string>
-
-
-
-
     <string name="WELCOMETO">WELCOME TO</string>
     <string name="DiscoveryBox">Discovery Box</string>
     <string name="Name">Name</string>
@@ -112,9 +89,6 @@
     <string name="language">en</string>
     <string name="country">US</string>
 
-
-    <string name="EducationalGames">Educational Games</string>
-    <string name="Learnwhileplaying">Learn while playing!</string>
     <string name="CreateStorieswithAI">Create Stories with AI!</string>
     <string name="Letyourimaginationfly">Let your imagination fly!</string>
 
@@ -125,26 +99,12 @@
 
     <string name="HikayeSİlindi">Story deleted</string>
 
-    <string name="DragAndDrop">Drag And Drop</string>
-    <string name="numaraeslestir">Match the correct numbers with the correct images</string>
-
-
-
     <string name="storyfriend">Story Friends</string>
     <string name="wherestory">Where Stories Come Alive!</string>
-    <string name="ogrenoyunla">Learn Through Play</string>
-    <string name="fungames">Fun Educational Games</string>
     <string name="get">Get</string>
     <string name="started">Started!</string>
     <string name="touch">Touch to Begin Your</string>
     <string name="Advanturemacera">Adventure!</string>
     <string name="StartNow">Start Now -></string>
-    <string name="learn">Learn &amp; Play</string>
-    <string name="play">Play</string>
-    <string name="andmore">Colors, Words and More</string>
-
-
-
-
 
 </resources>

@@ -11,9 +11,6 @@
     <string name="WrongPassword">Yanlış Şifre</string>
     <string name="Verify">Doğrulama</string>
     <string name="Cancel">İptal</string>
-    <string name="Game">Oyun</string>
-
-
     <string name="Adventure">Macera</string>
     <string name="Action">Aksiyon</string>
     <string name="Love">Sevgi</string>
@@ -23,18 +20,6 @@
     <string name="Medium">Orta</string>
     <string name="Long">Uzun</string>
 
-
-    <string name="MATCHINGGAME">EŞLESTİRME OYUNU</string>
-    <string name="CongratulationsGameisOver">Tebrikler, Oyun Bitti!</string>
-    <string name="matchWelcomeMessage">"Hosgeldin! Haydi Kelimeleri Eşleştirelim</string>
-    <string name="Congratulations">Tebrikler</string>
-
-    <string name="COLORMATCHINGGAME">RENK EŞLEŞTİRME OYUNU</string>
-    <string name="ColorWelcomeMessage">"Hoşgeldin! Haydi Doğru Renkleri Bulalım"</string>
-    <string name="Right">Doğru!</string>
-    <string name="Wrong">Yanlış!</string>
-
-    <string name="GameScreen">Oyunlar</string>
 
     <string name="WelcomeToMagicWorld">Sihir Dünyasına Hoşgeldin</string>
     <string name="Email">Email</string>
@@ -64,13 +49,8 @@
 
     <string name="MYSTORIES">HİKAYELERİM</string>
 
-    <string name="WordQuiz">Kelime Testi</string>
-    <string name="WordLearnWelcomeMessage">"Hosgeldiniz! Haydi kelimeleri öğrenelim"</string>
-    <string name="Next">İleri</string>
-    <string name="CardsAreLoading...">Kartlar Yükleniyor...</string>
-
     <string name="WELCOMETO">HOŞGELDİNİZ</string>
-    <string name="DiscoveryBox">Discovery Box</string>
+    <string name="DiscoveryBox">Keşif Kutusu</string>
     <string name="Name">İsim</string>
     <string name="Surname">Soyisim</string>
 
@@ -101,8 +81,6 @@
 
     <string name="default_web_client_id">764790962175-86cdpa0e5vi52scv1incbf4e7dph73m6.apps.googleusercontent.com</string>
 
-    <string name="EducationalGames">Eğitici Oyunlar</string>
-    <string name="Learnwhileplaying">Oynarken Öğren!</string>
     <string name="CreateStorieswithAI">Yapay Zeka ile Hikaye Yarat!</string>
     <string name="Letyourimaginationfly">Hayal Gücünü Serbest Bırak!</string>
 
@@ -114,21 +92,12 @@
 
     <string name="HikayeSİlindi">Hikaye Silindi</string>
 
-    <string name="DragAndDrop">Sürükle ve Bırak</string>
-    <string name="numaraeslestir">Doğru numaraları görsellerle eşleştirin</string>
-
     <string name="storyfriend">Hikaye Arkadaşları</string>
     <string name="wherestory">Hikayelerin Canlandığı Yer!</string>
-    <string name="ogrenoyunla">Oyunlarla Öğrenin!</string>
-    <string name="fungames">Eglenceli Öğretici Oyunlar</string>
     <string name="get">Haydi</string>
     <string name="started">Başlayalım</string>
     <string name="touch">Hikayene Başlamak için</string>
     <string name="Advanturemacera">Tıkla!</string>
     <string name="StartNow">Hemen Başla -></string>
-    <string name="learn">Oyna</string>
-    <string name="play">Oyna &amp; Öğren</string>
-    <string name="andmore">Renkler, Kelimeler ve Daha Fazlası</string>
-
 
 </resources>
