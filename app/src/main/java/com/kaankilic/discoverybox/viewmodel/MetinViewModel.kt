@@ -29,6 +29,8 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
     private val _ttsState = MutableLiveData<String>()
     private var mediaPlayer: MediaPlayer? = null
     private var textToSpeech: TextToSpeech? = null
+    private var isPaused = false
+    private var pausedPosition = 0
 
     /*fun handleTTS(context: Context, apiKey: String, text: String) {
         viewModelScope.launch {
@@ -75,6 +77,13 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
             imageBitmap.value = dbRepo.queryTextToImage(prompt, isPro, context)
         }
     }
+    
+    fun queryTextToImageForPage(prompt: String, isPro: Boolean, context: Context, onComplete: (Bitmap?) -> Unit) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val bitmap = dbRepo.queryTextToImage(prompt, isPro, context)
+            onComplete(bitmap)
+        }
+    }
 
     fun stopMediaPlayer() {
         mediaPlayer?.let {
@@ -111,11 +120,45 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
     }
 
     fun speak(text: String) {
-        textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        if (isPaused && pausedPosition > 0) {
+            val remainingText = text.substring(pausedPosition.coerceAtMost(text.length))
+            textToSpeech?.speak(remainingText, TextToSpeech.QUEUE_FLUSH, null, null)
+            isPaused = false
+        } else {
+            pausedPosition = 0
+            textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        }
     }
 
+    fun pause() {
+        textToSpeech?.stop()
+        isPaused = true
+    }
+    
     fun stop() {
         textToSpeech?.stop()
+        isPaused = false
+        pausedPosition = 0
+    }
+    
+    fun pauseMediaPlayer() {
+        mediaPlayer?.let {
+            if (it.isPlaying) {
+                pausedPosition = it.currentPosition
+                it.pause()
+                isPaused = true
+            }
+        }
+    }
+    
+    fun resumeMediaPlayer() {
+        mediaPlayer?.let {
+            if (isPaused) {
+                it.seekTo(pausedPosition)
+                it.start()
+                isPaused = false
+            }
+        }
     }
 
     override fun onCleared() {

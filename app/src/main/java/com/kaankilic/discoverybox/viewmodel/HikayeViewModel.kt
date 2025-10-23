@@ -14,22 +14,60 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HikayeViewModel @Inject constructor (val dbRepo: DiscoveryBoxRepository) : ViewModel() {
-    // var dbRepo= DiscoveryBoxRepository()
      var hikayeOlustur= MutableLiveData<String>()
      private var currentPrompt: String = ""
     val hikaye = MutableLiveData<Hikaye>()
+    val storyPages = MutableLiveData<List<com.kaankilic.discoverybox.entitiy.StoryPage>>()
 
 
-    fun generateStory(prompt: String) {
+    private var storyMainCharacter = ""
+    private var storySetting = ""
+    
+    fun generateStory(prompt: String, storyLength: String) {
         CoroutineScope(Dispatchers.Main).launch {
             currentPrompt = prompt
-            hikayeOlustur.value = dbRepo.generateStory(prompt)
-
+            val pageCount = when(storyLength.lowercase()) {
+                "short", "kısa" -> 2
+                "long", "uzun" -> 4
+                else -> 3
+            }
+            
+            val enhancedPrompt = "$prompt Hikayeyi $pageCount bölüme ayır. Her bölümü '---SAYFA---' ile ayır. ÖNEMLİ: Eğer karakterler Shrek, Sindirella, Pamuk Prenses gibi bilinen masal karakterleriyse, onların gerçek görünümlerini ve özelliklerini koru (örn: Shrek yeşil dev, Sindirella sarı saçlı prenses). Her sayfada karakterlerin fiziksel görünümünü tutarlı tut."
+            
+            val fullStory = dbRepo.generateStory(enhancedPrompt)
+            hikayeOlustur.value = fullStory
+            
+            val pages = fullStory.split("---SAYFA---").filter { it.isNotBlank() }
+            val storyPagesList = pages.mapIndexed { index, content ->
+                com.kaankilic.discoverybox.entitiy.StoryPage(
+                    pageNumber = index + 1,
+                    content = content.trim(),
+                    imagePrompt = "Scene from page ${index + 1}: ${content.take(100)}"
+                )
+            }
+            storyPages.value = storyPagesList
         }
     }
+    
+    fun setStoryContext(mainCharacter: String, setting: String) {
+        storyMainCharacter = mainCharacter
+        storySetting = setting
+    }
+    
+    fun getStoryContext() = Pair(storyMainCharacter, storySetting)
 
     fun getCurrentPrompt(): String {
         return currentPrompt
+    }
+    
+    fun generateImagesForPages(context: android.content.Context, metinViewModel: MetinViewModel, isPremium: Boolean, mainCharacter: String, setting: String) {
+        storyPages.value?.forEach { page ->
+            val consistentPrompt = "Professional children's book illustration, vibrant fantasy art. Main character $mainCharacter (same appearance throughout) in $setting. Scene: ${page.content.take(100)}. IMPORTANT: NO book pages, NO text overlays, NO page borders, pure scene illustration only. Consistent character design."
+            metinViewModel.queryTextToImageForPage(consistentPrompt, isPremium, context) { bitmap ->
+                page.imageBitmap = bitmap
+                storyPages.value = storyPages.value
+            }
+        }
     }
 
     fun getStoryById(hikayeId: String?) {

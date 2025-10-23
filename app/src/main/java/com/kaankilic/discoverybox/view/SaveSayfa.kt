@@ -257,7 +257,7 @@ fun SwipeToDeleteStoryItem(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFEC4899)),
+                            .background(Color(0xFFFCD34D)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -273,16 +273,10 @@ fun SwipeToDeleteStoryItem(
                     ) {
                         Text(
                             text = hikaye.title,
-                            fontSize = 16.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = sandtitle,
                             color = Color(0xFF1F2937)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Created 3 days ago",
-                            fontSize = 12.sp,
-                            color = Color(0xFF9CA3AF)
                         )
                     }
                 }

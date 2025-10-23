@@ -92,7 +92,11 @@ fun Metin(navController: NavController,
     val hikayeyiOlustur by hikayeViewModel.hikayeOlustur.observeAsState("")
     val context = LocalContext.current
     val kaan by hikayeViewModel.hikaye.observeAsState(Hikaye())
+    val storyPages by hikayeViewModel.storyPages.observeAsState(emptyList())
+    var currentPageIndex by remember { mutableStateOf(0) }
     val generatedImage by metinViewModel.imageBitmap.observeAsState(null)
+    var showSaveAnimation by remember { mutableStateOf(false) }
+    var isPlayingAudio by remember { mutableStateOf(false) }
     var audioVisible by remember { mutableStateOf(false) }
     var audioVisibleStory by remember { mutableStateOf(false) }
     val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -126,6 +130,21 @@ fun Metin(navController: NavController,
             isPremium = isPremiumStatus
         }
     }
+    
+    LaunchedEffect(storyPages) {
+        if (storyPages.isNotEmpty()) {
+            val (mainChar, setting) = hikayeViewModel.getStoryContext()
+            storyPages.forEachIndexed { index, page ->
+                if (page.imageBitmap == null) {
+                    val consistentPrompt = "Professional children's book illustration, vibrant fantasy art. Main character $mainChar (same appearance throughout) in $setting. Scene: ${page.content.take(100)}. IMPORTANT: NO book pages, NO text overlays, NO page borders, pure scene illustration only. Consistent character design."
+                    metinViewModel.queryTextToImageForPage(consistentPrompt, isPremium || hasTrial, context) { bitmap ->
+                        page.imageBitmap = bitmap
+                        hikayeViewModel.storyPages.value = hikayeViewModel.storyPages.value
+                    }
+                }
+            }
+        }
+    }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.saveanimation))
     var isAnimationPlaying by remember { mutableStateOf(false) }
@@ -146,9 +165,9 @@ fun Metin(navController: NavController,
 
     val gradientBackground = Brush.horizontalGradient(
         colors = listOf(
-            Color(0xFF4C1D95),
-            Color(0xFF6B21A8),
-            Color(0xFF7E22CE)
+            Color(0xFF3B0764),
+            Color(0xFF581C87),
+            Color(0xFF6B21A8)
         )
     )
 
@@ -174,122 +193,271 @@ fun Metin(navController: NavController,
                 verticalArrangement = Arrangement.Center,
 
                 ) {
-                if (kaan.title.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(480.dp)
-
-                        ) {
-                            AsyncImage(
-                                model = kaan.imageUrl,
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clip(RoundedCornerShape(12.dp))
-                            )
-
-                            // SADECE alt kısmı saydamlaştıran overlay
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
+                val featuredTitle by anasayfaViewModel.featuredStoryTitle.observeAsState("")
+                val featuredContent by anasayfaViewModel.featuredStoryContent.observeAsState("")
+                val featuredImage by anasayfaViewModel.featuredStoryImage.observeAsState(R.drawable.story)
+                
+                if (featuredTitle.isNotEmpty() && hikayeId?.startsWith("featured_") == true) {
+                    val featuredPages = remember { 
+                        val sentences = featuredContent.split(". ").filter { it.isNotBlank() }
+                        val pageCount = 4
+                        val sentencesPerPage = (sentences.size + pageCount - 1) / pageCount
+                        sentences.chunked(sentencesPerPage).mapIndexed { index, chunk ->
+                            com.kaankilic.discoverybox.entitiy.StoryPage(index + 1, chunk.joinToString(". ") + ".", "", null)
+                        }.take(4)
+                    }
+                    var currentFeaturedPageIndex by remember { mutableStateOf(0) }
+                    
+                    val storyImages = remember {
+                        when(hikayeId) {
+                            "featured_1" -> listOf(R.drawable.orman1, R.drawable.orman2, R.drawable.orman3, R.drawable.orman4)
+                            "featured_2" -> listOf(R.drawable.uzay1, R.drawable.uzay2, R.drawable.uzay3, R.drawable.uzay4)
+                            "featured_3" -> listOf(R.drawable.deniz1, R.drawable.deniz2, R.drawable.deniz3, R.drawable.deniz4)
+                            "featured_4" -> listOf(R.drawable.zaman1, R.drawable.zaman2, R.drawable.zaman3, R.drawable.zaman4)
+                            "featured_5" -> listOf(R.drawable.ejder1, R.drawable.ejder2, R.drawable.ejder3, R.drawable.ejder4)
+                            "featured_6" -> listOf(R.drawable.zeki1, R.drawable.zeki2, R.drawable.zeki3, R.drawable.zeki4)
+                            else -> listOf(featuredImage, featuredImage, featuredImage, featuredImage)
+                        }
+                    }
+                    
+                    if (featuredPages.isNotEmpty()) {
+                        val currentFeaturedPage = featuredPages.getOrNull(currentFeaturedPageIndex) ?: featuredPages[0]
+                        val currentImage = storyImages.getOrNull(currentFeaturedPageIndex) ?: featuredImage
+                        
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                            Box(modifier = Modifier.fillMaxWidth().height(480.dp)) {
+                                Image(
+                                    painter = painterResource(currentImage),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
+                                )
+                                Box(
+                                    modifier = Modifier.fillMaxSize().background(
                                         Brush.verticalGradient(
                                             colors = listOf(
-                                                Color.Transparent, // Üst kısım görünür
-                                                Color.Transparent, // Ortalar da görünür
-                                                Color(0xFF305063).copy(alpha = 0.1f),
-                                                Color(0xFF305063).copy(alpha = 0.3f),
-                                                Color(0xFF305063).copy(alpha = 0.9f),
-                                                Color(0xFF305063).copy(alpha = 0.9f),
-                                                Color(0xFF305063), // Tamamen arka plana geçiş
-                                                Color(0xFF305063) // Tamamen arka plana geçiş
+                                                Color.Transparent,
+                                                Color.Transparent,
+                                                Color(0xFF3B0764).copy(alpha = 0.2f),
+                                                Color(0xFF3B0764).copy(alpha = 0.5f),
+                                                Color(0xFF3B0764).copy(alpha = 0.8f),
+                                                Color(0xFF3B0764)
                                             ),
-                                            startY = 750f, // Geçiş daha geç başlasın
-                                            endY = 1500f    // Alt kısımda bitiş
+                                            startY = 0f,
+                                            endY = 1500f
                                         )
                                     )
-                            )
-
-                            Box(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(
-                                        top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-                                        end = 16.dp
-                                    )
-                                    .size(56.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFFFCD34D))
-                                    .clickable { audioVisibleStory = true },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.play),
-                                    contentDescription = "Play",
-                                    tint = Color(0xFF6B46C1),
-                                    modifier = Modifier.size(28.dp)
                                 )
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(
+                                            top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                                            end = 16.dp
+                                        )
+                                        .size(56.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFFCD34D))
+                                        .clickable {
+                                            if (isPlayingAudio) {
+                                                metinViewModel.pause()
+                                                isPlayingAudio = false
+                                            } else {
+                                                metinViewModel.speak(currentFeaturedPage.content)
+                                                isPlayingAudio = true
+                                            }
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(if (isPlayingAudio) R.drawable.pause else R.drawable.play),
+                                        contentDescription = if (isPlayingAudio) "Pause" else "Play",
+                                        tint = Color(0xFF6B46C1),
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                }
                             }
                         }
-
-
-
+                        
+                        Text(
+                            text = featuredTitle,
+                            modifier = Modifier.padding(5.dp).fillMaxWidth().padding(10.dp),
+                            color = Color.White,
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 45.sp,
+                            fontFamily = sandtitle
+                        )
+                        
+                        Text(
+                            text = "${stringResource(R.string.page)} ${currentFeaturedPage.pageNumber} / ${featuredPages.size}",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        
+                        Text(
+                            text = currentFeaturedPage.content,
+                            modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+                            lineHeight = 35.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Justify,
+                            fontSize = 25.sp,
+                            fontFamily = andikabody
+                        )
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Button(
+                                onClick = { if (currentFeaturedPageIndex > 0) currentFeaturedPageIndex-- },
+                                enabled = currentFeaturedPageIndex > 0,
+                                colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
+                            ) {
+                                Text(stringResource(R.string.previous), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                            }
+                            
+                            Button(
+                                onClick = { if (currentFeaturedPageIndex < featuredPages.size - 1) currentFeaturedPageIndex++ },
+                                enabled = currentFeaturedPageIndex < featuredPages.size - 1,
+                                colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
+                            ) {
+                                Text(stringResource(R.string.next), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                            }
+                        }
+                        
+                        Button(
+                            onClick = { navController.navigate("anasayfa") },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D)),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.return_home),
+                                fontSize = 22.sp,
+                                fontFamily = sandtitle,
+                                color = Color(0xFF6B46C1)
+                            )
+                        }
                     }
-
-                    Text(
-                    text = kaan.title,
-                    modifier = Modifier
-                        .padding(5.dp)
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                        ,
-                    color = Color.White,
-                    fontSize = 50.sp,
-                    fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        lineHeight = 50.sp,
-                        fontFamily = sandtitle
-
-                )
-                    Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = kaan.content,
-                    modifier = Modifier.padding(
-                        start = 12.dp,
-                        end = 12.dp,
-                        top = 4.dp,
-                        bottom = 4.dp
-                    ),
-                    lineHeight = 35.sp,
-                    color = Color.White,
-                    textAlign = TextAlign.Justify,
-                    fontSize = 25.sp,
-                   fontFamily = andikabody
-
-                )
-
-
-                Button(
-                    onClick = { navController.navigate("saveSayfa") },
-                    colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D)),
-                    modifier = Modifier.padding(bottom = 16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.MYSTORIES),
-                        fontSize = 22.sp,
-                        fontFamily = sandtitle,
-                        color = Color(0xFF6B46C1)
-                    )
-                }
-                //bitiş
+                } else if (kaan.title.isNotEmpty()) {
+                    val savedStoryPages = remember { kaan.content.split("\n\nSayfa ").filter { it.isNotBlank() }.mapIndexed { index, content -> 
+                        com.kaankilic.discoverybox.entitiy.StoryPage(index + 1, content.removePrefix("${index + 1}:\n"), "", null)
+                    }}
+                    var currentSavedPageIndex by remember { mutableStateOf(0) }
+                    
+                    if (savedStoryPages.isNotEmpty()) {
+                        val currentSavedPage = savedStoryPages.getOrNull(currentSavedPageIndex) ?: savedStoryPages[0]
+                        
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                            Box(modifier = Modifier.fillMaxWidth().height(480.dp)) {
+                                AsyncImage(
+                                    model = kaan.imageUrl,
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
+                                )
+                                Box(
+                                    modifier = Modifier.fillMaxSize().background(
+                                        Brush.verticalGradient(
+                                            colors = listOf(
+                                                Color.Transparent,
+                                                Color.Transparent,
+                                                Color(0xFF3B0764).copy(alpha = 0.2f),
+                                                Color(0xFF3B0764).copy(alpha = 0.5f),
+                                                Color(0xFF3B0764).copy(alpha = 0.8f),
+                                                Color(0xFF3B0764)
+                                            ),
+                                            startY = 0f,
+                                            endY = 1500f
+                                        )
+                                    )
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(
+                                            top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                                            end = 16.dp
+                                        )
+                                        .size(56.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFFFCD34D))
+                                        .clickable {
+                                            if (isPlayingAudio) {
+                                                metinViewModel.pause()
+                                                isPlayingAudio = false
+                                            } else {
+                                                metinViewModel.speak(currentSavedPage.content)
+                                                isPlayingAudio = true
+                                            }
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(if (isPlayingAudio) R.drawable.pause else R.drawable.play),
+                                        contentDescription = if (isPlayingAudio) "Pause" else "Play",
+                                        tint = Color(0xFF6B46C1),
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                }
+                            }
+                        }
+                        
+                        Text(
+                            text = "${stringResource(R.string.page)} ${currentSavedPage.pageNumber} / ${savedStoryPages.size}",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                        
+                        Text(
+                            text = currentSavedPage.content,
+                            modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+                            lineHeight = 35.sp,
+                            color = Color.White,
+                            textAlign = TextAlign.Justify,
+                            fontSize = 25.sp,
+                            fontFamily = andikabody
+                        )
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Button(
+                                onClick = { if (currentSavedPageIndex > 0) currentSavedPageIndex-- },
+                                enabled = currentSavedPageIndex > 0,
+                                colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
+                            ) {
+                                Text(stringResource(R.string.previous), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                            }
+                            
+                            Button(
+                                onClick = { if (currentSavedPageIndex < savedStoryPages.size - 1) currentSavedPageIndex++ },
+                                enabled = currentSavedPageIndex < savedStoryPages.size - 1,
+                                colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
+                            ) {
+                                Text(stringResource(R.string.next), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                            }
+                        }
+                        
+                        Button(
+                            onClick = { navController.navigate("saveSayfa") },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D)),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.MYSTORIES),
+                                fontSize = 22.sp,
+                                fontFamily = sandtitle,
+                                color = Color(0xFF6B46C1)
+                            )
+                        }
+                    }
             }else{
-                    if (hikayeyiOlustur.isEmpty() || generatedImage == null) {
+                    if (storyPages.isEmpty() && (hikayeyiOlustur.isEmpty() || generatedImage == null)) {
 
                         Column(
                             modifier = Modifier.fillMaxSize(),
@@ -297,11 +465,175 @@ fun Metin(navController: NavController,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             AnimatedLoadingImages()
-                            Text("Yeni Bir Dünya Yaratılıyor...", fontFamily = andikabody, fontSize = 20.sp, color = Color.White)
-                            Text("Karakterler Canlandırılıyor...",fontFamily = andikabody, fontSize = 20.sp, color = Color.White)
-                            Text("Sesler Duyulmaya Başlanıyor...",fontFamily = andikabody, fontSize = 20.sp, color = Color.White)
+                            Text(stringResource(R.string.new_world_creating), fontFamily = andikabody, fontSize = 20.sp, color = Color.White)
+                            Text(stringResource(R.string.characters_coming_alive),fontFamily = andikabody, fontSize = 20.sp, color = Color.White)
+                            Text(stringResource(R.string.sounds_starting),fontFamily = andikabody, fontSize = 20.sp, color = Color.White)
 
 
+                        }
+                    } else if (storyPages.isNotEmpty()) {
+                        val currentPage = storyPages.getOrNull(currentPageIndex)
+                        if (currentPage != null) {
+                            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+                                Box(modifier = Modifier.fillMaxWidth().height(480.dp)) {
+                                    currentPage.imageBitmap?.let { bitmap ->
+                                        Image(
+                                            bitmap = bitmap.asImageBitmap(),
+                                            contentDescription = "Page Image",
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
+                                        )
+                                        Box(
+                                            modifier = Modifier.fillMaxSize().background(
+                                                Brush.verticalGradient(
+                                                    colors = listOf(
+                                                        Color.Transparent,
+                                                        Color.Transparent,
+                                                        Color(0xFF3B0764).copy(alpha = 0.2f),
+                                                        Color(0xFF3B0764).copy(alpha = 0.5f),
+                                                        Color(0xFF3B0764).copy(alpha = 0.8f),
+                                                        Color(0xFF3B0764)
+                                                    ),
+                                                    startY = 0f,
+                                                    endY = 1500f
+                                                )
+                                            )
+                                        )
+                                    } ?: CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                                    
+                                    Box(
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(
+                                                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                                                end = 16.dp
+                                            )
+                                            .size(56.dp)
+                                            .clip(CircleShape)
+                                            .background(Color(0xFFFCD34D))
+                                            .clickable {
+                                                if (isPlayingAudio) {
+                                                    metinViewModel.pause()
+                                                    isPlayingAudio = false
+                                                } else {
+                                                    metinViewModel.speak(currentPage.content)
+                                                    isPlayingAudio = true
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(if (isPlayingAudio) R.drawable.pause else R.drawable.play),
+                                            contentDescription = if (isPlayingAudio) "Pause" else "Play",
+                                            tint = Color(0xFF6B46C1),
+                                            modifier = Modifier.size(28.dp)
+                                        )
+                                    }
+                                }
+                            }
+                            
+                            Text(
+                                text = "${stringResource(R.string.page)} ${currentPage.pageNumber} / ${storyPages.size}",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(8.dp)
+                            )
+                            
+                            Text(
+                                text = currentPage.content,
+                                modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
+                                lineHeight = 35.sp,
+                                color = Color.White,
+                                textAlign = TextAlign.Justify,
+                                fontSize = 25.sp,
+                                fontFamily = andikabody
+                            )
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Button(
+                                    onClick = { if (currentPageIndex > 0) currentPageIndex-- },
+                                    enabled = currentPageIndex > 0,
+                                    colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
+                                ) {
+                                    Text(stringResource(R.string.previous), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                }
+                                
+                                Button(
+                                    onClick = { if (currentPageIndex < storyPages.size - 1) currentPageIndex++ },
+                                    enabled = currentPageIndex < storyPages.size - 1,
+                                    colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
+                                ) {
+                                    Text(stringResource(R.string.next), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                }
+                            }
+                            
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                Button(
+                                    onClick = {
+                                        val userId = getCurrentUserId()
+                                        if (userId != null && currentPage.imageBitmap != null) {
+                                            val fullStory = storyPages.joinToString("\n\n") { "Sayfa ${it.pageNumber}:\n${it.content}" }
+                                            metinViewModel.saveImageToStorage(currentPage.imageBitmap!!, userId)
+                                            metinViewModel.imageSavedUrl.observe(context as androidx.lifecycle.LifecycleOwner) { imageUrl ->
+                                                if (imageUrl != null) {
+                                                    metinViewModel.saveStoryForUser(
+                                                        hikayeId ?: "Hikaye",
+                                                        fullStory,
+                                                        imageUrl,
+                                                        userId
+                                                    )
+                                                }
+                                            }
+                                            showSaveAnimation = true
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
+                                ) {
+                                    Text(stringResource(R.string.save), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                }
+                                
+                                Button(
+                                    onClick = { navController.navigate("saveSayfa") },
+                                    colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.MYSTORIES),
+                                        fontSize = 18.sp,
+                                        fontFamily = sandtitle,
+                                        color = Color(0xFF6B46C1)
+                                    )
+                                }
+                            }
+                            
+                            if (showSaveAnimation) {
+                                LaunchedEffect(Unit) {
+                                    delay(2000)
+                                    showSaveAnimation = false
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color(0xFF10B981))
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        stringResource(R.string.story_saved),
+                                        color = Color.White,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = sandtitle
+                                    )
+                                }
+                            }
                         }
                     } else {
                         if (hikayeyiOlustur.isNotEmpty() && generatedImage != null) {
@@ -488,7 +820,7 @@ fun Metin(navController: NavController,
                             Button(
                                 onClick = {
                                     val prompt = hikayeViewModel.getCurrentPrompt()
-                                    hikayeViewModel.generateStory(prompt)
+                                    hikayeViewModel.generateStory(prompt, "Medium")
                                 },
                                 colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D)),
                                 modifier = Modifier.padding(bottom = 8.dp)

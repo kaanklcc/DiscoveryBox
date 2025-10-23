@@ -89,7 +89,7 @@ fun Hikaye(
 
                             )
                             Text(
-                                "Create Your Story",
+                                stringResource(R.string.create_your_story),
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = sandtitle,
@@ -99,7 +99,7 @@ fun Hikaye(
                         }
 
                         Text(
-                            "Let your imagination come to life!",
+                            stringResource(R.string.let_imagination_live),
                             fontSize = 12.sp,
                             fontFamily = andikabody,
                             color = Color.White.copy(alpha = 0.9f)
@@ -110,7 +110,7 @@ fun Hikaye(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = Color.White
                         )
                     }
@@ -132,8 +132,8 @@ fun Hikaye(
         ) {
             // Theme Section (Accordion)
             AccordionCard(
-                title = "Theme",
-                subtitle = if (selectedTheme.isNotEmpty()) selectedTheme else "Select a theme",
+                title = stringResource(R.string.theme),
+                subtitle = if (selectedTheme.isNotEmpty()) selectedTheme else stringResource(R.string.select_theme),
                 icon = R.drawable.theme,
                 expanded = themeExpanded,
                 onExpandChange = { themeExpanded = !themeExpanded }
@@ -196,8 +196,8 @@ fun Hikaye(
 
             // Story Length Section (Accordion)
             AccordionCard(
-                title = "Story Length",
-                subtitle = if (selectedLength.isNotEmpty()) selectedLength else "Select story length",
+                title = stringResource(R.string.story_length),
+                subtitle = if (selectedLength.isNotEmpty()) selectedLength else stringResource(R.string.select_story_length),
                 icon = R.drawable.book,
                 expanded = lengthExpanded,
                 onExpandChange = { lengthExpanded = !lengthExpanded }
@@ -226,7 +226,7 @@ fun Hikaye(
 
             // Setting Section
             InputCard(
-                title = "Konu",
+                title = stringResource(R.string.topic),
                 icon = R.drawable.topic,
                 placeholder = "A magical kingdom in the clouds...",
                 value = konu,
@@ -235,17 +235,17 @@ fun Hikaye(
 
             // Main Character Section
             InputCard(
-                title = "Main Character",
+                title = stringResource(R.string.main_character),
                 icon = R.drawable.main_cha,
-                placeholder = "Enter your hero's name",
+                placeholder = stringResource(R.string.enter_hero_name),
                 value = anaKarakter,
                 onValueChange = { anaKarakter = it }
             )
 
             // Supporting Characters Section (Accordion)
             AccordionCard(
-                title = "Supporting Characters",
-                subtitle = "Add characters",
+                title = stringResource(R.string.supporting_characters),
+                subtitle = stringResource(R.string.add_characters),
                 icon =R.drawable.sup_cha,
                 expanded = supportingExpanded,
                 onExpandChange = { supportingExpanded = !supportingExpanded }
@@ -264,7 +264,7 @@ fun Hikaye(
                                         this[index] = newValue
                                     }
                                 },
-                                placeholder = { Text("Add a character...", fontSize = 14.sp, color = Color(0xFF9CA3AF)) },
+                                placeholder = { Text(stringResource(R.string.add_character), fontSize = 14.sp, color = Color(0xFF9CA3AF)) },
                                 modifier = Modifier.weight(1f),
                                 colors = TextFieldDefaults.colors(
                                     focusedTextColor = Color(0xFF1F2937),
@@ -289,12 +289,12 @@ fun Hikaye(
                                     modifier = Modifier
                                         .size(48.dp)
                                         .clip(RoundedCornerShape(24.dp))
-                                        .background(Color(0xFF10B981))
+                                        .background(Color(0xFFFCD34D))
                                 ) {
                                     Icon(
                                         Icons.Default.Add,
                                         contentDescription = "Add",
-                                        tint = Color.White
+                                        tint = Color(0xFF6B46C1)
                                     )
                                 }
                             }
@@ -320,7 +320,7 @@ fun Hikaye(
 
             // Location Section
             InputCard(
-                title = "Location",
+                title = stringResource(R.string.location),
                 icon = R.drawable.location,
                 placeholder = "The Enchanted Forest",
                 value = mekan,
@@ -329,7 +329,7 @@ fun Hikaye(
 
             // Character Trait Section
             InputCard(
-                title = "Main Character Trait",
+                title = stringResource(R.string.main_character_trait),
                 icon = R.drawable.trait,
                 placeholder = stringResource(R.string.MainCharacterCharacteristicExp),
                 value = anaKarakterOzellik,
@@ -346,20 +346,27 @@ fun Hikaye(
                         val temaText = if (selectedTheme.isNotEmpty()) "Tema: $selectedTheme" else ""
                         val uzunlukText = if (selectedLength.isNotEmpty()) "Uzunluk: $selectedLength" else ""
 
-                        val generatedStory = "Bana bir hikaye yaz. " +
+                        val characterDescription = when {
+                            anaKarakter.text.contains("shrek", ignoreCase = true) -> "${anaKarakter.text} (yeşil dev, büyük kulaklar)"
+                            anaKarakter.text.contains("sindirella", ignoreCase = true) || anaKarakter.text.contains("cinderella", ignoreCase = true) -> "${anaKarakter.text} (sarı saçlı prenses, mavi elbise)"
+                            anaKarakter.text.contains("pamuk prenses", ignoreCase = true) || anaKarakter.text.contains("snow white", ignoreCase = true) -> "${anaKarakter.text} (siyah saçlı prenses, kırmızı kurdele)"
+                            anaKarakter.text.contains("rapunzel", ignoreCase = true) -> "${anaKarakter.text} (çok uzun sarı saçlı prenses)"
+                            anaKarakter.text.contains("elsa", ignoreCase = true) -> "${anaKarakter.text} (platin sarısı saçlı buz kraliçesi)"
+                            anaKarakter.text.contains("anna", ignoreCase = true) -> "${anaKarakter.text} (kızıl saçlı prenses)"
+                            else -> "${anaKarakter.text} (${anaKarakterOzellik.text})"
+                        }
+
+                        val generatedStory = "Bana bir çocuk hikayesi yaz. " +
                                 "Konu: ${konu.text}, " +
                                 "Mekan: ${mekan.text}, " +
-                                "Ana karakter: ${anaKarakter.text}, " +
-                                "Ana karakter özelliği: ${anaKarakterOzellik.text}, " +
+                                "Ana karakter: $characterDescription, " +
                                 "Yardımcı karakterler: $yanKarakterlerText, " +
                                 "$temaText, " +
                                 "$uzunlukText. " +
-                                "Hikaye doğrudan başlasın."
+                                "ÖNEMLİ: Karakterlerin fiziksel görünümünü her sayfada tutarlı tut. Hikaye doğrudan başlasın."
 
-                        val imageGenerate = "A magical scene of ${konu.text} in ${mekan.text}"
-
-                        hikayeViewModel.generateStory(generatedStory)
-                        metinViewModel.queryTextToImage(imageGenerate, isPro = false, context = context)
+                        hikayeViewModel.setStoryContext(characterDescription, mekan.text)
+                        hikayeViewModel.generateStory(generatedStory, selectedLength)
                         navController.navigate("metin/${konu.text}")
                     }
                 },
@@ -466,22 +473,22 @@ fun ThemeButton(
 ) {
     Box(
         modifier = modifier
-            .aspectRatio(0.8f)
-            .clip(RoundedCornerShape(16.dp))
+            .aspectRatio(1.2f)
+            .clip(RoundedCornerShape(12.dp))
             .background(if (selected) color else color.copy(alpha = 0.3f))
             .clickable { onClick() }
-            .padding(12.dp),
+            .padding(8.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(icon, fontSize = 28.sp)
-            Spacer(modifier = Modifier.height(4.dp))
+            Text(icon, fontSize = 20.sp)
+            Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text,
-                fontSize = 13.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (selected) Color.White else Color.White.copy(alpha = 0.9f)
             )

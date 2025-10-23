@@ -49,19 +49,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
            DiscoveryBoxTheme {
-                //val navController = rememberNavController()
-             auth = FirebaseAuth.getInstance()
                 val navController = rememberNavController()
-
-               LaunchedEffect(Unit) {
-                    if (auth.currentUser != null) {
-                        // Kullanıcı giriş yapmışsa, anasayfaya yönlendir
-                        //navController.navigate("anasayfa")
-                        navController.navigate("loginSplash") {
-                            popUpTo("girisSayfa") { inclusive = true }
-                        }
-                    }
-                }
                SayfaGecisleri(
                    navController=navController,
                     anasayfaViewModel = anasayfaViewModel,
