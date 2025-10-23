@@ -99,5 +99,42 @@
     <string name="touch">Hikayene Başlamak için</string>
     <string name="Advanturemacera">Tıkla!</string>
     <string name="StartNow">Hemen Başla -></string>
+    
+    <string name="home">Ana Sayfa</string>
+    <string name="create">Oluştur</string>
+    <string name="saved">Kaydedilenler</string>
+    <string name="logout">Çıkış</string>
+    <string name="taleteller">TaleTeller</string>
+    <string name="ai_story_friend">Yapay zeka hikaye arkadaşın</string>
+    <string name="welcome_little_storyteller">Hoşgeldin, küçük hikaye kurdu!</string>
+    <string name="start_creating_story">Hikayeni Oluşturmaya Başla</string>
+    <string name="decide_your_story">Hikayenin nasıl olacağına karar ver</string>
+    <string name="create_magic_story">✨ Sihirli Hikaye Oluştur ✨</string>
+    <string name="featured_stories">Öne çıkan hikayeler</string>
+    <string name="view_all_stories">Bütün hikayeleri göster</string>
+    <string name="create_your_story">Hikayeni Oluştur</string>
+    <string name="let_imagination_live">Hayal gücünü hayata geçir!</string>
+    <string name="theme">Tema</string>
+    <string name="select_theme">Bir tema seç</string>
+    <string name="story_length">Hikaye Uzunluğu</string>
+    <string name="select_story_length">Hikaye uzunluğu seç</string>
+    <string name="topic">Konu</string>
+    <string name="main_character">Ana Karakter</string>
+    <string name="enter_hero_name">Kahramanının adını gir</string>
+    <string name="supporting_characters">Yardımcı Karakterler</string>
+    <string name="add_characters">Karakter ekle</string>
+    <string name="add_character">Bir karakter ekle...</string>
+    <string name="location">Mekan</string>
+    <string name="main_character_trait">Ana Karakter Özelliği</string>
+    <string name="back">Geri</string>
+    <string name="page">Sayfa</string>
+    <string name="previous">Önceki</string>
+    <string name="next">Sonraki</string>
+    <string name="save">Kaydet</string>
+    <string name="story_saved">Hikayeniz Kaydedildi! ✅</string>
+    <string name="return_home">Anasayfaya Dön</string>
+    <string name="new_world_creating">Yeni Bir Dünya Yaratılıyor...</string>
+    <string name="characters_coming_alive">Karakterler Canlandırılıyor...</string>
+    <string name="sounds_starting">Sesler Duyulmaya Başlanıyor...</string>
 
 </resources>

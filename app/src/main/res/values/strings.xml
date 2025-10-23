@@ -106,5 +106,42 @@
     <string name="touch">Touch to Begin Your</string>
     <string name="Advanturemacera">Adventure!</string>
     <string name="StartNow">Start Now -></string>
+    
+    <string name="home">Home</string>
+    <string name="create">Create</string>
+    <string name="saved">Saved</string>
+    <string name="logout">Logout</string>
+    <string name="taleteller">TaleTeller</string>
+    <string name="ai_story_friend">Your AI story friend</string>
+    <string name="welcome_little_storyteller">Welcome, little storyteller!</string>
+    <string name="start_creating_story">Start Creating Your Story</string>
+    <string name="decide_your_story">Decide how your story will be</string>
+    <string name="create_magic_story">✨ Create Magic Story ✨</string>
+    <string name="featured_stories">Featured Stories</string>
+    <string name="view_all_stories">View All Stories</string>
+    <string name="create_your_story">Create Your Story</string>
+    <string name="let_imagination_live">Let your imagination come to life!</string>
+    <string name="theme">Theme</string>
+    <string name="select_theme">Select a theme</string>
+    <string name="story_length">Story Length</string>
+    <string name="select_story_length">Select story length</string>
+    <string name="topic">Topic</string>
+    <string name="main_character">Main Character</string>
+    <string name="enter_hero_name">Enter your hero\'s name</string>
+    <string name="supporting_characters">Supporting Characters</string>
+    <string name="add_characters">Add characters</string>
+    <string name="add_character">Add a character...</string>
+    <string name="location">Location</string>
+    <string name="main_character_trait">Main Character Trait</string>
+    <string name="back">Back</string>
+    <string name="page">Page</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
+    <string name="save">Save</string>
+    <string name="story_saved">Story Saved! ✅</string>
+    <string name="return_home">Return to Home</string>
+    <string name="new_world_creating">A New World is Being Created...</string>
+    <string name="characters_coming_alive">Characters Coming to Life...</string>
+    <string name="sounds_starting">Sounds Starting to Be Heard...</string>
 
 </resources>
