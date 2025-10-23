@@ -54,7 +54,8 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
     )
 
     suspend fun generateImageWithGpt(prompt: String): Bitmap? {
-        val request = ImageRequest(prompt = prompt)
+        val enhancedPrompt = "$prompt. Style: professional children's book illustration, digital art, vibrant colors, fantasy style. NEGATIVE PROMPT: no book pages, no text, no words, no letters, no page borders, no book spine, no page numbers, no frames, no UI elements, pure illustration only."
+        val request = ImageRequest(prompt = enhancedPrompt)
         val api = api
         return withContext(Dispatchers.IO) {
             try {

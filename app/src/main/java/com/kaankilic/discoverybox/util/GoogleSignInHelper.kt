@@ -24,12 +24,14 @@ object GoogleSignInHelper {
         launcher: ActivityResultLauncher<Intent>
     ) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(context.getString(R.string.default_web_client_id)) // Firebase'den alınan ID
+            .requestIdToken(context.getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
         val googleSignInClient = GoogleSignIn.getClient(context, gso)
-        launcher.launch(googleSignInClient.signInIntent)
+        googleSignInClient.signOut().addOnCompleteListener {
+            launcher.launch(googleSignInClient.signInIntent)
+        }
     }
     fun handleGoogleSignInResult(
         data: Intent?,

@@ -46,11 +46,11 @@ class DiscoveryBoxRepository(val dbds :DiscoveryBoxDataSource) {
 
 
     suspend fun isUserPremium(): Triple<Boolean, Boolean, Long> {
-        val user = FirebaseAuth.getInstance().currentUser ?: return Triple(false, false, 0)
+        val user = FirebaseAuth.getInstance().currentUser ?: return Triple(false, true, 0)
         val doc = FirebaseFirestore.getInstance().collection("users").document(user.uid).get().await()
 
         val premium = doc.getBoolean("premium") ?: false
-        val usedFreeTrial = doc.getBoolean("usedFreeTrial") ?: false
+        val usedFreeTrial = doc.getBoolean("usedFreeTrial") ?: true
         val remaining = doc.getLong("remainingChatgptUses") ?: 0
 
         return Triple(premium, usedFreeTrial, remaining)
@@ -67,17 +67,34 @@ class DiscoveryBoxRepository(val dbds :DiscoveryBoxDataSource) {
         }
     }*/
     suspend fun queryTextToImage(prompt: String, isPro: Boolean, context: Context): Bitmap? {
-        return if (isPro) {
-            val bitmap = dbds.generateImageWithGpt(prompt)
-            if (bitmap != null) {
-               // dbds.decrementRemainingChatgptUses() // ✅ Hak azalt
-                return bitmap
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userRef = FirebaseFirestore.getInstance().collection("users").document(user.uid)
+            val doc = userRef.get().await()
+            val premium = doc.getBoolean("premium") ?: false
+            val usedFreeTrial = doc.getBoolean("usedFreeTrial") ?: true
+            val remaining = doc.getLong("remainingChatgptUses") ?: 0
+            
+            val canUseGPT = premium || (!usedFreeTrial && remaining > 0)
+            
+            return if (canUseGPT) {
+                val bitmap = dbds.generateImageWithGpt(prompt)
+                if (bitmap != null) {
+                    if (!premium && !usedFreeTrial && remaining > 0) {
+                        userRef.update(mapOf(
+                            "remainingChatgptUses" to remaining - 1,
+                            "usedFreeTrial" to (remaining - 1 <= 0)
+                        )).await()
+                    }
+                    bitmap
+                } else {
+                    dbds.getDefaultImage(context)
+                }
             } else {
-                return dbds.getDefaultImage(context)
+                dbds.getDefaultImage(context)
             }
-        } else {
-            dbds.getDefaultImage(context)
         }
+        return dbds.getDefaultImage(context)
     }
 
 

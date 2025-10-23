@@ -19,6 +19,15 @@ import javax.inject.Inject
 class AnasayfaViewModel @Inject constructor(val dbRepo: DiscoveryBoxRepository) : ViewModel() {
    // var dbRepo= DiscoveryBoxRepository()
     var konular = MutableLiveData<List<Story>>()
+    var featuredStoryTitle = MutableLiveData<String>()
+    var featuredStoryContent = MutableLiveData<String>()
+    var featuredStoryImage = MutableLiveData<Int>()
+    
+    fun setFeaturedStory(title: String, content: String, imageRes: Int) {
+        featuredStoryTitle.value = title
+        featuredStoryContent.value = content
+        featuredStoryImage.value = imageRes
+    }
 
   /*  init {
         konulariYukle()
