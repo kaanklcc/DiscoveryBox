@@ -18,6 +18,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +37,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
@@ -77,6 +83,8 @@ fun Hikaye(
         stringResource(R.string.Long)
     )
 
+    var selectedTab by remember { mutableStateOf(1) }
+    
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -84,9 +92,7 @@ fun Hikaye(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Row {
                             Image(
-                                painterResource(R.drawable.pencil),"pencil",
-
-
+                                painterResource(R.drawable.pencil),"pencil"
                             )
                             Text(
                                 stringResource(R.string.create_your_story),
@@ -95,9 +101,7 @@ fun Hikaye(
                                 fontFamily = sandtitle,
                                 color = Color.White
                             )
-
                         }
-
                         Text(
                             stringResource(R.string.let_imagination_live),
                             fontSize = 12.sp,
@@ -116,15 +120,110 @@ fun Hikaye(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF6B46C1)
+                    containerColor = Color(0xFF4C1D95)
                 )
             )
+        },
+        bottomBar = {
+            NavigationBar(
+                containerColor = Color(0xFF1E1B4B),
+                modifier = Modifier.height(90.dp)
+            ) {
+                NavigationBarItem(
+                    selected = selectedTab == 0,
+                    onClick = { 
+                        selectedTab = 0
+                        navController.navigate("anasayfa")
+                    },
+                    icon = {
+                        Icon(
+                            Icons.Default.Home,
+                            contentDescription = "Home",
+                            tint = if (selectedTab == 0) Color(0xFFC084FC) else Color(0xFFE9D5FF)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.home), fontSize = 10.sp, color = Color(0xFFE9D5FF)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFC084FC),
+                        unselectedIconColor = Color(0xFFE9D5FF),
+                        indicatorColor = Color(0xFF7C3AED).copy(alpha = 0.2f)
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    icon = {
+                        Icon(
+                            Icons.Default.Create,
+                            contentDescription = "Create",
+                            tint = if (selectedTab == 1) Color(0xFFF472B6) else Color(0xFFFCE7F3)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.create), fontSize = 10.sp, color = Color(0xFFFCE7F3)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFF472B6),
+                        unselectedIconColor = Color(0xFFFCE7F3),
+                        indicatorColor = Color(0xFFEC4899).copy(alpha = 0.2f)
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 2,
+                    onClick = {
+                        selectedTab = 2
+                        navController.navigate("saveSayfa")
+                    },
+                    icon = {
+                        Icon(
+                            Icons.Default.Favorite,
+                            contentDescription = "Saved",
+                            tint = if (selectedTab == 2) Color(0xFFFBBF24) else Color(0xFFFEF3C7)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.saved), fontSize = 10.sp, color = Color(0xFFFEF3C7)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFFBBF24),
+                        unselectedIconColor = Color(0xFFFEF3C7),
+                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 3,
+                    onClick = {
+                        selectedTab = 3
+                        Firebase.auth.signOut()
+                        navController.navigate("girisSayfa") {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    },
+                    icon = {
+                        Icon(
+                            Icons.Default.ExitToApp,
+                            contentDescription = "Logout",
+                            tint = if (selectedTab == 3) Color(0xFF22D3EE) else Color(0xFFCFFAFE)
+                        )
+                    },
+                    label = { Text(stringResource(R.string.logout), fontSize = 10.sp, color = Color(0xFFCFFAFE)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFF22D3EE),
+                        unselectedIconColor = Color(0xFFCFFAFE),
+                        indicatorColor = Color(0xFF06B6D4).copy(alpha = 0.2f)
+                    )
+                )
+            }
         }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF6B46C1))
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            Color(0xFF4C1D95),
+                            Color(0xFF6B21A8),
+                            Color(0xFF7E22CE)
+                        )
+                    )
+                )
                 .padding(it)
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
@@ -341,33 +440,34 @@ fun Hikaye(
             // Generate Button
             Button(
                 onClick = {
-                    coroutineScope.launch {
-                        val yanKarakterlerText = yanKarakterler.filter { it.isNotBlank() }.joinToString(", ")
-                        val temaText = if (selectedTheme.isNotEmpty()) "Tema: $selectedTheme" else ""
-                        val uzunlukText = if (selectedLength.isNotEmpty()) "Uzunluk: $selectedLength" else ""
+                    val yanKarakterlerText = yanKarakterler.filter { it.isNotBlank() }.joinToString(", ")
+                    val temaText = if (selectedTheme.isNotEmpty()) "Tema: $selectedTheme" else ""
+                    val uzunlukText = if (selectedLength.isNotEmpty()) "Uzunluk: $selectedLength" else ""
 
-                        val characterDescription = when {
-                            anaKarakter.text.contains("shrek", ignoreCase = true) -> "${anaKarakter.text} (yeşil dev, büyük kulaklar)"
-                            anaKarakter.text.contains("sindirella", ignoreCase = true) || anaKarakter.text.contains("cinderella", ignoreCase = true) -> "${anaKarakter.text} (sarı saçlı prenses, mavi elbise)"
-                            anaKarakter.text.contains("pamuk prenses", ignoreCase = true) || anaKarakter.text.contains("snow white", ignoreCase = true) -> "${anaKarakter.text} (siyah saçlı prenses, kırmızı kurdele)"
-                            anaKarakter.text.contains("rapunzel", ignoreCase = true) -> "${anaKarakter.text} (çok uzun sarı saçlı prenses)"
-                            anaKarakter.text.contains("elsa", ignoreCase = true) -> "${anaKarakter.text} (platin sarısı saçlı buz kraliçesi)"
-                            anaKarakter.text.contains("anna", ignoreCase = true) -> "${anaKarakter.text} (kızıl saçlı prenses)"
-                            else -> "${anaKarakter.text} (${anaKarakterOzellik.text})"
-                        }
+                    val characterDescription = when {
+                        anaKarakter.text.contains("shrek", ignoreCase = true) -> "${anaKarakter.text} (yeşil dev, büyük kulaklar)"
+                        anaKarakter.text.contains("sindirella", ignoreCase = true) || anaKarakter.text.contains("cinderella", ignoreCase = true) -> "${anaKarakter.text} (sarı saçlı prenses, mavi elbise)"
+                        anaKarakter.text.contains("pamuk prenses", ignoreCase = true) || anaKarakter.text.contains("snow white", ignoreCase = true) -> "${anaKarakter.text} (siyah saçlı prenses, kırmızı kurdele)"
+                        anaKarakter.text.contains("rapunzel", ignoreCase = true) -> "${anaKarakter.text} (çok uzun sarı saçlı prenses)"
+                        anaKarakter.text.contains("elsa", ignoreCase = true) -> "${anaKarakter.text} (platin sarısı saçlı buz kraliçesi)"
+                        anaKarakter.text.contains("anna", ignoreCase = true) -> "${anaKarakter.text} (kızıl saçlı prenses)"
+                        else -> "${anaKarakter.text} (${anaKarakterOzellik.text})"
+                    }
 
-                        val generatedStory = "Bana bir çocuk hikayesi yaz. " +
-                                "Konu: ${konu.text}, " +
-                                "Mekan: ${mekan.text}, " +
-                                "Ana karakter: $characterDescription, " +
-                                "Yardımcı karakterler: $yanKarakterlerText, " +
-                                "$temaText, " +
-                                "$uzunlukText. " +
-                                "ÖNEMLİ: Karakterlerin fiziksel görünümünü her sayfada tutarlı tut. Hikaye doğrudan başlasın."
+                    val generatedStory = "Bana bir çocuk hikayesi yaz. " +
+                            "Konu: ${konu.text}, " +
+                            "Mekan: ${mekan.text}, " +
+                            "Ana karakter: $characterDescription, " +
+                            "Yardımcı karakterler: $yanKarakterlerText, " +
+                            "$temaText, " +
+                            "$uzunlukText. " +
+                            "ÖNEMLİ: Karakterlerin fiziksel görünümünü her sayfada tutarlı tut. Hikaye doğrudan başlasın."
 
-                        hikayeViewModel.setStoryContext(characterDescription, mekan.text)
-                        hikayeViewModel.generateStory(generatedStory, selectedLength)
-                        navController.navigate("metin/${konu.text}")
+                    hikayeViewModel.setStoryContext(characterDescription, mekan.text)
+                    navController.navigate("metin/${konu.text}")
+                    
+                    anasayfaViewModel.checkUserAccess { hasTrial, isPremiumStatus, _ ->
+                        hikayeViewModel.generateStoryWithImages(generatedStory, selectedLength, context, isPremiumStatus || hasTrial)
                     }
                 },
                 modifier = Modifier

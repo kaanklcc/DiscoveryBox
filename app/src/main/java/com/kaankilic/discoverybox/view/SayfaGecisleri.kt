@@ -54,7 +54,7 @@ fun SayfaGecisleri(
     saveSayfaViewModel: SaveSayfaViewModel
     ) {
         // val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = "splashScreen1" ){
+        NavHost(navController = navController, startDestination = "loginSplash" ){
             composable("anasayfa"){
                 Anasayfa(navController = navController, anasayfaViewModel = anasayfaViewModel)
             }
@@ -84,10 +84,7 @@ fun SayfaGecisleri(
                 SplashScreen2(navController)
 
             }
-            composable("splashScreen3"){
-                SplashScreen3(navController)
 
-            }
             composable("loginSplash"){
                 LoginSplashScreen(navController)
 

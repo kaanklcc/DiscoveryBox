@@ -110,6 +110,31 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
         }
 
     }
+    
+    // Birden fazla görseli sırayla kaydetme
+    fun saveMultipleImagesToStorage(bitmaps: List<Bitmap>, userId: String, onComplete: (List<String>) -> Unit) {
+        val imageUrls = mutableListOf<String>()
+        var savedCount = 0
+        
+        bitmaps.forEach { bitmap ->
+            dbRepo.saveImageToStorage(bitmap, userId) { success, url ->
+                if (success && url != null) {
+                    imageUrls.add(url)
+                }
+                savedCount++
+                
+                if (savedCount == bitmaps.size) {
+                    onComplete(imageUrls)
+                }
+            }
+        }
+    }
+    
+    fun saveStoryWithMultipleImages(title: String, story: String, imageUrls: List<String>, userId: String) {
+        dbRepo.saveStoryForUserWithMultipleImages(title, story, imageUrls, userId) { success ->
+            storySaved.value = success
+        }
+    }
 
     fun initTTS(context: Context, language: String, country: String) {
         dbRepo.initTTS(context, language, country)

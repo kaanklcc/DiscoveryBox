@@ -130,21 +130,6 @@ fun Metin(navController: NavController,
             isPremium = isPremiumStatus
         }
     }
-    
-    LaunchedEffect(storyPages) {
-        if (storyPages.isNotEmpty()) {
-            val (mainChar, setting) = hikayeViewModel.getStoryContext()
-            storyPages.forEachIndexed { index, page ->
-                if (page.imageBitmap == null) {
-                    val consistentPrompt = "Professional children's book illustration, vibrant fantasy art. Main character $mainChar (same appearance throughout) in $setting. Scene: ${page.content.take(100)}. IMPORTANT: NO book pages, NO text overlays, NO page borders, pure scene illustration only. Consistent character design."
-                    metinViewModel.queryTextToImageForPage(consistentPrompt, isPremium || hasTrial, context) { bitmap ->
-                        page.imageBitmap = bitmap
-                        hikayeViewModel.storyPages.value = hikayeViewModel.storyPages.value
-                    }
-                }
-            }
-        }
-    }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.saveanimation))
     var isAnimationPlaying by remember { mutableStateOf(false) }
@@ -270,7 +255,7 @@ fun Metin(navController: NavController,
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        painter = painterResource(if (isPlayingAudio) R.drawable.pause else R.drawable.play),
+                                        painter = painterResource(if (isPlayingAudio) R.drawable.pausestory else R.drawable.playstory),
                                         contentDescription = if (isPlayingAudio) "Pause" else "Play",
                                         tint = Color(0xFF6B46C1),
                                         modifier = Modifier.size(28.dp)
@@ -350,10 +335,19 @@ fun Metin(navController: NavController,
                     if (savedStoryPages.isNotEmpty()) {
                         val currentSavedPage = savedStoryPages.getOrNull(currentSavedPageIndex) ?: savedStoryPages[0]
                         
+                        // Her sayfa için ilgili görseli belirle
+                        val currentImageUrl = if (kaan.imageUrls.isNotEmpty()) {
+                            // Yeni sistem: her sayfa için ayrı görsel
+                            kaan.imageUrls.getOrNull(currentSavedPageIndex) ?: kaan.imageUrls.firstOrNull() ?: kaan.imageUrl
+                        } else {
+                            // Eski sistem: tek görsel
+                            kaan.imageUrl
+                        }
+                        
                         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
                             Box(modifier = Modifier.fillMaxWidth().height(480.dp)) {
                                 AsyncImage(
-                                    model = kaan.imageUrl,
+                                    model = currentImageUrl,
                                     contentDescription = null,
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp))
@@ -396,7 +390,7 @@ fun Metin(navController: NavController,
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        painter = painterResource(if (isPlayingAudio) R.drawable.pause else R.drawable.play),
+                                        painter = painterResource(if (isPlayingAudio) R.drawable.pausestory else R.drawable.playstory),
                                         contentDescription = if (isPlayingAudio) "Pause" else "Play",
                                         tint = Color(0xFF6B46C1),
                                         modifier = Modifier.size(28.dp)
@@ -523,7 +517,7 @@ fun Metin(navController: NavController,
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
-                                            painter = painterResource(if (isPlayingAudio) R.drawable.pause else R.drawable.play),
+                                            painter = painterResource(if (isPlayingAudio) R.drawable.pausestory else R.drawable.playstory),
                                             contentDescription = if (isPlayingAudio) "Pause" else "Play",
                                             tint = Color(0xFF6B46C1),
                                             modifier = Modifier.size(28.dp)
@@ -577,20 +571,38 @@ fun Metin(navController: NavController,
                                 Button(
                                     onClick = {
                                         val userId = getCurrentUserId()
-                                        if (userId != null && currentPage.imageBitmap != null) {
-                                            val fullStory = storyPages.joinToString("\n\n") { "Sayfa ${it.pageNumber}:\n${it.content}" }
-                                            metinViewModel.saveImageToStorage(currentPage.imageBitmap!!, userId)
-                                            metinViewModel.imageSavedUrl.observe(context as androidx.lifecycle.LifecycleOwner) { imageUrl ->
-                                                if (imageUrl != null) {
-                                                    metinViewModel.saveStoryForUser(
-                                                        hikayeId ?: "Hikaye",
-                                                        fullStory,
-                                                        imageUrl,
-                                                        userId
-                                                    )
+                                        if (userId != null) {
+                                            // Tüm sayfaların görsellerini topla
+                                            val allBitmaps = storyPages.mapNotNull { it.imageBitmap }
+                                            
+                                            if (allBitmaps.isNotEmpty()) {
+                                                val fullStory = storyPages.joinToString("\n\n") { "Sayfa ${it.pageNumber}:\n${it.content}" }
+                                                
+                                                // Tüm görselleri kaydet
+                                                metinViewModel.saveMultipleImagesToStorage(allBitmaps, userId) { imageUrls ->
+                                                    if (imageUrls.isNotEmpty()) {
+                                                        // Tüm görsel URL'leriyle hikayeyi kaydet
+                                                        metinViewModel.saveStoryWithMultipleImages(
+                                                            hikayeId ?: "Hikaye",
+                                                            fullStory,
+                                                            imageUrls,
+                                                            userId
+                                                        )
+                                                        Toast.makeText(
+                                                            context,
+                                                            "${imageUrls.size} görsel ile hikaye kaydedildi!",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
+                                                    }
                                                 }
+                                                showSaveAnimation = true
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Kaydedilecek görsel bulunamadı",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
-                                            showSaveAnimation = true
                                         }
                                     },
                                     colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
@@ -1083,7 +1095,7 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                     )
                 } else {
                     Icon(
-                        painter = painterResource(R.drawable.play),
+                        painter = painterResource(R.drawable.playstory),
                         contentDescription = "play",
                         tint = Color(0xFF6B46C1),
                         modifier = Modifier.size(32.dp)
@@ -1112,7 +1124,7 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                     .background(Color.White.copy(if (isStopped) 0.3f else 0.9f), CircleShape)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.pause),
+                    painter = painterResource(R.drawable.pausestory),
                     contentDescription = "pause",
                     tint = Color(0xFF6B46C1)
                 )
@@ -1235,7 +1247,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
                     .background(Color(0xFFFCD34D), CircleShape)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.play),
+                    painter = painterResource(R.drawable.playstory),
                     contentDescription = "Play",
                     tint = Color(0xFF6B46C1)
                 )
@@ -1252,7 +1264,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
                     .background(Color.White.copy(0.9f), CircleShape)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.pause),
+                    painter = painterResource(R.drawable.pausestory),
                     contentDescription = "Pause",
                     tint = Color(0xFF6B46C1)
                 )

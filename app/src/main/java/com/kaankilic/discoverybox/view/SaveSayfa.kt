@@ -15,12 +15,20 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.SwipeableState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.rememberSwipeableState
 import androidx.compose.material.swipeable
 import androidx.compose.material3.*
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -60,6 +68,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
     val userId = auth.currentUser?.uid
     val stories by saveSayfaViewModel.stories.observeAsState(emptyList())
     val sandtitle = FontFamily(Font(R.font.sandtitle))
+    var selectedTab by remember { mutableStateOf(2) }
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -75,9 +84,9 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                     .background(
                         Brush.horizontalGradient(
                             colors = listOf(
-                                Color(0xFF7C3AED),
-                                Color(0xFF9333EA),
-                                Color(0xFFA855F7)
+                                Color(0xFF4C1D95),
+                                Color(0xFF6B21A8),
+                                Color(0xFF7E22CE)
                             )
                         )
                     )
@@ -119,6 +128,93 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                         modifier = Modifier.padding(start = 56.dp)
                     )
                 }
+            }
+        },
+        bottomBar = {
+            NavigationBar(
+                containerColor = Color(0xFF1E1B4B),
+                modifier = Modifier.height(90.dp)
+            ) {
+                NavigationBarItem(
+                    selected = selectedTab == 0,
+                    onClick = { 
+                        selectedTab = 0
+                        navController.navigate("anasayfa")
+                    },
+                    icon = {
+                        Icon(
+                            Icons.Default.Home,
+                            contentDescription = "Home",
+                            tint = if (selectedTab == 0) Color(0xFFC084FC) else Color(0xFFE9D5FF)
+                        )
+                    },
+                    label = { Text("Home", fontSize = 10.sp, color = Color(0xFFE9D5FF)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFC084FC),
+                        unselectedIconColor = Color(0xFFE9D5FF),
+                        indicatorColor = Color(0xFF7C3AED).copy(alpha = 0.2f)
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 1,
+                    onClick = {
+                        selectedTab = 1
+                        navController.navigate("hikaye")
+                    },
+                    icon = {
+                        Icon(
+                            Icons.Default.Create,
+                            contentDescription = "Create",
+                            tint = if (selectedTab == 1) Color(0xFFF472B6) else Color(0xFFFCE7F3)
+                        )
+                    },
+                    label = { Text("Create", fontSize = 10.sp, color = Color(0xFFFCE7F3)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFF472B6),
+                        unselectedIconColor = Color(0xFFFCE7F3),
+                        indicatorColor = Color(0xFFEC4899).copy(alpha = 0.2f)
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
+                    icon = {
+                        Icon(
+                            Icons.Default.Favorite,
+                            contentDescription = "Saved",
+                            tint = if (selectedTab == 2) Color(0xFFFBBF24) else Color(0xFFFEF3C7)
+                        )
+                    },
+                    label = { Text("Saved", fontSize = 10.sp, color = Color(0xFFFEF3C7)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFFFBBF24),
+                        unselectedIconColor = Color(0xFFFEF3C7),
+                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
+                    )
+                )
+                NavigationBarItem(
+                    selected = selectedTab == 3,
+                    onClick = {
+                        selectedTab = 3
+                        Firebase.auth.signOut()
+                        navController.navigate("girisSayfa") {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    },
+                    icon = {
+                        Icon(
+                            Icons.Default.ExitToApp,
+                            contentDescription = "Logout",
+                            tint = if (selectedTab == 3) Color(0xFF22D3EE) else Color(0xFFCFFAFE)
+                        )
+                    },
+                    label = { Text("Logout", fontSize = 10.sp, color = Color(0xFFCFFAFE)) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = Color(0xFF22D3EE),
+                        unselectedIconColor = Color(0xFFCFFAFE),
+                        indicatorColor = Color(0xFF06B6D4).copy(alpha = 0.2f)
+                    )
+                )
             }
         }
     ) { paddingValues ->
@@ -237,7 +333,7 @@ fun SwipeToDeleteStoryItem(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 AsyncImage(
-                    model = hikaye.imageUrl,
+                    model = if (hikaye.imageUrls.isNotEmpty()) hikaye.imageUrls.first() else hikaye.imageUrl,
                     contentDescription = "Story Image",
                     modifier = Modifier
                         .fillMaxWidth()
