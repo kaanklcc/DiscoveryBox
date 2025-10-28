@@ -132,8 +132,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
         },
         bottomBar = {
             NavigationBar(
-                containerColor = Color(0xFF1E1B4B),
-                modifier = Modifier.height(90.dp)
+                containerColor = Color(0xFF410D98),
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,

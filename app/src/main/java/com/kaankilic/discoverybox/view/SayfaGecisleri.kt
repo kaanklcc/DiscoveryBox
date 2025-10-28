@@ -89,6 +89,9 @@ fun SayfaGecisleri(
                 LoginSplashScreen(navController)
 
             }
+            composable("premium"){
+                PremiumSayfa(navController = navController)
+            }
         }
 
 

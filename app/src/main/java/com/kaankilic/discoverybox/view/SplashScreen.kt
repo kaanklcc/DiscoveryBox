@@ -9,12 +9,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -137,487 +140,510 @@ fun LoginSplashScreen(navController: NavController) {
 
 @Composable
 fun SplashScreen1(navController: NavController) {
-    val andikabody= FontFamily(Font(R.font.andikabody))
-    val sandtitle= FontFamily(Font(R.font.sandtitle))
+    val andikabody = FontFamily(Font(R.font.andikabody))
+    val sandtitle = FontFamily(Font(R.font.sandtitle))
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(  Brush.horizontalGradient(
-                colors = listOf(
-                    Color(0xFF4C1D95),
-                    Color(0xFF6B21A8),
-                    Color(0xFF7E22CE)
-                )
-            ))
-    ){
-        Image(
-            painter = painterResource(id = R.drawable.starimage),
-            contentDescription = "Star",
-            modifier = Modifier
-                .size(30.dp)
-                .offset(x = 40.dp, y = 40.dp)
-        )
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.Transparent,
+        contentWindowInsets = WindowInsets.systemBars, // ✅ sistem çubuklarına saygı duyar
+    ) { innerPadding ->
 
-        Image(
-            painter = painterResource(id = R.drawable.starimage),
-            contentDescription = "Star",
-            modifier = Modifier
-                .size(25.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = (-40).dp, y = (-120).dp)
-        )
-
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(innerPadding) // ✅ sistem paddings ekleniyor
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            Color(0xFF4C1D95),
+                            Color(0xFF6B21A8),
+                            Color(0xFF7E22CE)
+                        )
+                    )
+                )
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
-            
-            Box(
+            // ✨ Arka plan yıldızları
+            Image(
+                painter = painterResource(id = R.drawable.starimage),
+                contentDescription = "Star",
                 modifier = Modifier
-                    .size(120.dp)
-                    .border(3.dp, Color.White, CircleShape)
-                    .clip(CircleShape)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color(0xFFFFAA3D), Color(0xFFFFBF67))
-                        )
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.book),
-                    contentDescription = "Book Icon",
-                    modifier = Modifier.size(60.dp),
-                    tint = Color.White
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.starimage),
-                    contentDescription = "Star",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Welcome to",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontFamily = andikabody
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.starimage),
-                    contentDescription = "Star",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            
-            Text(
-                text = "Story Magic!",
-                color = Color(0xFFFFD700),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = sandtitle
+                    .size(30.dp)
+                    .offset(x = 40.dp, y = 40.dp)
             )
-            
-            Spacer(modifier = Modifier.height(30.dp))
 
-            Box(
+            Image(
+                painter = painterResource(id = R.drawable.starimage),
+                contentDescription = "Star",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                // 🔥 Glow (ışık) katmanı
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .graphicsLayer {
-                            // Biraz dışa taşıma için alpha ve blur efekti
-                            alpha = 0.8f
-                            scaleX = 1.05f
-                            scaleY = 1.05f
-                        }
-                        .background(
-                            brush = Brush.radialGradient(
-                                colors = listOf(
-                                    Color(0xFFFF6B6B).copy(alpha = 0.9f), // dışa yayılan pembe kırmızı ton
-                                    Color.Transparent
-                                ),
-                                center = Offset.Infinite, // ortalamayı Box merkezine verir
-                                radius = 600f
-                            ),
-                            shape = RoundedCornerShape(24.dp)
-                        )
-                        .blur(40.dp) // 💡 asıl parıltı efekti
-                )
+                    .size(25.dp)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-40).dp, y = (-120).dp)
+            )
 
-                // 🎨 Ana kutu
+            // 🌈 İçerik
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(60.dp))
+
+                // Kitap ikonu
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(Color(0xFFE0DAD2)),
+                        .size(120.dp)
+                        .border(3.dp, Color.White, CircleShape)
+                        .clip(CircleShape)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Color(0xFFFFAA3D), Color(0xFFFFBF67))
+                            )
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.castle),
-                        contentDescription = "Castle Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
+                    Icon(
+                        painter = painterResource(id = R.drawable.book),
+                        contentDescription = "Book Icon",
+                        modifier = Modifier.size(60.dp),
+                        tint = Color.White
                     )
                 }
-            }
 
+                Spacer(modifier = Modifier.height(20.dp))
 
-
-            Spacer(modifier = Modifier.height(30.dp))
-            
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .border(1.dp, Color.White, RoundedCornerShape(20.dp))
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0xFF8B6FB8))
-                    .padding(20.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                // Başlık
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.starimage),
-                            contentDescription = "Star",
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Create amazing stories with AI magic!",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = sandtitle,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.starimage),
+                        contentDescription = "Star",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Every tale is unique and specially made just for you. Let your imagination soar!",
+                        text = "Welcome to",
                         color = Color.White,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = sandtitle,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 8.dp)
+                        fontSize = 18.sp,
+                        fontFamily = andikabody
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.starimage),
+                        contentDescription = "Star",
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
-            }
-            
-            Spacer(modifier = Modifier.weight(1f))
-            
-            Button(
-                onClick = { navController.navigate("splashScreen2") },
-                colors = ButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.White,
-                    disabledContainerColor = Color.Gray,
-                    disabledContentColor = Color.White
-                ),
-                shape = RoundedCornerShape(25.dp),
-                modifier = Modifier
-                    .width(140.dp)
-                    .height(50.dp)
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E8E))
-                        ),
-                        shape = RoundedCornerShape(25.dp)
-                    )
-                    .border(
-                        width = 3.dp,
-                        color = Color.White,
-                        shape = RoundedCornerShape(25.dp)
-                    )
-            ) {
+
                 Text(
-                    text = "Next",
-                    fontSize = 18.sp,
+                    text = "Story Magic!",
+                    color = Color(0xFFFFD700),
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = sandtitle
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.pencil),
-                    contentDescription = "Pencil",
-                    modifier = Modifier.size(20.dp),
-                    tint = Color.White
-                )
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // Kale görseli kutusu (Glow efektiyle)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .graphicsLayer {
+                                alpha = 0.8f
+                                scaleX = 1.05f
+                                scaleY = 1.05f
+                            }
+                            .background(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(
+                                        Color(0xFFFF6B6B).copy(alpha = 0.9f),
+                                        Color.Transparent
+                                    ),
+                                    radius = 600f
+                                ),
+                                shape = RoundedCornerShape(24.dp)
+                            )
+                            .blur(40.dp)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(Color(0xFFE0DAD2)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.castle),
+                            contentDescription = "Castle Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // Açıklama kutusu
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .border(1.dp, Color.White, RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color(0xFF8B6FB8))
+                        .padding(20.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.starimage),
+                                contentDescription = "Star",
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Create amazing stories with AI magic!",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = sandtitle,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Every tale is unique and specially made just for you. Let your imagination soar!",
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = sandtitle,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Buton
+                Button(
+                    onClick = { navController.navigate("splashScreen2") },
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(25.dp),
+                    modifier = Modifier
+                        .width(140.dp)
+                        .height(50.dp)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E8E))
+                            ),
+                            shape = RoundedCornerShape(25.dp)
+                        )
+                        .border(3.dp, Color.White, RoundedCornerShape(25.dp))
+                ) {
+                    Text(
+                        text = "Next",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = sandtitle
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.pencil),
+                        contentDescription = "Pencil",
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.White
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+                PageIndicator(2, 0)
+                Spacer(modifier = Modifier.height(10.dp))
+                ShortBar()
+                Spacer(modifier = Modifier.height(20.dp))
             }
-            
-            Spacer(modifier = Modifier.height(20.dp))
-            PageIndicator(2, 0)
-            Spacer(modifier = Modifier.height(10.dp))
-            ShortBar()
-            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
 
+
+
 @Composable
 fun SplashScreen2(navController: NavController) {
-    val andikabody= FontFamily(Font(R.font.andikabody))
-    val sandtitle= FontFamily(Font(R.font.sandtitle))
+    val andikabody = FontFamily(Font(R.font.andikabody))
+    val sandtitle = FontFamily(Font(R.font.sandtitle))
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.horizontalGradient(
-                colors = listOf(
-                    Color(0xFF4C1D95),
-                    Color(0xFF6B21A8),
-                    Color(0xFF7E22CE)
-                )
-            ))
-    ){
-        Image(
-            painter = painterResource(id = R.drawable.starimage),
-            contentDescription = "Star",
-            modifier = Modifier
-                .size(30.dp)
-                .offset(x = 40.dp, y = 40.dp)
-        )
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.Transparent,
+        contentWindowInsets = WindowInsets.systemBars // ✅ sistem paddings otomatik
+    ) { innerPadding ->
 
-        Image(
-            painter = painterResource(id = R.drawable.starimage),
-            contentDescription = "Star",
-            modifier = Modifier
-                .size(25.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = (-40).dp, y = (-120).dp)
-        )
-
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(innerPadding)
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            Color(0xFF4C1D95),
+                            Color(0xFF6B21A8),
+                            Color(0xFF7E22CE)
+                        )
+                    )
+                )
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
-            
-            Box(
+            // 🌟 Arka plan yıldızları
+            Image(
+                painter = painterResource(id = R.drawable.starimage),
+                contentDescription = "Star",
                 modifier = Modifier
-                    .size(120.dp)
-                    .border(3.dp, Color.White, CircleShape)
-                    .clip(CircleShape)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color(0xFFFFAA3D), Color(0xFFFFBF67))
-                        )
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.pencil),
-                    contentDescription = "Magic Pen",
-                    modifier = Modifier.size(60.dp),
-                    tint = Color.White
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.starimage),
-                    contentDescription = "Star",
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Safe & Trusted",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontFamily = andikabody
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.starimage),
-                    contentDescription = "Star",
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            
-            Text(
-                text = "For Parents",
-                color = Color(0xFFFFD700),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = sandtitle
+                    .size(30.dp)
+                    .offset(x = 40.dp, y = 40.dp)
             )
-            
-            Spacer(modifier = Modifier.height(30.dp))
 
-            Box(
+            Image(
+                painter = painterResource(id = R.drawable.starimage),
+                contentDescription = "Star",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .graphicsLayer {
-                            alpha = 0.8f
-                            scaleX = 1.05f
-                            scaleY = 1.05f
-                        }
-                        .background(
-                            brush = Brush.radialGradient(
-                                colors = listOf(
-                                    Color(0xFFFF6B6B).copy(alpha = 0.9f),
-                                    Color.Transparent
-                                ),
-                                center = Offset.Infinite,
-                                radius = 600f
-                            ),
-                            shape = RoundedCornerShape(24.dp)
-                        )
-                        .blur(40.dp)
-                )
+                    .size(25.dp)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-40).dp, y = (-120).dp)
+            )
 
+            // 📜 İçerik
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(60.dp))
+
+                // 🖋️ Kalem ikonu
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(Color.White),
+                        .size(120.dp)
+                        .border(3.dp, Color.White, CircleShape)
+                        .clip(CircleShape)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(Color(0xFFFFAA3D), Color(0xFFFFBF67))
+                            )
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.s2),
-                        contentDescription = "Parent Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
+                    Icon(
+                        painter = painterResource(id = R.drawable.pencil),
+                        contentDescription = "Magic Pen",
+                        modifier = Modifier.size(60.dp),
+                        tint = Color.White
                     )
                 }
-            }
 
-            Spacer(modifier = Modifier.height(30.dp))
-            
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .border(1.dp, Color.White, RoundedCornerShape(20.dp))
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color(0xFF8B6FB8))
-                    .padding(20.dp)
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Başlık kısmı
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.starimage),
-                            contentDescription = "Star",
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Trusted AI for Your Children",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = sandtitle,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.starimage),
+                        contentDescription = "Star",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Safe, age-appropriate stories created with AI. Monitor your child's creativity and imagination in a secure environment.",
+                        text = "Safe & Trusted",
                         color = Color.White,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = sandtitle,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 8.dp)
+                        fontSize = 18.sp,
+                        fontFamily = andikabody
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Image(
+                        painter = painterResource(id = R.drawable.starimage),
+                        contentDescription = "Star",
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
-            }
-            
-            Spacer(modifier = Modifier.weight(1f))
-            
-            Button(
-                onClick = { navController.navigate("girisSayfa") },
-                colors = ButtonColors(
-                    containerColor = Color.Transparent,
-                    contentColor = Color.White,
-                    disabledContainerColor = Color.Gray,
-                    disabledContentColor = Color.White
-                ),
-                shape = RoundedCornerShape(25.dp),
-                modifier = Modifier
-                    .width(140.dp)
-                    .height(50.dp)
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E8E))
-                        ),
-                        shape = RoundedCornerShape(25.dp)
-                    )
-                    .border(
-                        width = 3.dp,
-                        color = Color.White,
-                        shape = RoundedCornerShape(25.dp)
-                    )
-            ) {
+
                 Text(
-                    text = "Next",
-                    fontSize = 18.sp,
+                    text = "For Parents",
+                    color = Color(0xFFFFD700),
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = sandtitle
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Icon(
-                    painter = painterResource(id = R.drawable.pencil),
-                    contentDescription = "Pencil",
-                    modifier = Modifier.size(20.dp),
-                    tint = Color.White
-                )
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // 🏰 Görsel alanı
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .graphicsLayer {
+                                alpha = 0.8f
+                                scaleX = 1.05f
+                                scaleY = 1.05f
+                            }
+                            .background(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(
+                                        Color(0xFFFF6B6B).copy(alpha = 0.9f),
+                                        Color.Transparent
+                                    ),
+                                    radius = 600f
+                                ),
+                                shape = RoundedCornerShape(24.dp)
+                            )
+                            .blur(40.dp)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(24.dp))
+                            .background(Color.White),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.s2),
+                            contentDescription = "Parent Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(30.dp))
+
+                // Bilgilendirme kutusu
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .border(1.dp, Color.White, RoundedCornerShape(20.dp))
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color(0xFF8B6FB8))
+                        .padding(20.dp)
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(bottom = 24.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.starimage),
+                                contentDescription = "Star",
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Trusted AI for Your Children",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = sandtitle,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Safe, age-appropriate stories created with AI. Monitor your child's creativity and imagination in a secure environment.",
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = sandtitle,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                // 🔘 Buton
+                Button(
+                    onClick = { navController.navigate("girisSayfa") },
+                    colors = ButtonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White,
+                        disabledContainerColor = Color.Gray,
+                        disabledContentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(25.dp),
+                    modifier = Modifier
+                        .width(140.dp)
+                        .height(50.dp)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E8E))
+                            ),
+                            shape = RoundedCornerShape(25.dp)
+                        )
+                        .border(3.dp, Color.White, RoundedCornerShape(25.dp))
+                ) {
+                    Text(
+                        text = "Next",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = sandtitle
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.pencil),
+                        contentDescription = "Pencil",
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.White
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+                PageIndicator(2, 1)
+                Spacer(modifier = Modifier.height(10.dp))
+                ShortBar()
+                Spacer(modifier = Modifier.height(20.dp))
             }
-            
-            Spacer(modifier = Modifier.height(20.dp))
-            PageIndicator(2, 1)
-            Spacer(modifier = Modifier.height(10.dp))
-            ShortBar()
-            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
