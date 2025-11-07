@@ -47,20 +47,34 @@ class AnasayfaViewModel @Inject constructor(val dbRepo: DiscoveryBoxRepository) 
             onSignedOut()
         }
     }
-    fun checkUserAccess(onResult: (Boolean, Boolean, Boolean) -> Unit) {
-        val user = Firebase.auth.currentUser ?: return
+    /**
+     * Kullanıcı erişim kontrolü - YENİ SİSTEM
+     * @param onResult (canCreateFullStory: Boolean, canCreateTextOnly: Boolean, isPremium: Boolean, usedFreeTrial: Boolean)
+     * 
+     * canCreateFullStory: Görsel + Ses + Metin oluşturabilir mi?
+     * canCreateTextOnly: Sadece Metin oluşturabilir mi? (Reklam izleyerek)
+     * isPremium: Premium kullanıcı mı?
+     * usedFreeTrial: Ücretsiz denemeyi kullanmış mı?
+     */
+    fun checkUserAccess(onResult: (Boolean, Boolean, Boolean, Boolean) -> Unit) {
+        val user = Firebase.auth.currentUser ?: run {
+            onResult(false, false, false, true)
+            return
+        }
+        
         val userDocRef = Firebase.firestore.collection("users").document(user.uid)
 
         userDocRef.get().addOnSuccessListener { doc ->
-            val remainingUses = doc.getLong("remainingChatgptUses") ?: 0
+            val remainingChatgptUses = doc.getLong("remainingChatgptUses") ?: 0
             var isPremium = doc.getBoolean("premium") ?: false
-            var usedFreeTrial = doc.getBoolean("usedFreeTrial") ?: false
+            val usedFreeTrial = doc.getBoolean("usedFreeTrial") ?: true
+            val remainingFreeUses = doc.getLong("remainingFreeUses") ?: 0
             val premiumStartDate = doc.getTimestamp("premiumStartDate")
             val premiumDurationDays = doc.getLong("premiumDurationDays") ?: 0L
 
             var premiumExpired = false
 
-            // 1️⃣ Premium süresi dolmuş mu?
+            // 1️⃣ Premium süresi dolmuş mu kontrol et
             if (isPremium && premiumStartDate != null) {
                 val nowMillis = System.currentTimeMillis()
                 val startMillis = premiumStartDate.toDate().time
@@ -71,8 +85,8 @@ class AnasayfaViewModel @Inject constructor(val dbRepo: DiscoveryBoxRepository) 
                 }
             }
 
-            // 2️⃣ Premium hak bitmiş mi?
-            val usageExpired = isPremium && remainingUses <= 0
+            // 2️⃣ Premium hakkı bitmiş mi?
+            val usageExpired = isPremium && remainingChatgptUses <= 0
 
             // 3️⃣ Premium bitmişse kapat
             if (isPremium && (premiumExpired || usageExpired)) {
@@ -85,18 +99,19 @@ class AnasayfaViewModel @Inject constructor(val dbRepo: DiscoveryBoxRepository) 
                 )
             }
 
-            // ✅ 4️⃣ Premium satın aldıysa usedFreeTrial = true yap
-            if (isPremium && !usedFreeTrial) {
-                usedFreeTrial = true
-                userDocRef.update("usedFreeTrial", true)
+            // 4️⃣ TAM ÖZELLİKLİ (Görsel + Ses + Metin) hikaye oluşturabilir mi?
+            val canCreateFullStory = when {
+                isPremium && remainingChatgptUses > 0 -> true // Premium ve hakkı var
+                !usedFreeTrial && remainingChatgptUses > 0 -> true // İlk ücretsiz deneme hakkı var
+                else -> false
             }
 
-            // 5️⃣ Trial hakkı var mı? (sadece kalan kullanım varsa)
-            val hasTrial = remainingUses > 0  && !usedFreeTrial
+            // 5️⃣ SADECE METİN hikaye oluşturabilir mi? (Reklam izleyerek)
+            val canCreateTextOnly = !isPremium && remainingFreeUses > 0
 
-            onResult(hasTrial, isPremium, usedFreeTrial)
+            onResult(canCreateFullStory, canCreateTextOnly, isPremium, usedFreeTrial)
         }.addOnFailureListener {
-            onResult(false, false, true) // hata varsa hak yok gibi davran
+            onResult(false, false, false, true) // hata varsa hak yok
         }
     }
 

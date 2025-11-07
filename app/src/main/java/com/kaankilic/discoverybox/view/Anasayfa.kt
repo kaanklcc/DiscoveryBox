@@ -2,8 +2,10 @@ package com.kaankilic.discoverybox.view
 
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.util.Log
+import android.widget.Space
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -90,6 +92,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.kaankilic.discoverybox.R
+import com.kaankilic.discoverybox.util.InterstitialAdHelper
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import kotlinx.coroutines.launch
 
@@ -101,6 +104,46 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     var selectedTab by remember { mutableStateOf(0) }
     val sandtitle = FontFamily(Font(R.font.sandtitle))
     val andikabody = FontFamily(Font(R.font.andikabody))
+    
+    // 🧪 DEBUG MENU
+    var showDebugMenu by remember { mutableStateOf(false) }
+    
+    // Çıkış onay dialog'u
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    
+    // Kullanıcı durumu state'leri
+    var canCreateFullStory by remember { mutableStateOf(false) }
+    var canCreateTextOnly by remember { mutableStateOf(false) }
+    var isPremium by remember { mutableStateOf(false) }
+    var usedFreeTrial by remember { mutableStateOf(true) }
+    var remainingPremiumUses by remember { mutableStateOf(0) }
+    var remainingAdUses by remember { mutableStateOf(0) }
+    var adsWatchedToday by remember { mutableStateOf(0) }
+    var maxAdsPerDay by remember { mutableStateOf(3) }
+    var adsRequiredForReward by remember { mutableStateOf(3) } // 3 reklam = 1 hikaye
+    
+    // Kullanıcı durumunu yükle
+    LaunchedEffect(Unit) {
+        anasayfaViewModel.checkUserAccess { fullStory, textOnly, premium, trial ->
+            canCreateFullStory = fullStory
+            canCreateTextOnly = textOnly
+            isPremium = premium
+            usedFreeTrial = trial
+        }
+        
+        // Hak sayılarını da al
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            Firebase.firestore.collection("users").document(userId).get()
+                .addOnSuccessListener { doc ->
+                    remainingPremiumUses = (doc.getLong("remainingChatgptUses") ?: 0).toInt()
+                    remainingAdUses = (doc.getLong("remainingFreeUses") ?: 0).toInt()
+                    adsWatchedToday = (doc.getLong("adsWatchedToday") ?: 0).toInt()
+                    maxAdsPerDay = kotlin.math.max(3, (doc.getLong("maxAdsPerDay") ?: 3).toInt())
+                    adsRequiredForReward = (doc.getLong("adsRequiredForReward") ?: 3).toInt()
+                }
+        }
+    }
     val infiniteTransition = rememberInfiniteTransition(label = "")
     val scale by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -115,8 +158,8 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = Color(0xFF1E1B4B),
-                modifier = Modifier.height(90.dp)
+                containerColor = Color(0xFF410D98),
+
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
@@ -178,11 +221,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                 NavigationBarItem(
                     selected = selectedTab == 3,
                     onClick = {
-                        selectedTab = 3
-                        Firebase.auth.signOut()
-                        navController.navigate("girisSayfa") {
-                            popUpTo(0) { inclusive = true }
-                        }
+                        showLogoutDialog = true
                     },
                     icon = {
                         Icon(
@@ -217,16 +256,15 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top
         ) {
-            // Header
+            // Header with Premium Button
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Column {
-
                     Text(
                         stringResource(R.string.taleteller),
                         color = Color.White,
@@ -238,6 +276,143 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         color = Color.White.copy(alpha = 0.8f),
                         fontSize = 14.sp
                     )
+                }
+                
+                // Premium Button or Credit Display
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .graphicsLayer {
+                                scaleX = scale
+                                scaleY = scale
+                            }
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Color(0xFFFBBF24))
+                            .clickable {
+                                if (!isPremium) {
+                                    navController.navigate("premium")
+                                }
+                            }
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.crown),
+                                contentDescription = "crown",
+                                tint = Color.White
+                            )
+                            Text(
+                                if (isPremium) "$remainingPremiumUses" else "Premium",
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = sandtitle
+                            )
+                        }
+                    }
+                }
+            }
+            // Ad Watch Card (Compact) - Sadece premium değilse ve günlük hak kullanılmamışsa göster
+            if (!isPremium && remainingAdUses == 0 && adsWatchedToday < maxAdsPerDay) {
+                // Kaç reklam daha izlemesi gerektiğini hesapla
+                val remainingAdsForReward = adsRequiredForReward - (adsWatchedToday % adsRequiredForReward)
+                val displayRemainingAds = if (remainingAdsForReward == adsRequiredForReward) adsRequiredForReward else remainingAdsForReward
+                
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding( 16.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(
+                            Brush.horizontalGradient(
+                                colors = listOf(Color(0xFF10B981), Color(0xFF14B8A6))
+                            )
+                        )
+                        .clickable {
+                            val activity = context as? Activity ?: return@clickable
+                            val userId = Firebase.auth.currentUser?.uid
+                            if (userId != null) {
+                                // Reklamı göster, kapatıldığında krediyi ver
+                                InterstitialAdHelper.showAd(activity) {
+                                    Firebase.firestore.collection("users").document(userId).get()
+                                        .addOnSuccessListener { doc ->
+                                            val today = com.kaankilic.discoverybox.util.getTodayDateString()
+                                            val lastReset = doc.getString("lastFreeUseReset") ?: ""
+                                            var currentAdsWatched = (doc.getLong("adsWatchedToday") ?: 0).toInt()
+                                            var currentRemainingFreeUses = (doc.getLong("remainingFreeUses") ?: 0).toInt()
+                                            val currentAdsRequired = (doc.getLong("adsRequiredForReward") ?: 3).toInt()
+
+                                            if (lastReset != today) {
+                                                currentAdsWatched = 0
+                                                currentRemainingFreeUses = 0
+                                            }
+
+                                            if (currentAdsWatched < maxAdsPerDay && currentRemainingFreeUses == 0) {
+                                                val newAdsWatched = currentAdsWatched + 1
+                                                val newFreeUses = if (newAdsWatched % currentAdsRequired == 0) {
+                                                    1 // Günde sadece 1 hak
+                                                } else {
+                                                    0
+                                                }
+
+                                                Firebase.firestore.collection("users").document(userId).update(
+                                                    mapOf(
+                                                        "adsWatchedToday" to newAdsWatched,
+                                                        "remainingFreeUses" to newFreeUses,
+                                                        "lastFreeUseReset" to today
+                                                    )
+                                                ).addOnSuccessListener {
+                                                    if (newAdsWatched % currentAdsRequired == 0) {
+                                                        Toast.makeText(context, "🎉 1 hikaye hakkı kazandınız! (Günlük)", Toast.LENGTH_SHORT).show()
+                                                        remainingAdUses = newFreeUses
+                                                        adsWatchedToday = newAdsWatched
+                                                    } else {
+                                                        val remaining = currentAdsRequired - (newAdsWatched % currentAdsRequired)
+                                                        Toast.makeText(context, "✅ Reklam izlendi! $remaining reklam daha izleyin.", Toast.LENGTH_SHORT).show()
+                                                        adsWatchedToday = newAdsWatched
+                                                    }
+                                                }
+                                            } else if (currentRemainingFreeUses > 0) {
+                                                Toast.makeText(context, "Bugünlük hikaye hakkınızı zaten kazandınız!", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Toast.makeText(context, "Bugün tüm reklamları izlediniz!", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                }
+                            }
+                        }
+                        .padding(12.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(14.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+
+                        Icon(
+                            painterResource(R.drawable.gift),
+                            contentDescription ="gift",
+                            tint = Color.White
+                        )
+                        Text(
+                                "$displayRemainingAds reklam izle, +1 hikaye kazan (Günlük)",
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = sandtitle
+                            )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            "✨",
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
 
@@ -284,13 +459,34 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         .background(Color.White.copy(alpha = 0.95f))
                         .padding(14.dp)
                 ) {
-                    Text(
-                        stringResource(R.string.welcome_little_storyteller),
-                        color = Color(0xFF5B21B6),
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = andikabody
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(
+                            stringResource(R.string.welcome_little_storyteller),
+                            color = Color(0xFF5B21B6),
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = andikabody
+                        )
+                        
+                        // Story Credits Display
+                        val totalCredits = if (isPremium) remainingPremiumUses else remainingAdUses
+                        val creditText = if (isPremium) {
+                            "$totalCredits ${stringResource(R.string.story_credits_remaining)}"
+                        } else {
+                            if (totalCredits > 0) {
+                                "$totalCredits ${stringResource(R.string.story_credits_remaining)} (Günlük)"
+                            } else {
+                                stringResource(R.string.watch_ads_to_create_story)
+                            }
+                        }
+                        
+                        Text(
+                            creditText,
+                            color = Color(0xFF8B5CF6),
+                            fontSize = 13.sp,
+                            fontFamily = andikabody
+                        )
+                    }
                 }
             }
 
@@ -315,7 +511,20 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             )
                         )
                     )
-                    .clickable { navController.navigate("hikaye") }
+                    .clickable {
+                        // Premium ise ve hakkı bitmişse premium sayfasına yönlendir
+                        if (isPremium && remainingPremiumUses <= 0) {
+                            navController.navigate("premium")
+                        }
+                        // Premium değilse ve hakkı yoksa premium sayfasına yönlendir
+                        else if (!isPremium && remainingAdUses <= 0) {
+                            navController.navigate("premium")
+                        }
+                        // Hakkı varsa hikaye sayfasına git
+                        else {
+                            navController.navigate("hikaye")
+                        }
+                    }
                     .padding(20.dp)
             ) {
                 Column {
@@ -352,7 +561,20 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(16.dp))
                             .background(Color(0xFFFBBF24))
-                            .clickable { navController.navigate("hikaye") }
+                            .clickable {
+                                // Premium ise ve hakkı bitmişse premium sayfasına yönlendir
+                                if (isPremium && remainingPremiumUses <= 0) {
+                                    navController.navigate("premium")
+                                }
+                                // Premium değilse ve hakkı yoksa premium sayfasına yönlendir
+                                else if (!isPremium && remainingAdUses <= 0) {
+                                    navController.navigate("premium")
+                                }
+                                // Hakkı varsa hikaye sayfasına git
+                                else {
+                                    navController.navigate("hikaye")
+                                }
+                            }
                             .padding(vertical = 14.dp),
                         contentAlignment = Alignment.Center
                     ) {
@@ -383,16 +605,115 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         fontWeight = FontWeight.Bold,
                         fontFamily = sandtitle
                     )
-                    Text(
-                        stringResource(R.string.view_all_stories),
-                        color = Color(0xFFE9D5FF),
-                        fontSize = 14.sp,
-                        modifier = Modifier.clickable { navController.navigate("saveSayfa") }
-                    )
+
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 
-                val featuredStories = remember {
+                // Mevcut dili al
+                val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                val currentLanguage = prefs.getString("language_code", "tr") ?: "tr"
+                val isEnglish = currentLanguage == "en"
+                
+                val featuredStories = remember(currentLanguage) {
+                    if (isEnglish) {
+                        // İngilizce hikayeler
+                        listOf(
+                            Triple("featured_1", "Magical Forest Adventure", "The Magical Forest Adventure\n\n" +
+                                    "Once upon a time...\n" +
+                                    "In distant lands, there was a lush green forest with hills covered in clouds, reaching all the way to the sky. This forest was called the Shimmer Forest. When the sun rose, thousands of colors would filter through the leaves of the trees, and at night, flowers sparkled like stars.\n\n" +
+                                    "But this forest had a secret:\n" +
+                                    "Only those with pure hearts could see the magical side of the forest.\n\n" +
+                                    "🌿 One Day...\n\n" +
+                                    "In a small village lived a curious girl named Elif. Elif was eight years old, with big brown eyes and two braids, and had won everyone's love. She loved reading adventure books most of all. Every night she would look at the stars and say, \"I wish I could go on an adventure someday.\"\n\n" +
+                                    "One morning, when the sun had just risen from behind the mountains, Elif found a bright feather in front of her house. The feather shone so brightly it seemed to have fallen from inside a rainbow. When Elif picked it up, the feather suddenly glowed and a tiny voice was heard:\n\n" +
+                                    "\"Help me! The Magical Forest is in danger!\"\n\n" +
+                                    "Elif was surprised but not scared. She bravely asked:\n" +
+                                    "— Who's talking?\n\n" +
+                                    "A tiny fairy emerged from inside the feather! Her name was Lila.\n" +
+                                    "Lila was one of the guardians of the Magical Forest. Since the Light Stone of the forest had been stolen, the forest's magic was beginning to weaken. Trees were fading, flowers losing their light.\n\n" +
+                                    "\"Elif, only you can save us,\" said Lila.\n\n" +
+                                    "Without thinking, Elif said:\n" +
+                                    "— \"Okay! Let's go!\"\n\n" +
+                                    "And so the magical adventure began.\n\n" +
+                                    "🌲 At the Forest Gate\n\n" +
+                                    "Lila held Elif's hand, the feather suddenly grew and lifted them into the sky. Passing through the wind and gliding among the lights, Elif felt her heart beating fast.\n" +
+                                    "When she opened her eyes, there was a huge, shining forest gate in front of her. The gate was made of crystals with this shining inscription:\n\n" +
+                                    "\"Enter with courage, find your way with your heart.\"\n\n" +
+                                    "Elif pushed the gate and entered.\n" +
+                                    "Suddenly everything became colorful: butterflies were singing, trees whispering, rivers laughing.\n\n" +
+                                    "But Lila looked sad:\n\n" +
+                                    "\"The Light Stone is in the Shadow Cave to the north. To get there, we must pass three obstacles.\"\n\n" +
+                                    "Elif was determined:\n" +
+                                    "— \"Three obstacles? Let's go then!\"\n\n" +
+                                    "And with courage, friendship, and wisdom, Elif overcame every challenge, defeated the Dark Shadow, and restored light to the Magical Forest. She returned home as a hero, knowing that true magic lies within the heart. 🌈✨"),
+                            Triple("featured_2", "Space Journey", "Once upon a time, in a small town lived a curious boy named Kaan. Every night before bed, Kaan would look out his window at the sky and say, \"One day I'll go there, among the stars!\"\n\n" +
+                                    "One evening, the sky was different than usual. The moon was bright, stars seemed to be dancing. As Kaan watched the brightest star through his telescope, he suddenly saw a point of light shining like a rainbow next to the star. The light grew bigger and bigger and whoooosh! A tiny spaceship appeared in the middle of his room!\n\n" +
+                                    "The ship's hatch opened, and out came a blue, sparkling alien.\n" +
+                                    "\"Hello Kaan! I'm Zuzu, captain of the Stardust Ship!\" he said.\n" +
+                                    "Kaan asked in amazement, \"Did you really come from space?\"\n" +
+                                    "Zuzu smiled: \"Yes! While traveling the universe, I picked up your curiosity signals. So you want to go to space?\"\n\n" +
+                                    "Kaan nodded excitedly.\n" +
+                                    "\"But I can't go alone,\" he said, \"my friends Anıl and Miralp must come too!\"\n\n" +
+                                    "Zuzu smiled, waved his magic antenna, and suddenly Anıl and Miralp appeared in Kaan's room too!\n" +
+                                    "\"What's happening here?\" said Anıl in amazement.\n" +
+                                    "\"We're going to space!\" said Kaan excitedly.\n\n" +
+                                    "The three friends jumped into the ship. The ship sparkled brightly and suddenly shot through the window into the sky! 🚀\n\n" +
+                                    "They explored the Moon's craters, flew through Saturn's rings, visited the Dream Cloud Galaxy with purple and orange skies, and saw giant star butterflies gliding through space.\n\n" +
+                                    "When they returned home, a small bottle of glowing stardust was beside the telescope.\n\n" +
+                                    "Kaan whispered:\n" +
+                                    "\"So it was all real...\"\n\n" +
+                                    "And from that day on, every night Kaan, Anıl, and Miralp looked at the sky together and sent a new signal — hoping that maybe one day Zuzu would return."),
+                            Triple("featured_3", "Underwater Kingdom", "Once upon a time, in a small fishing village by the deep blue sea, lived a curious girl named Alya. Alya's favorite thing was to listen to the sound of waves every morning and imagine the mysteries beneath the sea.\n\n" +
+                                    "One day while walking on the beach, Alya found a sparkling blue seashell among the sand. When she put the shell to her ear, she heard a thin voice:\n\n" +
+                                    "\"Alya... help... the Underwater Kingdom is in danger!\"\n\n" +
+                                    "Alya was scared at first, then gathered her courage and asked, \"How can I help you?\" A light rose from inside the shell and suddenly Alya found herself underwater, able to breathe!\n\n" +
+                                    "🐚 Coral City\n\n" +
+                                    "When Alya opened her eyes, she was surrounded by colorful corals, starfish, and gliding fish. A graceful mermaid with silver scales appeared before her.\n\n" +
+                                    "\"I am Mira, guardian of the Underwater Kingdom,\" she said. \"King Triton's light pearl has been stolen! That pearl gives light and life to our sea. Without it, everything will darken.\"\n\n" +
+                                    "Alya immediately said, \"I'll help you find that pearl!\"\n\n" +
+                                    "Together with Mira and a cheerful octopus named Pippo, they ventured to the Dark Cave, outsmarted a moray eel, and retrieved the light pearl. The kingdom celebrated with songs and dances.\n\n" +
+                                    "When Alya bid farewell, Mira smiled:\n\n" +
+                                    "\"Whenever you put the seashell to your ear, we will hear you.\"\n\n" +
+                                    "Alya suddenly found herself back on the beach. She still had that blue seashell in her hand. When she put it to her ear, she heard a voice from the depths:\n\n" +
+                                    "\"Thank you, Alya, hero of the Sea Kingdom!\" 🌊✨"),
+                            Triple("featured_4", "Dream World", "Once upon a time, in a small town lived a curious girl: Necla. Necla loved to daydream. Sometimes she would look at the clouds in the sky, changing their shapes and making up stories. But one night, something different happened...\n\n" +
+                                    "That night, as soon as Necla put her head on her pillow, her eyelids grew heavy. Suddenly bright lights appeared around her. When she opened her eyes, she found herself in a place made of soft cotton. Around her floated clouds in shades of blue, pink, and purple like the sky.\n\n" +
+                                    "\"Where is this?\" she asked herself.\n\n" +
+                                    "Just then, a tiny bird with golden yellow wings came to her.\n" +
+                                    "\"Welcome to Dream World, Necla!\" it chirped. \"I'm Luma! Here everyone lives their own dreams.\"\n\n" +
+                                    "Necla looked around in amazement. In the sky were flying ice creams, talking pillows, and flowers dancing and changing colors. \"This is wonderful!\" she said.\n\n" +
+                                    "But Luma's face suddenly became serious.\n" +
+                                    "\"Dream World is in danger, Necla! The Dark Shadow is gaining power from people's nightmares. If we don't stop it, beautiful dreams will disappear!\"\n\n" +
+                                    "Necla bravely said, \"Then let's go right away!\"\n\n" +
+                                    "Using the light from her heart and thinking of beautiful things, Necla defeated the Dark Shadow and saved Dream World. From that day on, every night before falling asleep, Necla made a wish:\n" +
+                                    "\"I wish everyone has a beautiful dream today.\"\n\n" +
+                                    "And that wish added one more light to Dream World every night. 💫"),
+                            Triple("featured_5", "Dragon Friendship", "Once upon a time, in a small village shadowed by clouds, lived a brave girl named Elif. Every day Elif would go to the edge of the forest and look at the distant mountains. Beyond those mountains was Dragon Valley, where no one dared to go. Villagers believed a terrible dragon lived there and were afraid to go near.\n\n" +
+                                    "But Elif was different. Instead of being afraid of dragons, she was curious about them.\n" +
+                                    "One day she gathered her courage, packed some bread, water, and her favorite stuffed toy in her small backpack, and set off toward the forest.\n\n" +
+                                    "At the end of a long walk, she saw a huge cave among the mists. In front of the cave lay an injured, tiny dragon! Its scales were green, eyes sparkling like emeralds. Elif was scared at first but then realized the dragon was in pain.\n\n" +
+                                    "\"Hello... I won't hurt you,\" said Elif, slowly approaching.\n" +
+                                    "The dragon also lifted its head with a slight moan. A stone was stuck in its foot!\n\n" +
+                                    "Elif immediately carefully removed the stone with a small stick, then cleaned the wound with water from her bag. The dragon gratefully puffed warm steam from its nose — almost like a thank you.\n\n" +
+                                    "Elif named the dragon \"Spark.\" From that day on, she secretly visited her friend in the valley every day. She brought food, they played games, and sometimes Elif even rode on its back and flew above the clouds! ☁️\n\n" +
+                                    "Through Elif's courage and kindness, she showed the villagers that the dragon wasn't terrible, and Dragon Valley became known as the valley of friendship and courage. Elif and Spark flew in the sky every day, waving to the villagers from afar.\n\n" +
+                                    "And so a little girl's courage changed the heart of an entire village. 💖"),
+                            Triple("featured_6", "Time Traveler", "Once upon a time, in a small town lived a curious child. His name was Zeki. Unlike other children, Zeki loved working with old things more than playing games. In his father's repair workshop, he would dismantle broken clocks and try to understand how the gears inside worked.\n\n" +
+                                    "One day, he entered the old antique shop at the edge of town. While browsing among the shelves, his eyes caught a dusty pocket watch. On the watch's cover it said \"Time is waiting for you.\" Zeki immediately took the watch curiously and wound it. At that moment, a bright light appeared and Zeki suddenly found himself somewhere completely different!\n\n" +
+                                    "Looking around, he was in a square where people wore fez hats and traveled in horse carriages, where there weren't even electric poles. A sign read \"Year 1890 – Town Square.\"\n" +
+                                    "Zeki said to himself in wonder, \"So I really traveled through time!\"\n\n" +
+                                    "At first he was scared, but then his curiosity won. In the square he met a boy named Hasan. Hasan was amazed at Zeki's clothes:\n" +
+                                    "— What kind of clothes are these? Even the fabric is different! Where did you come from?\n" +
+                                    "Zeki laughed and said, \"From a faraway place...\" without explaining further.\n\n" +
+                                    "The two immediately became friends. Hasan showed Zeki around the town, the water mill, the old school building, and the village market. Zeki admiringly watched how different life was in the past. But in the evening he noticed something:\n" +
+                                    "The watch in his pocket was vibrating and its hands were turning backward!\n\n" +
+                                    "Saying goodbye to Hasan, Zeki said, \"We'll meet again someday.\" The lights flashed again and Zeki found himself back in his own room. Looking at the watch, the hand had stopped but the writing underneath had changed:\n" +
+                                    "\"Time has become your friend.\"\n\n" +
+                                    "From that day on, Zeki became a traveler not only of the past but also of knowledge. He started studying harder to understand history, science, and time. Because now he knew that anyone who is curious is a bit of a time traveler.\n\n" +
+                                    "🌟 The End.")
+                        )
+                    } else {
+                        // Türkçe hikayeler (mevcut)
                     listOf(
                         Triple("featured_1", "Sihirli Orman Macerası", "Sihirli Orman Macerası\n" +
                                 "\n" +
@@ -475,7 +796,8 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                                 "\n" +
                                 "“Teşekkür ederim küçük kahraman. İşte sana yardımım: Gölge Mağarası’na giden yolu gösteren ışık taşı parçası.”\n" +
                                 "\n" +
-                                "\uD83C\uDF0C 3. Engel: Fısıltı Vadisi\n" +
+                                "\uD83C\uDF0C" +
+                                "   3. Engel: Fısıltı Vadisi\n" +
                                 "\n" +
                                 "Son engel, rüzgârların konuştuğu bir vadiden geçiyormuş. Burada karanlık fısıltılar Elif’in kulağına “geri dön” diyormuş.\n" +
                                 "Ama Lila ona,\n" +
@@ -685,6 +1007,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                                 "\n"
                                 )
                     )
+                    }
                 }
                 
                 val storyImages = mapOf(
@@ -749,8 +1072,77 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
             }
 
             Spacer(modifier = Modifier.height(100.dp))
+            
+            // 🧪 DEBUG BUTTON (sadece TEST_MODE açıkken görünür)
+            if (com.kaankilic.discoverybox.BuildConfig.TEST_MODE) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Button(
+                        onClick = { showDebugMenu = true },
+                        modifier = Modifier.align(Alignment.Center),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFA500)
+                        )
+                    ) {
+                        Text("🧪 DEBUG MENU", color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
         }
-
+        
+        // 🧪 DEBUG MENU DIALOG
+        if (showDebugMenu) {
+            DebugMenu(onDismiss = { showDebugMenu = false })
+        }
+        
+        // Çıkış onay dialog'u
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = {
+                    Text(
+                        stringResource(R.string.logout_confirmation_title),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = sandtitle
+                    )
+                },
+                text = {
+                    Text(
+                        stringResource(R.string.logout_confirmation_message),
+                        fontFamily = andikabody
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            selectedTab = 3
+                            Firebase.auth.signOut()
+                            navController.navigate("girisSayfa") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                            showLogoutDialog = false
+                        },
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFEF4444)
+                        )
+                    ) {
+                        Text(stringResource(R.string.yes), fontFamily = andikabody)
+                    }
+                },
+                dismissButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { showLogoutDialog = false }
+                    ) {
+                        Text(stringResource(R.string.no), fontFamily = andikabody)
+                    }
+                }
+            )
+        }
     }
 }
 

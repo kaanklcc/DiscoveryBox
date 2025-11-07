@@ -24,9 +24,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.kaankilic.discoverybox" />
-                  <option name="mobileSdkAppId" value="1:764790962175:android:7cc5b70872d6bbe695d9ca" />
-                  <option name="projectId" value="discoverybox-5bedd" />
-                  <option name="projectNumber" value="764790962175" />
+                  <option name="mobileSdkAppId" value="1:430097357601:android:ead296f80013cb378cfc60" />
+                  <option name="projectId" value="storyteller-23720" />
+                  <option name="projectNumber" value="430097357601" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
