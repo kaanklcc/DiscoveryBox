@@ -79,7 +79,7 @@
     <string name="language">tr</string>
     <string name="country">TR</string>
 
-    <string name="default_web_client_id">764790962175-86cdpa0e5vi52scv1incbf4e7dph73m6.apps.googleusercontent.com</string>
+    <string name="default_web_client_id">430097357601-b2t3af3hhj9upgqf81sdfdu0mpshfgtf.apps.googleusercontent.com</string>
 
     <string name="CreateStorieswithAI">Yapay Zeka ile Hikaye Yarat!</string>
     <string name="Letyourimaginationfly">Hayal Gücünü Serbest Bırak!</string>
@@ -111,7 +111,7 @@
     <string name="decide_your_story">Hikayenin nasıl olacağına karar ver</string>
     <string name="create_magic_story">✨ Sihirli Hikaye Oluştur ✨</string>
     <string name="featured_stories">Öne çıkan hikayeler</string>
-    <string name="view_all_stories">Bütün hikayeleri göster</string>
+    <string name="view_all_stories">Kaydedilen hikayelerini göster</string>
     <string name="create_your_story">Hikayeni Oluştur</string>
     <string name="let_imagination_live">Hayal gücünü hayata geçir!</string>
     <string name="theme">Tema</string>
@@ -136,5 +136,30 @@
     <string name="new_world_creating">Yeni Bir Dünya Yaratılıyor...</string>
     <string name="characters_coming_alive">Karakterler Canlandırılıyor...</string>
     <string name="sounds_starting">Sesler Duyulmaya Başlanıyor...</string>
+    <string name="story_credits_remaining">hikaye kredisi kaldı</string>
+
+    
+    <!-- Login sayfası -->
+    <string name="story_magic">Hikaye Sihri</string>
+    <string name="create_amazing_stories">Yapay Zeka ile Muhteşem Hikayeler Yarat!</string>
+    <string name="welcome_to_magical_world">Hikaye anlatımının büyülü dünyasına\nhoş geldiniz</string>
+    <string name="sign_up_with_google">Google ile Kayıt Ol</string>
+    <string name="sign_in_with_google">Google ile Giriş Yap</string>
+    <string name="or">veya</string>
+    <string name="let_imagination_soar">Hayal gücünü serbest bırak!</string>
+    
+    <!-- Çıkış onayı -->
+    <string name="logout_confirmation_title">Çıkış Yap</string>
+    <string name="logout_confirmation_message">Çıkış yapmak istediğinizden emin misiniz?</string>
+    <string name="yes">Evet</string>
+    <string name="no">Hayır</string>
+    
+    <!-- Kayıtlı hikayeler sayfası -->
+    <string name="my_story_collection">Hikaye Koleksiyonum</string>
+    <string name="magical_stories_saved">sihirli hikaye kaydedildi</string>
+    <string name="delete_story_title">Hikayeyi Sil</string>
+    <string name="delete_story_message">Bu hikayeyi silmek istediğinizden emin misiniz?</string>
+    <string name="delete">Sil</string>
+    <string name="watch_ads_to_create_story">Hikaye oluşturmak için reklam izleyin</string>
 
 </resources>

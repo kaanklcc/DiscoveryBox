@@ -108,27 +108,13 @@ fun LoginSplashScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
-                    .size(300.dp) // Dairenin boyutu
-                    .clip(CircleShape) // Yuvarlak şekil
-                    .background(Color.White), // Beyaz arka plan
-                contentAlignment = Alignment.Center
-            ){
-
-                Column( verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
                     Image(
-                        painter = painterResource(id = R.drawable.logoyapay),
+                        painter = painterResource(id = R.drawable.applogo),
                         contentDescription = "Profile Image",
-                        contentScale = ContentScale.Crop, // Görseli kırpmadan ortalar
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(300.dp) // Görselin boyutu (çerçeve içinde)
+                            .size(300.dp)
                     )
-                }
-
-            }
             Spacer(modifier = Modifier.height(30.dp))
             Text("DISCOVERY BOX", color = Color(0xFF353BA4), fontWeight = FontWeight.ExtraBold, fontSize = 44.sp,fontFamily = sandtitle)
 

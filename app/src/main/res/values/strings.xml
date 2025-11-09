@@ -21,7 +21,8 @@
     <string name="NewToDiscoveryBox">New To DiscoveryBox?</string>
     <string name="SignUp">Sign Up</string>
 
-    <string name="default_web_client_id">764790962175-86cdpa0e5vi52scv1incbf4e7dph73m6.apps.googleusercontent.com</string>
+    <!-- TODO: Firebase Console'dan yeni Web Client ID'yi buraya ekleyin -->
+    <string name="default_web_client_id">430097357601-b2t3af3hhj9upgqf81sdfdu0mpshfgtf.apps.googleusercontent.com</string>
 
 
 
@@ -143,5 +144,29 @@
     <string name="new_world_creating">A New World is Being Created...</string>
     <string name="characters_coming_alive">Characters Coming to Life...</string>
     <string name="sounds_starting">Sounds Starting to Be Heard...</string>
+    <string name="story_credits_remaining">story credits remaining</string>
+
+    <!-- Login page -->
+    <string name="story_magic">Story Magic</string>
+    <string name="create_amazing_stories">Create Amazing Stories with AI!</string>
+    <string name="welcome_to_magical_world">Welcome to the magical world of\nstorytelling</string>
+    <string name="sign_up_with_google">Sign up with Google</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="or">or</string>
+    <string name="let_imagination_soar">Let your imagination soar!</string>
+    
+    <!-- Logout confirmation -->
+    <string name="logout_confirmation_title">Logout</string>
+    <string name="logout_confirmation_message">Are you sure you want to logout?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    
+    <!-- Save page -->
+    <string name="my_story_collection">My Story Collection</string>
+    <string name="magical_stories_saved">magical stories saved</string>
+    <string name="delete_story_title">Delete Story</string>
+    <string name="delete_story_message">Are you sure you want to delete this story?</string>
+    <string name="delete">Delete</string>
+    <string name="watch_ads_to_create_story">Watch ads to create stories</string>
 
 </resources>

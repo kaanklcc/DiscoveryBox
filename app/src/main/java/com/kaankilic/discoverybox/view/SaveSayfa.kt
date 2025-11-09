@@ -68,7 +68,9 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
     val userId = auth.currentUser?.uid
     val stories by saveSayfaViewModel.stories.observeAsState(emptyList())
     val sandtitle = FontFamily(Font(R.font.sandtitle))
+    val andikabody = FontFamily(Font(R.font.andikabody))
     var selectedTab by remember { mutableStateOf(2) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -113,7 +115,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "My Story Collection",
+                            text = stringResource(R.string.my_story_collection),
                             fontSize = 20.sp,
                             fontFamily = sandtitle,
                             fontWeight = FontWeight.Bold,
@@ -122,7 +124,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "${stories.size} magical stories saved",
+                        text = "${stories.size} ${stringResource(R.string.magical_stories_saved)}",
                         fontSize = 14.sp,
                         color = Color.White.copy(alpha = 0.9f),
                         modifier = Modifier.padding(start = 56.dp)
@@ -147,7 +149,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                             tint = if (selectedTab == 0) Color(0xFFC084FC) else Color(0xFFE9D5FF)
                         )
                     },
-                    label = { Text("Home", fontSize = 10.sp, color = Color(0xFFE9D5FF)) },
+                    label = { Text(stringResource(R.string.home), fontSize = 10.sp, color = Color(0xFFE9D5FF)) },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = Color(0xFFC084FC),
                         unselectedIconColor = Color(0xFFE9D5FF),
@@ -167,7 +169,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                             tint = if (selectedTab == 1) Color(0xFFF472B6) else Color(0xFFFCE7F3)
                         )
                     },
-                    label = { Text("Create", fontSize = 10.sp, color = Color(0xFFFCE7F3)) },
+                    label = { Text(stringResource(R.string.create), fontSize = 10.sp, color = Color(0xFFFCE7F3)) },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = Color(0xFFF472B6),
                         unselectedIconColor = Color(0xFFFCE7F3),
@@ -184,7 +186,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                             tint = if (selectedTab == 2) Color(0xFFFBBF24) else Color(0xFFFEF3C7)
                         )
                     },
-                    label = { Text("Saved", fontSize = 10.sp, color = Color(0xFFFEF3C7)) },
+                    label = { Text(stringResource(R.string.saved), fontSize = 10.sp, color = Color(0xFFFEF3C7)) },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = Color(0xFFFBBF24),
                         unselectedIconColor = Color(0xFFFEF3C7),
@@ -194,11 +196,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                 NavigationBarItem(
                     selected = selectedTab == 3,
                     onClick = {
-                        selectedTab = 3
-                        Firebase.auth.signOut()
-                        navController.navigate("girisSayfa") {
-                            popUpTo(0) { inclusive = true }
-                        }
+                        showLogoutDialog = true
                     },
                     icon = {
                         Icon(
@@ -207,7 +205,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                             tint = if (selectedTab == 3) Color(0xFF22D3EE) else Color(0xFFCFFAFE)
                         )
                     },
-                    label = { Text("Logout", fontSize = 10.sp, color = Color(0xFFCFFAFE)) },
+                    label = { Text(stringResource(R.string.logout), fontSize = 10.sp, color = Color(0xFFCFFAFE)) },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = Color(0xFF22D3EE),
                         unselectedIconColor = Color(0xFFCFFAFE),
@@ -240,6 +238,50 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                     hikayeViewModel = hikayeViewModel
                 )
             }
+        }
+        
+        // Çıkış onay dialog'u
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = {
+                    Text(
+                        stringResource(R.string.logout_confirmation_title),
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = sandtitle
+                    )
+                },
+                text = {
+                    Text(
+                        stringResource(R.string.logout_confirmation_message),
+                        fontFamily = andikabody
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            selectedTab = 3
+                            Firebase.auth.signOut()
+                            navController.navigate("girisSayfa") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                            showLogoutDialog = false
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFEF4444)
+                        )
+                    ) {
+                        Text(stringResource(R.string.yes), fontFamily = andikabody)
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showLogoutDialog = false }
+                    ) {
+                        Text(stringResource(R.string.no), fontFamily = andikabody)
+                    }
+                }
+            )
         }
     }
 }
@@ -389,8 +431,8 @@ fun SwipeToDeleteStoryItem(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Story", fontWeight = FontWeight.Bold) },
-            text = { Text("Are you sure you want to delete this story?") },
+            title = { Text(stringResource(R.string.delete_story_title), fontWeight = FontWeight.Bold, fontFamily = sandtitle) },
+            text = { Text(stringResource(R.string.delete_story_message)) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -405,12 +447,12 @@ fun SwipeToDeleteStoryItem(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEF4444))
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.Cancel))
                 }
             }
         )

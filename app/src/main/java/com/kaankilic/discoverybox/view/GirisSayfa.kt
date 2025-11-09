@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.width
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DropdownMenu
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -113,166 +115,274 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
 
     Scaffold(
     ) { paddingValues ->
-
-
         Box(
             modifier = Modifier
-                .fillMaxSize().padding(paddingValues)
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            GradientBackgroundd(listOf( Color(0xFFfbdceb),Color(0xFFd5e0fe)))
+            GradientBackgroundd(listOf(Color(0xFF4C1D95), Color(0xFF6B21A8), Color(0xFF7E22CE)))
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 40.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
+
+                Spacer(Modifier.height(20.dp))
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(end = 16.dp), // Sağdan 16 dp boşluk bırak
-                    contentAlignment = Alignment.TopEnd
+                        .clip(RoundedCornerShape(24.dp))
+                        .background(Color.White.copy(alpha = 0.15f))
+                        .padding(24.dp)
                 ) {
-                    LanguageSwitcher(context = LocalContext.current)
-                }
-
-                    Box(
-                        modifier = Modifier
-                            .size(250.dp) // Dairenin boyutu
-                            .clip(RoundedCornerShape(18.dp))
-                            .background(Color.White), // Beyaz arka plan
-                        contentAlignment = Alignment.Center
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            LanguageSwitcher(context = context)
+                        }
 
-                        Image(
-                            painter = painterResource(id = R.drawable.logoyapay),
-                            contentDescription = "Profile Image",
-                            contentScale = ContentScale.Crop, // Görseli kırpmadan ortalar
+                        Box(
                             modifier = Modifier
-                                .size(250.dp) // Görselin boyutu (çerçeve içinde)
+                                .size(100.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(
+                                    Brush.verticalGradient(
+                                        listOf(Color(0xFFFF6B9D), Color(0xFFFFA06B))
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("✨", fontSize = 40.sp)
+                        }
 
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            stringResource(R.string.story_magic),
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontFamily = sandtitle
                         )
 
-                    }
+                        Spacer(modifier = Modifier.height(4.dp))
 
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                   stringResource(R.string.DiscoveryBox),
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 40.sp,
-                    color = Color.DarkGray, fontFamily = sandtitle
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(stringResource(R.string.WelcomeToMagicWorld), fontWeight = FontWeight.Normal, fontSize = 24.sp, fontFamily = andikabody,
-                    modifier = Modifier.padding(start = 3.dp, end = 3.dp))
+                        Text(
+                            stringResource(R.string.create_amazing_stories),
+                            fontSize = 14.sp,
+                            color = Color.White,
+                            fontFamily = andikabody
+                        )
 
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.White)
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Button(
-                                onClick = {
-                                    GoogleSignInHelper.signInWithGoogle(
-                                        context = context,
-                                        launcher = googleSignInLauncher
-                                    )
-                                },
-                                colors = ButtonDefaults.buttonColors(Color(0xFFFCFCFC)),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(48.dp)
-                                    .padding(horizontal = 20.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                            Text(
+                                stringResource(R.string.welcome_to_magical_world),
+                                fontSize = 14.sp,
+                                color = Color(0xFF7C3AED),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                fontWeight = FontWeight.Medium,
+                                lineHeight = 20.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Button(
+                            onClick = {
+                                GoogleSignInHelper.signInWithGoogle(
+                                    context = context,
+                                    launcher = googleSignInLauncher
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFFFF5C8D)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.google),
-                                        contentDescription = "Google Sign-In",
-                                        modifier = Modifier
-                                            .size(20.dp), tint = Color.Black
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = "Continue with Google",
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = Color.Black
-                                    )
-                                }
-
+                                Text(
+                                    "G",
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    stringResource(R.string.sign_up_with_google),
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White
+                                )
                             }
-                            Spacer(Modifier.height(10.dp))
-                            Button(
-                                onClick = {
-                                    GoogleSignInHelper.signInWithGoogle(
-                                        context = context,
-                                        launcher = googleSignInLauncher,
-                                        //activity = activity
-                                    )
-                                },
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(48.dp)
-                                    .padding(horizontal = 20.dp)
-                                    .clip(RoundedCornerShape(10.dp)),
-                                colors = ButtonDefaults.buttonColors(Color(0xFFFFFFFF))
+                                    .weight(1f)
+                                    .height(1.dp)
+                                    .background(Color.White.copy(alpha = 0.4f))
+                            )
+                            Text(
+                                stringResource(R.string.or),
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                                color = Color.White,
+                                fontSize = 13.sp
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(1.dp)
+                                    .background(Color.White.copy(alpha = 0.4f))
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Button(
+                            onClick = {
+                                GoogleSignInHelper.signInWithGoogle(
+                                    context = context,
+                                    launcher = googleSignInLauncher
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(Color(0xFF8B5CF6)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
                             ) {
-
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.google), // Google logosunu eklemelisin
-                                        contentDescription = "Google Sign-In",
-                                        modifier = Modifier
-                                            .size(20.dp), tint = Color.Black
-                                    )
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = "Sign Up with Google",
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = Color.Black
-                                    )
-                                }
+                                Icon(
+                                    painter = painterResource(id = R.drawable.google),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                    tint = Color.White
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    stringResource(R.string.sign_in_with_google),
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.White
+                                )
                             }
+                        }
 
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("🌟", fontSize = 18.sp)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                stringResource(R.string.let_imagination_soar),
+                                color = Color.White,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("🌟", fontSize = 18.sp)
                         }
                     }
-
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(20.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.theme),
+                    contentDescription = null,
+                    tint = Color(0xFFFF6B9D),
+                    modifier = Modifier.size(56.dp)
+                )
             }
         }
+    }
+}
 
 
 @Composable
 fun LanguageSwitcher(context: Context) {
-    var locale by remember { mutableStateOf(Locale.getDefault()) }
+    // Mevcut dili SharedPreferences'dan al
+    val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    val savedLanguage = prefs.getString("language_code", "tr") ?: "tr"
+    
+    var currentLanguage by remember { mutableStateOf(savedLanguage) }
     var showMenu by remember { mutableStateOf(false) }
 
     Box(
         contentAlignment = Alignment.TopEnd
     ) {
-        Button(onClick = { showMenu = true },
-            colors = ButtonDefaults.buttonColors(Color.White),) {
-            Text(text = "\uD83C\uDDF9\uD83C\uDDF7 / \uD83C\uDDFA\uD83C\uDDF8" , color = Color.Black)
+        Button(
+            onClick = { showMenu = true },
+            colors = ButtonDefaults.buttonColors(Color.White),
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.height(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = null,
+                tint = Color(0xFF7C3AED),
+                modifier = Modifier.size(24.dp)
+            )
+
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = if (currentLanguage == "tr") "TR" else "EN", 
+                color = Color(0xFF7C3AED), 
+                fontWeight = FontWeight.Bold, 
+                fontSize = 13.sp
+            )
         }
 
         DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
             DropdownMenuItem(text = { Text("Türkçe 🇹🇷") }, onClick = {
-                locale = Locale("tr")
+                val locale = Locale("tr")
+                currentLanguage = "tr"
                 updateLocale(context, locale)
                 showMenu = false
             })
             DropdownMenuItem(text = { Text("English 🇺🇸") }, onClick = {
-                locale = Locale("en")
+                val locale = Locale("en")
+                currentLanguage = "en"
                 updateLocale(context, locale)
                 showMenu = false
             })

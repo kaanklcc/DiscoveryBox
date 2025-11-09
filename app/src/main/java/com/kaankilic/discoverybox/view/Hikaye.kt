@@ -126,8 +126,7 @@ fun Hikaye(
         },
         bottomBar = {
             NavigationBar(
-                containerColor = Color(0xFF1E1B4B),
-                modifier = Modifier.height(90.dp)
+                containerColor = Color(0xFF410D98),
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
@@ -229,6 +228,35 @@ fun Hikaye(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // TEST MODE BANNER
+            if (com.kaankilic.discoverybox.BuildConfig.TEST_MODE) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text("🧪", fontSize = 24.sp)
+                        Column {
+                            Text(
+                                "TEST MODU AKTİF",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Text(
+                                "API çağrıları yapılmıyor, mock data kullanılıyor",
+                                fontSize = 11.sp,
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        }
+                    }
+                }
+            }
             // Theme Section (Accordion)
             AccordionCard(
                 title = stringResource(R.string.theme),
@@ -440,34 +468,84 @@ fun Hikaye(
             // Generate Button
             Button(
                 onClick = {
-                    val yanKarakterlerText = yanKarakterler.filter { it.isNotBlank() }.joinToString(", ")
-                    val temaText = if (selectedTheme.isNotEmpty()) "Tema: $selectedTheme" else ""
-                    val uzunlukText = if (selectedLength.isNotEmpty()) "Uzunluk: $selectedLength" else ""
+                    // Önce kullanıcı erişim kontrolü yap
+                    anasayfaViewModel.checkUserAccess { canCreateFullStory, canCreateTextOnly, isPremiumStatus, _ ->
+                        // Premium ise ve hakkı bitmişse premium sayfasına yönlendir
+                        if (isPremiumStatus && !canCreateFullStory && !canCreateTextOnly) {
+                            navController.navigate("premium")
+                            return@checkUserAccess
+                        }
+                        // Premium değilse ve hiç hakkı yoksa premium sayfasına yönlendir
+                        if (!isPremiumStatus && !canCreateFullStory && !canCreateTextOnly) {
+                            navController.navigate("premium")
+                            return@checkUserAccess
+                        }
+                        
+                        // Hakkı varsa hikaye oluştur
+                        val yanKarakterlerText = yanKarakterler.filter { it.isNotBlank() }.joinToString(", ")
+                        
+                        val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                        val currentLanguage = prefs.getString("language_code", "tr") ?: "tr"
+                        val isEnglish = currentLanguage == "en"
+                        
+                        val themeLabel = if (isEnglish) "Theme" else "Tema"
+                        val lengthLabel = if (isEnglish) "Length" else "Uzunluk"
+                        
+                        val temaText = if (selectedTheme.isNotEmpty()) "$themeLabel: $selectedTheme" else ""
+                        val uzunlukText = if (selectedLength.isNotEmpty()) "$lengthLabel: $selectedLength" else ""
 
-                    val characterDescription = when {
-                        anaKarakter.text.contains("shrek", ignoreCase = true) -> "${anaKarakter.text} (yeşil dev, büyük kulaklar)"
-                        anaKarakter.text.contains("sindirella", ignoreCase = true) || anaKarakter.text.contains("cinderella", ignoreCase = true) -> "${anaKarakter.text} (sarı saçlı prenses, mavi elbise)"
-                        anaKarakter.text.contains("pamuk prenses", ignoreCase = true) || anaKarakter.text.contains("snow white", ignoreCase = true) -> "${anaKarakter.text} (siyah saçlı prenses, kırmızı kurdele)"
-                        anaKarakter.text.contains("rapunzel", ignoreCase = true) -> "${anaKarakter.text} (çok uzun sarı saçlı prenses)"
-                        anaKarakter.text.contains("elsa", ignoreCase = true) -> "${anaKarakter.text} (platin sarısı saçlı buz kraliçesi)"
-                        anaKarakter.text.contains("anna", ignoreCase = true) -> "${anaKarakter.text} (kızıl saçlı prenses)"
-                        else -> "${anaKarakter.text} (${anaKarakterOzellik.text})"
-                    }
+                        val characterDescription = when {
+                            anaKarakter.text.contains("shrek", ignoreCase = true) -> {
+                                if (isEnglish) "${anaKarakter.text} (green ogre, big ears)" 
+                                else "${anaKarakter.text} (yeşil dev, büyük kulaklar)"
+                            }
+                            anaKarakter.text.contains("sindirella", ignoreCase = true) || anaKarakter.text.contains("cinderella", ignoreCase = true) -> {
+                                if (isEnglish) "${anaKarakter.text} (blonde princess, blue dress)" 
+                                else "${anaKarakter.text} (sarı saçlı prenses, mavi elbise)"
+                            }
+                            anaKarakter.text.contains("pamuk prenses", ignoreCase = true) || anaKarakter.text.contains("snow white", ignoreCase = true) -> {
+                                if (isEnglish) "${anaKarakter.text} (black-haired princess, red ribbon)" 
+                                else "${anaKarakter.text} (siyah saçlı prenses, kırmızı kurdele)"
+                            }
+                            anaKarakter.text.contains("rapunzel", ignoreCase = true) -> {
+                                if (isEnglish) "${anaKarakter.text} (princess with very long blonde hair)" 
+                                else "${anaKarakter.text} (çok uzun sarı saçlı prenses)"
+                            }
+                            anaKarakter.text.contains("elsa", ignoreCase = true) -> {
+                                if (isEnglish) "${anaKarakter.text} (ice queen with platinum blonde hair)" 
+                                else "${anaKarakter.text} (platin sarısı saçlı buz kraliçesi)"
+                            }
+                            anaKarakter.text.contains("anna", ignoreCase = true) -> {
+                                if (isEnglish) "${anaKarakter.text} (princess with red hair)" 
+                                else "${anaKarakter.text} (kızıl saçlı prenses)"
+                            }
+                            else -> "${anaKarakter.text} (${anaKarakterOzellik.text})"
+                        }
 
-                    val generatedStory = "Bana bir çocuk hikayesi yaz. " +
-                            "Konu: ${konu.text}, " +
-                            "Mekan: ${mekan.text}, " +
-                            "Ana karakter: $characterDescription, " +
-                            "Yardımcı karakterler: $yanKarakterlerText, " +
-                            "$temaText, " +
-                            "$uzunlukText. " +
-                            "ÖNEMLİ: Karakterlerin fiziksel görünümünü her sayfada tutarlı tut. Hikaye doğrudan başlasın."
+                        val generatedStory = if (isEnglish) {
+                            "Write me a children's story. " +
+                                    "Topic: ${konu.text}, " +
+                                    "Setting: ${mekan.text}, " +
+                                    "Main character: $characterDescription, " +
+                                    "Supporting characters: $yanKarakterlerText, " +
+                                    "$temaText, " +
+                                    "$uzunlukText. " +
+                                    "IMPORTANT: Keep the physical appearance of the characters consistent on every page. Start the story directly."
+                        } else {
+                            "Bana bir çocuk hikayesi yaz. " +
+                                    "Konu: ${konu.text}, " +
+                                    "Mekan: ${mekan.text}, " +
+                                    "Ana karakter: $characterDescription, " +
+                                    "Yardımcı karakterler: $yanKarakterlerText, " +
+                                    "$temaText, " +
+                                    "$uzunlukText. " +
+                                    "ÖNEMLİ: Karakterlerin fiziksel görünümünü her sayfada tutarlı tut. Hikaye doğrudan başlasın."
+                        }
 
-                    hikayeViewModel.setStoryContext(characterDescription, mekan.text)
-                    navController.navigate("metin/${konu.text}")
-                    
-                    anasayfaViewModel.checkUserAccess { hasTrial, isPremiumStatus, _ ->
-                        hikayeViewModel.generateStoryWithImages(generatedStory, selectedLength, context, isPremiumStatus || hasTrial)
+                        hikayeViewModel.setStoryContext(characterDescription, mekan.text)
+                        navController.navigate("metin/${konu.text}")
+                        
+                        hikayeViewModel.generateStoryWithImages(generatedStory, selectedLength, context, canCreateFullStory)
                     }
                 },
                 modifier = Modifier

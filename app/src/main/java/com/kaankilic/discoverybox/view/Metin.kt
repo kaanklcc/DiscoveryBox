@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.ThumbUp
@@ -110,6 +111,8 @@ fun Metin(navController: NavController,
     var isSaved by remember { mutableStateOf(false) }
     val imageSaved by metinViewModel.imageSaved.observeAsState()
     val imageSavedUrl by metinViewModel.imageSavedUrl.observeAsState()
+    var canUseGPTTTS by remember { mutableStateOf(false) }
+    var isAudioInitialized by remember { mutableStateOf(false) }
 
 
 
@@ -125,10 +128,20 @@ fun Metin(navController: NavController,
     }
 
     LaunchedEffect(Unit) {
-        anasayfaViewModel.checkUserAccess { hasTrialStatus, isPremiumStatus,usedFreeTrial ->
-            hasTrial = hasTrialStatus
+        anasayfaViewModel.checkUserAccess { canCreateFullStory, canCreateTextOnly, isPremiumStatus, usedFreeTrialStatus ->
+            hasTrial = canCreateFullStory
             isPremium = isPremiumStatus
+            // Premium veya deneme kullanmamışsa GPT TTS kullanabilir
+            canUseGPTTTS = canCreateFullStory
         }
+    }
+    
+    // Sayfa değiştiğinde ses durumunu reset et
+    LaunchedEffect(currentPageIndex) {
+        metinViewModel.stopMediaPlayer()
+        metinViewModel.stop()
+        isPlayingAudio = false
+        isAudioInitialized = false
     }
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.saveanimation))
@@ -172,12 +185,42 @@ fun Metin(navController: NavController,
                     .fillMaxSize()
                     //.padding(paddingValues)
                     .verticalScroll(scrollState)
-                    .background(gradientBackground),
+                    .background(gradientBackground)
+                    .navigationBarsPadding(),
 
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
 
                 ) {
+                // TEST MODE BANNER
+                if (com.kaankilic.discoverybox.BuildConfig.TEST_MODE) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFA500)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("🧪", fontSize = 20.sp)
+                            Column {
+                                Text(
+                                    "TEST MODU",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Text(
+                                    "Mock hikaye & default görsel",
+                                    fontSize = 10.sp,
+                                    color = Color.White.copy(alpha = 0.9f)
+                                )
+                            }
+                        }
+                    }
+                }
                 val featuredTitle by anasayfaViewModel.featuredStoryTitle.observeAsState("")
                 val featuredContent by anasayfaViewModel.featuredStoryContent.observeAsState("")
                 val featuredImage by anasayfaViewModel.featuredStoryImage.observeAsState(R.drawable.story)
@@ -233,6 +276,26 @@ fun Metin(navController: NavController,
                                         )
                                     )
                                 )
+                                // Geri butonu
+                                IconButton(
+                                    onClick = { navController.popBackStack() },
+                                    modifier = Modifier
+                                        .align(Alignment.TopStart)
+                                        .padding(
+                                            top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                                            start = 16.dp
+                                        )
+                                        .size(48.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.White.copy(alpha = 0.9f))
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowBack,
+                                        contentDescription = stringResource(R.string.back),
+                                        tint = Color(0xFF6B46C1),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
                                 Box(
                                     modifier = Modifier
                                         .align(Alignment.TopEnd)
@@ -245,10 +308,22 @@ fun Metin(navController: NavController,
                                         .background(Color(0xFFFCD34D))
                                         .clickable {
                                             if (isPlayingAudio) {
-                                                metinViewModel.pause()
+                                                if (canUseGPTTTS) {
+                                                    metinViewModel.pauseMediaPlayer()
+                                                } else {
+                                                    metinViewModel.pause()
+                                                }
                                                 isPlayingAudio = false
                                             } else {
-                                                metinViewModel.speak(currentFeaturedPage.content)
+                                                if (canUseGPTTTS && !isAudioInitialized) {
+                                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentFeaturedPage.content) {
+                                                        isAudioInitialized = true
+                                                    }
+                                                } else if (canUseGPTTTS && isAudioInitialized) {
+                                                    metinViewModel.resumeMediaPlayer()
+                                                } else {
+                                                    metinViewModel.speak(currentFeaturedPage.content)
+                                                }
                                                 isPlayingAudio = true
                                             }
                                         },
@@ -368,6 +443,26 @@ fun Metin(navController: NavController,
                                         )
                                     )
                                 )
+                                // Geri butonu
+                                IconButton(
+                                    onClick = { navController.popBackStack() },
+                                    modifier = Modifier
+                                        .align(Alignment.TopStart)
+                                        .padding(
+                                            top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                                            start = 16.dp
+                                        )
+                                        .size(48.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.White.copy(alpha = 0.9f))
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowBack,
+                                        contentDescription = stringResource(R.string.back),
+                                        tint = Color(0xFF6B46C1),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
                                 Box(
                                     modifier = Modifier
                                         .align(Alignment.TopEnd)
@@ -380,10 +475,22 @@ fun Metin(navController: NavController,
                                         .background(Color(0xFFFCD34D))
                                         .clickable {
                                             if (isPlayingAudio) {
-                                                metinViewModel.pause()
+                                                if (canUseGPTTTS) {
+                                                    metinViewModel.pauseMediaPlayer()
+                                                } else {
+                                                    metinViewModel.pause()
+                                                }
                                                 isPlayingAudio = false
                                             } else {
-                                                metinViewModel.speak(currentSavedPage.content)
+                                                if (canUseGPTTTS && !isAudioInitialized) {
+                                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentSavedPage.content) {
+                                                        isAudioInitialized = true
+                                                    }
+                                                } else if (canUseGPTTTS && isAudioInitialized) {
+                                                    metinViewModel.resumeMediaPlayer()
+                                                } else {
+                                                    metinViewModel.speak(currentSavedPage.content)
+                                                }
                                                 isPlayingAudio = true
                                             }
                                         },
@@ -495,6 +602,26 @@ fun Metin(navController: NavController,
                                         )
                                     } ?: CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                                     
+                                    // Geri butonu
+                                    IconButton(
+                                        onClick = { navController.popBackStack() },
+                                        modifier = Modifier
+                                            .align(Alignment.TopStart)
+                                            .padding(
+                                                top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                                                start = 16.dp
+                                            )
+                                            .size(48.dp)
+                                            .clip(CircleShape)
+                                            .background(Color.White.copy(alpha = 0.9f))
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowBack,
+                                            contentDescription = stringResource(R.string.back),
+                                            tint = Color(0xFF6B46C1)
+                                        )
+                                    }
+                                    
                                     Box(
                                         modifier = Modifier
                                             .align(Alignment.TopEnd)
@@ -507,10 +634,22 @@ fun Metin(navController: NavController,
                                             .background(Color(0xFFFCD34D))
                                             .clickable {
                                                 if (isPlayingAudio) {
-                                                    metinViewModel.pause()
+                                                    if (canUseGPTTTS) {
+                                                        metinViewModel.pauseMediaPlayer()
+                                                    } else {
+                                                        metinViewModel.pause()
+                                                    }
                                                     isPlayingAudio = false
                                                 } else {
-                                                    metinViewModel.speak(currentPage.content)
+                                                    if (canUseGPTTTS && !isAudioInitialized) {
+                                                        metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content) {
+                                                            isAudioInitialized = true
+                                                        }
+                                                    } else if (canUseGPTTTS && isAudioInitialized) {
+                                                        metinViewModel.resumeMediaPlayer()
+                                                    } else {
+                                                        metinViewModel.speak(currentPage.content)
+                                                    }
                                                     isPlayingAudio = true
                                                 }
                                             },
@@ -568,34 +707,66 @@ fun Metin(navController: NavController,
                                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
+                                val coroutineScope = rememberCoroutineScope()
+                                var isSaving by remember { mutableStateOf(false) }
+                                
                                 Button(
                                     onClick = {
                                         val userId = getCurrentUserId()
-                                        if (userId != null) {
+                                        if (userId != null && !isSaving) {
                                             // Tüm sayfaların görsellerini topla
                                             val allBitmaps = storyPages.mapNotNull { it.imageBitmap }
                                             
                                             if (allBitmaps.isNotEmpty()) {
+                                                isSaving = true
                                                 val fullStory = storyPages.joinToString("\n\n") { "Sayfa ${it.pageNumber}:\n${it.content}" }
                                                 
-                                                // Tüm görselleri kaydet
-                                                metinViewModel.saveMultipleImagesToStorage(allBitmaps, userId) { imageUrls ->
-                                                    if (imageUrls.isNotEmpty()) {
-                                                        // Tüm görsel URL'leriyle hikayeyi kaydet
-                                                        metinViewModel.saveStoryWithMultipleImages(
-                                                            hikayeId ?: "Hikaye",
-                                                            fullStory,
-                                                            imageUrls,
-                                                            userId
-                                                        )
-                                                        Toast.makeText(
-                                                            context,
-                                                            "${imageUrls.size} görsel ile hikaye kaydedildi!",
-                                                            Toast.LENGTH_SHORT
-                                                        ).show()
+                                                // Background thread'de kaydetme işlemini yap
+                                                coroutineScope.launch(Dispatchers.IO) {
+                                                    try {
+                                                        // Tüm görselleri kaydet
+                                                        metinViewModel.saveMultipleImagesToStorage(allBitmaps, userId) { imageUrls ->
+                                                            if (imageUrls.isNotEmpty()) {
+                                                                // Tüm görsel URL'leriyle hikayeyi kaydet
+                                                                metinViewModel.saveStoryWithMultipleImages(
+                                                                    hikayeId ?: "Hikaye",
+                                                                    fullStory,
+                                                                    imageUrls,
+                                                                    userId
+                                                                )
+                                                                
+                                                                // UI güncellemeleri Main thread'de
+                                                                CoroutineScope(Dispatchers.Main).launch {
+                                                                    Toast.makeText(
+                                                                        context,
+                                                                        "${imageUrls.size} görsel ile hikaye kaydedildi!",
+                                                                        Toast.LENGTH_SHORT
+                                                                    ).show()
+                                                                    showSaveAnimation = true
+                                                                    isSaving = false
+                                                                }
+                                                            } else {
+                                                                CoroutineScope(Dispatchers.Main).launch {
+                                                                    Toast.makeText(
+                                                                        context,
+                                                                        "Görsel kaydetme başarısız",
+                                                                        Toast.LENGTH_SHORT
+                                                                    ).show()
+                                                                    isSaving = false
+                                                                }
+                                                            }
+                                                        }
+                                                    } catch (e: Exception) {
+                                                        CoroutineScope(Dispatchers.Main).launch {
+                                                            Toast.makeText(
+                                                                context,
+                                                                "Kaydetme sırasında hata: ${e.message}",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                            isSaving = false
+                                                        }
                                                     }
                                                 }
-                                                showSaveAnimation = true
                                             } else {
                                                 Toast.makeText(
                                                     context,
@@ -605,9 +776,18 @@ fun Metin(navController: NavController,
                                             }
                                         }
                                     },
+                                    enabled = !isSaving,
                                     colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
                                 ) {
-                                    Text(stringResource(R.string.save), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                    if (isSaving) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(20.dp),
+                                            color = Color(0xFF6B46C1),
+                                            strokeWidth = 2.dp
+                                        )
+                                    } else {
+                                        Text(stringResource(R.string.save), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                    }
                                 }
                                 
                                 Button(
@@ -1023,7 +1203,6 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                         metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, hikayeyiOlustur) {
                             isAudioLoading = false // 🎯 Ses hazır
                         }
-                        dbRepo.markUsedFreeTrialIfNeeded(userId)
                         isPlaying = true
                     }
             )
@@ -1083,7 +1262,6 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                         ) {
                             isAudioLoading = false
                         }
-                        dbRepo.markUsedFreeTrialIfNeeded(userId)
                         isPlaying = true
                     }
             ) {
