@@ -9,6 +9,13 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+
+# Sensitive files - API keys and credentials
+google-services.json
+local.properties
+*.keystore
+*.jks
+app/google-services.json
 /captures
 .externalNativeBuild
 .cxx
