@@ -51,36 +51,65 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
         }
     }*/
 
-    fun handleTTS(context: Context, apiKey: String, text: String, onDone: () -> Unit) {
+    /**
+     * TTS işleme fonksiyonu - PREMIUM SYSTEM
+     * Premium users + First-time trial users: GPT TTS (premium voice)
+     * Saved stories (playback): Google TTS (default voice)
+     */
+    private var currentOnComplete: (() -> Unit)? = null
+    
+    fun handleTTS(context: Context, apiKey: String, text: String, onDone: () -> Unit, onComplete: (() -> Unit)? = null) {
+        currentOnComplete = onComplete
+        
         viewModelScope.launch {
-            val (premium, usedFreeTrial, remaining) = dbRepo.isUserPremium()
-            val canUseGPTTTS = premium || (!usedFreeTrial && remaining > 0)
+            val (premium, usedFreeTrial, remainingChatgptUses) = dbRepo.isUserPremium()
+            
+            // Premium users OR first-time trial users can use GPT TTS
+            val canUseGPTTTS = (premium && remainingChatgptUses > 0) || (!usedFreeTrial && remainingChatgptUses > 0)
 
             if (canUseGPTTTS) {
+                // Premium voice - GPT TTS
                 val result = dbRepo.generateGPTTTS(context, apiKey, text)
                 _ttsState.postValue(result)
+                
+                // Get MediaPlayer and add completion listener
+                kotlinx.coroutines.delay(500)
+                mediaPlayer = dbRepo.getMediaPlayer()
+                mediaPlayer?.setOnCompletionListener {
+                    currentOnComplete?.invoke()
+                }
             } else {
+                // Default voice - Google TTS (for saved stories playback)
                 dbRepo.generateGoogleTTS(context, text) { tts, result ->
                     textToSpeech = tts
                     _ttsState.postValue(result)
+                    
+                    // Add TTS completion listener
+                    tts?.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
+                        override fun onStart(utteranceId: String?) {}
+                        override fun onDone(utteranceId: String?) {
+                            currentOnComplete?.invoke()
+                        }
+                        override fun onError(utteranceId: String?) {}
+                    })
                 }
             }
 
-            onDone() // 🎯 her iki durumda da callback çağrılır
+            onDone() // Callback is called in both cases
         }
     }
 
 
-    fun queryTextToImage(prompt: String, isPro: Boolean, context: Context) {
+    fun queryTextToImage(prompt: String, canCreateFullStory: Boolean, context: Context, decrementUsage: Boolean = false) {
         CoroutineScope(Dispatchers.Main).launch {
             currentImage = prompt
-            imageBitmap.value = dbRepo.queryTextToImage(prompt, isPro, context)
+            imageBitmap.value = dbRepo.queryTextToImage(prompt, canCreateFullStory, context, decrementUsage)
         }
     }
     
-    fun queryTextToImageForPage(prompt: String, isPro: Boolean, context: Context, onComplete: (Bitmap?) -> Unit) {
+    fun queryTextToImageForPage(prompt: String, canCreateFullStory: Boolean, context: Context, decrementUsage: Boolean = false, onComplete: (Bitmap?) -> Unit) {
         CoroutineScope(Dispatchers.Main).launch {
-            val bitmap = dbRepo.queryTextToImage(prompt, isPro, context)
+            val bitmap = dbRepo.queryTextToImage(prompt, canCreateFullStory, context, decrementUsage)
             onComplete(bitmap)
         }
     }
@@ -144,20 +173,42 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
         }
     }
 
-    fun speak(text: String) {
-        if (isPaused && pausedPosition > 0) {
-            val remainingText = text.substring(pausedPosition.coerceAtMost(text.length))
-            textToSpeech?.speak(remainingText, TextToSpeech.QUEUE_FLUSH, null, null)
-            isPaused = false
-        } else {
-            pausedPosition = 0
-            textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
-        }
+    private var currentText: String = ""
+    
+    fun speak(text: String, onComplete: (() -> Unit)? = null) {
+        currentText = text
+        
+        textToSpeech?.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) {}
+            override fun onDone(utteranceId: String?) {
+                if (!isPaused) {
+                    onComplete?.invoke()
+                }
+            }
+            override fun onError(utteranceId: String?) {}
+        })
+        
+        val params = android.os.Bundle()
+        params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "tts_id")
+        
+        textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, params, "tts_id")
+        isPaused = false
     }
 
     fun pause() {
-        textToSpeech?.stop()
-        isPaused = true
+        if (textToSpeech?.isSpeaking == true) {
+            textToSpeech?.stop()
+            isPaused = true
+        }
+    }
+    
+    fun resume() {
+        if (isPaused && currentText.isNotEmpty()) {
+            val params = android.os.Bundle()
+            params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "tts_id")
+            textToSpeech?.speak(currentText, TextToSpeech.QUEUE_FLUSH, params, "tts_id")
+            isPaused = false
+        }
     }
     
     fun stop() {

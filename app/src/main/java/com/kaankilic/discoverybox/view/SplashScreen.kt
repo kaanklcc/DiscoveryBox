@@ -82,17 +82,16 @@ fun LoginSplashScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     
     LaunchedEffect(Unit) {
-        delay(2000) // 2 saniye bekle
-        
-        // Firebase Auth kontrolü
+        delay(2000)
+
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            // Kullanıcı giriş yapmış, anasayfaya git
+
             navController.navigate("anasayfa") {
                 popUpTo("loginSplash") { inclusive = true }
             }
         } else {
-            // Kullanıcı giriş yapmamış, splash screen'lere git
+
             navController.navigate("splashScreen1") {
                 popUpTo("loginSplash") { inclusive = true }
             }
@@ -100,7 +99,9 @@ fun LoginSplashScreen(navController: NavController) {
     }
 
     Box(modifier = Modifier.fillMaxSize()){
-        GradientBackground(listOf(Color(0xFFd5e0fe), Color(0xFFfbdceb)))
+        GradientBackground(listOf(Color(0xFF003366),
+            Color(0xFF004080),
+            Color(0xFF0055AA)))
 
         Column(
             modifier = Modifier
@@ -111,12 +112,12 @@ fun LoginSplashScreen(navController: NavController) {
                     Image(
                         painter = painterResource(id = R.drawable.applogo),
                         contentDescription = "Profile Image",
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.Fit,
                         modifier = Modifier
                             .size(300.dp)
                     )
             Spacer(modifier = Modifier.height(30.dp))
-            Text("DISCOVERY BOX", color = Color(0xFF353BA4), fontWeight = FontWeight.ExtraBold, fontSize = 44.sp,fontFamily = sandtitle)
+            Text("Fablette", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 44.sp,fontFamily = sandtitle)
 
         }
 
@@ -132,42 +133,23 @@ fun SplashScreen1(navController: NavController) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = Color.Transparent,
-        contentWindowInsets = WindowInsets.systemBars, // ✅ sistem çubuklarına saygı duyar
+        contentWindowInsets = WindowInsets.systemBars,
     ) { innerPadding ->
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding) // ✅ sistem paddings ekleniyor
+                .padding(innerPadding)
                 .background(
                     Brush.horizontalGradient(
                         colors = listOf(
-                            Color(0xFF4C1D95),
-                            Color(0xFF6B21A8),
-                            Color(0xFF7E22CE)
+                            Color(0xFF003366),
+                            Color(0xFF004080),
+                            Color(0xFF0055AA)
                         )
                     )
                 )
         ) {
-            // ✨ Arka plan yıldızları
-            Image(
-                painter = painterResource(id = R.drawable.starimage),
-                contentDescription = "Star",
-                modifier = Modifier
-                    .size(30.dp)
-                    .offset(x = 40.dp, y = 40.dp)
-            )
-
-            Image(
-                painter = painterResource(id = R.drawable.starimage),
-                contentDescription = "Star",
-                modifier = Modifier
-                    .size(25.dp)
-                    .align(Alignment.BottomEnd)
-                    .offset(x = (-40).dp, y = (-120).dp)
-            )
-
-            // 🌈 İçerik
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -176,7 +158,7 @@ fun SplashScreen1(navController: NavController) {
             ) {
                 Spacer(modifier = Modifier.height(60.dp))
 
-                // Kitap ikonu
+
                 Box(
                     modifier = Modifier
                         .size(120.dp)
@@ -205,27 +187,25 @@ fun SplashScreen1(navController: NavController) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.starimage),
-                        contentDescription = "Star",
-                        modifier = Modifier.size(20.dp)
+                        painter = painterResource(R.drawable.pencil),
+                        contentDescription = "pencil",
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Welcome to",
+                        text = stringResource(R.string.welcome_to),
                         color = Color.White,
                         fontSize = 18.sp,
                         fontFamily = andikabody
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Image(
-                        painter = painterResource(id = R.drawable.starimage),
-                        contentDescription = "Star",
-                        modifier = Modifier.size(20.dp)
+                        painter = painterResource(R.drawable.pencil),
+                        contentDescription = "pencil",
                     )
                 }
 
                 Text(
-                    text = "Story Magic!",
+                    text = stringResource(R.string.story_magic_title),
                     color = Color(0xFFFFD700),
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
@@ -289,7 +269,7 @@ fun SplashScreen1(navController: NavController) {
                         .padding(horizontal = 16.dp)
                         .border(1.dp, Color.White, RoundedCornerShape(20.dp))
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Color(0xFF8B6FB8))
+                        .background(Color(0xFF0055AA))
                         .padding(20.dp)
                 ) {
                     Column(
@@ -301,9 +281,8 @@ fun SplashScreen1(navController: NavController) {
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.starimage),
-                                contentDescription = "Star",
-                                modifier = Modifier.size(16.dp)
+                                painter = painterResource(R.drawable.pencil),
+                                contentDescription = "pencil",
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
@@ -347,7 +326,7 @@ fun SplashScreen1(navController: NavController) {
                         .height(50.dp)
                         .background(
                             brush = Brush.horizontalGradient(
-                                colors = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E8E))
+                                colors = listOf(Color(0xFFFCD34D), Color(0xFFFBBF24))
                             ),
                             shape = RoundedCornerShape(25.dp)
                         )
@@ -398,30 +377,14 @@ fun SplashScreen2(navController: NavController) {
                 .background(
                     Brush.horizontalGradient(
                         colors = listOf(
-                            Color(0xFF4C1D95),
-                            Color(0xFF6B21A8),
-                            Color(0xFF7E22CE)
+                            Color(0xFF003366),
+                            Color(0xFF004080),
+                            Color(0xFF0055AA)
                         )
                     )
                 )
         ) {
-            // 🌟 Arka plan yıldızları
-            Image(
-                painter = painterResource(id = R.drawable.starimage),
-                contentDescription = "Star",
-                modifier = Modifier
-                    .size(30.dp)
-                    .offset(x = 40.dp, y = 40.dp)
-            )
 
-            Image(
-                painter = painterResource(id = R.drawable.starimage),
-                contentDescription = "Star",
-                modifier = Modifier
-                    .size(25.dp)
-                    .align(Alignment.BottomEnd)
-                    .offset(x = (-40).dp, y = (-120).dp)
-            )
 
             // 📜 İçerik
             Column(
@@ -461,9 +424,8 @@ fun SplashScreen2(navController: NavController) {
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.starimage),
-                        contentDescription = "Star",
-                        modifier = Modifier.size(20.dp)
+                        painter = painterResource(R.drawable.pencil),
+                        contentDescription = "pencil",
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -474,9 +436,8 @@ fun SplashScreen2(navController: NavController) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Image(
-                        painter = painterResource(id = R.drawable.starimage),
-                        contentDescription = "Star",
-                        modifier = Modifier.size(20.dp)
+                        painter = painterResource(R.drawable.pencil),
+                        contentDescription = "pencil",
                     )
                 }
 
@@ -545,7 +506,7 @@ fun SplashScreen2(navController: NavController) {
                         .padding(horizontal = 16.dp)
                         .border(1.dp, Color.White, RoundedCornerShape(20.dp))
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Color(0xFF8B6FB8))
+                        .background(Color(0xFF0055AA))
                         .padding(20.dp)
                 ) {
                     Column(
@@ -557,9 +518,8 @@ fun SplashScreen2(navController: NavController) {
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Image(
-                                painter = painterResource(id = R.drawable.starimage),
-                                contentDescription = "Star",
-                                modifier = Modifier.size(16.dp)
+                                painter = painterResource(R.drawable.pencil),
+                                contentDescription = "pencil",
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
@@ -603,7 +563,7 @@ fun SplashScreen2(navController: NavController) {
                         .height(50.dp)
                         .background(
                             brush = Brush.horizontalGradient(
-                                colors = listOf(Color(0xFFFF6B6B), Color(0xFFFF8E8E))
+                                colors = listOf(Color(0xFFFCD34D), Color(0xFFFBBF24))
                             ),
                             shape = RoundedCornerShape(25.dp)
                         )

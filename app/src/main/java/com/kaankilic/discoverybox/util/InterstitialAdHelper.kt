@@ -51,4 +51,21 @@ object InterstitialAdHelper {
 
         mInterstitialAd?.show(activity) ?: onAdDismissed()
     }
+    
+    /**
+     * Premium-aware ad showing - only shows ads for non-premium users
+     */
+    fun showAdIfNeeded(
+        activity: Activity,
+        isPremium: Boolean,
+        onComplete: () -> Unit
+    ) {
+        if (isPremium) {
+            // Premium users skip ads
+            onComplete()
+        } else {
+            // Free users see ads
+            showAd(activity, onComplete)
+        }
+    }
 }

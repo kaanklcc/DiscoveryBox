@@ -120,7 +120,7 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            GradientBackgroundd(listOf(Color(0xFF4C1D95), Color(0xFF6B21A8), Color(0xFF7E22CE)))
+            GradientBackgroundd(listOf(Color(0xFF003366), Color(0xFF004080), Color(0xFF0055AA)))
 
             Column(
                 modifier = Modifier
@@ -147,25 +147,18 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                         ) {
                             LanguageSwitcher(context = context)
                         }
-
-                        Box(
+                        Image(
+                            painter = painterResource(id = R.drawable.applogo),
+                            contentDescription = "Profile Image",
+                            contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(100.dp)
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(
-                                    Brush.verticalGradient(
-                                        listOf(Color(0xFFFF6B9D), Color(0xFFFFA06B))
-                                    )
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("✨", fontSize = 40.sp)
-                        }
+                        )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
-                            stringResource(R.string.story_magic),
+                            "Fabllette",
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
@@ -194,7 +187,7 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                             Text(
                                 stringResource(R.string.welcome_to_magical_world),
                                 fontSize = 14.sp,
-                                color = Color(0xFF7C3AED),
+                                color = Color(0xFF0055AA),
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                 fontWeight = FontWeight.Medium,
                                 lineHeight = 20.sp
@@ -272,7 +265,7 @@ fun GirisSayfa(navController: NavController,GirisSayfaViewModel: GirisSayfaViewM
                                     launcher = googleSignInLauncher
                                 )
                             },
-                            colors = ButtonDefaults.buttonColors(Color(0xFF8B5CF6)),
+                            colors = ButtonDefaults.buttonColors(Color(0xFF0055AA)),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),
@@ -360,14 +353,14 @@ fun LanguageSwitcher(context: Context) {
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = null,
-                tint = Color(0xFF7C3AED),
+                tint = Color(0xFF0055AA),
                 modifier = Modifier.size(24.dp)
             )
 
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = if (currentLanguage == "tr") "TR" else "EN", 
-                color = Color(0xFF7C3AED), 
+                color = Color(0xFF0055AA), 
                 fontWeight = FontWeight.Bold, 
                 fontSize = 13.sp
             )

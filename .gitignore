@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# API Keys - Never commit!
+*.key
+*apikey*
+secrets.properties
+google-services.json

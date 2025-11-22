@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,7 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
-
+import com.google.firebase.auth.FirebaseAuth
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -53,7 +54,6 @@ fun SayfaGecisleri(
     kayitSayfaViewModel: KayitSayfaViewModel,
     saveSayfaViewModel: SaveSayfaViewModel
     ) {
-        // val navController = rememberNavController()
         NavHost(navController = navController, startDestination = "loginSplash" ){
             composable("anasayfa"){
                 Anasayfa(navController = navController, anasayfaViewModel = anasayfaViewModel)

@@ -104,12 +104,12 @@
     <string name="create">Oluştur</string>
     <string name="saved">Kaydedilenler</string>
     <string name="logout">Çıkış</string>
-    <string name="taleteller">TaleTeller</string>
+    <string name="taleteller">Fablette</string>
     <string name="ai_story_friend">Yapay zeka hikaye arkadaşın</string>
     <string name="welcome_little_storyteller">Hoşgeldin, küçük hikaye kurdu!</string>
     <string name="start_creating_story">Hikayeni Oluşturmaya Başla</string>
     <string name="decide_your_story">Hikayenin nasıl olacağına karar ver</string>
-    <string name="create_magic_story">✨ Sihirli Hikaye Oluştur ✨</string>
+    <string name="create_magic_story">Sihirli Hikaye Oluştur </string>
     <string name="featured_stories">Öne çıkan hikayeler</string>
     <string name="view_all_stories">Kaydedilen hikayelerini göster</string>
     <string name="create_your_story">Hikayeni Oluştur</string>
@@ -161,5 +161,22 @@
     <string name="delete_story_message">Bu hikayeyi silmek istediğinizden emin misiniz?</string>
     <string name="delete">Sil</string>
     <string name="watch_ads_to_create_story">Hikaye oluşturmak için reklam izleyin</string>
+    
+    <!-- Onboarding -->
+    <string name="welcome_to">Hoş Geldiniz</string>
+    <string name="story_magic_title">Hikaye Sihri!</string>
+    
+    <!-- Hikaye oluşturma placeholder'ları -->
+    <string name="topic_placeholder">Bulutlardaki sihirli bir krallık...</string>
+    <string name="location_placeholder">Büyülü Orman</string>
+    
+    <!-- Premium sistem mesajları -->
+    <string name="trial_used">Ücretsiz deneme hakkınız bitti. Premiuma geçin!</string>
+    <string name="no_tokens">Hikaye hakkınız kalmadı. Yeni paket alın!</string>
+    <string name="length_locked">Bu uzunluk premium kullanıcılar içindir</string>
+    <string name="upgrade_to_premium">Premiuma Geç</string>
+    <string name="premium_required_message">Daha fazla hikaye oluşturmak için premium üyelik gereklidir.</string>
+    <string name="premium_features_unlocked">Premium özellikler açıldı!</string>
+    <string name="tokens_remaining">hak kaldı</string>
 
 </resources>

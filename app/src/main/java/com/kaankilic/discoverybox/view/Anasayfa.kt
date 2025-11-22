@@ -158,7 +158,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     Scaffold(
         bottomBar = {
             NavigationBar(
-                containerColor = Color(0xFF410D98),
+                containerColor = Color(0xFF003366),
 
             ) {
                 NavigationBarItem(
@@ -168,14 +168,14 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         Icon(
                             Icons.Default.Home,
                             contentDescription = "Home",
-                            tint = if (selectedTab == 0) Color(0xFFC084FC) else Color(0xFFE9D5FF)
+                            tint = if (selectedTab == 0) Color(0xFFFCD34D) else Color.White
                         )
                     },
-                    label = { Text(stringResource(R.string.home), fontSize = 10.sp, color = Color(0xFFE9D5FF)) },
+                    label = { Text(stringResource(R.string.home), fontSize = 10.sp, color = Color.White) },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFC084FC),
-                        unselectedIconColor = Color(0xFFE9D5FF),
-                        indicatorColor = Color(0xFF7C3AED).copy(alpha = 0.2f)
+                        selectedIconColor = Color(0xFFFCD34D),
+                        unselectedIconColor = Color.White,
+                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
                     )
                 )
                 NavigationBarItem(
@@ -188,14 +188,14 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         Icon(
                             Icons.Default.Create,
                             contentDescription = "Create",
-                            tint = if (selectedTab == 1) Color(0xFFF472B6) else Color(0xFFFCE7F3)
+                            tint = if (selectedTab == 1) Color(0xFFFCD34D) else Color.White
                         )
                     },
-                    label = { Text(stringResource(R.string.create), fontSize = 10.sp, color = Color(0xFFFCE7F3)) },
+                    label = { Text(stringResource(R.string.create), fontSize = 10.sp, color = Color.White) },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFF472B6),
-                        unselectedIconColor = Color(0xFFFCE7F3),
-                        indicatorColor = Color(0xFFEC4899).copy(alpha = 0.2f)
+                        selectedIconColor = Color(0xFFFCD34D),
+                        unselectedIconColor = Color.White,
+                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
                     )
                 )
                 NavigationBarItem(
@@ -208,7 +208,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         Icon(
                             Icons.Default.Favorite,
                             contentDescription = "Saved",
-                            tint = if (selectedTab == 2) Color(0xFFFBBF24) else Color(0xFFFEF3C7)
+                            tint = if (selectedTab == 2) Color(0xFFFCD34D) else  Color.White
                         )
                     },
                     label = { Text(stringResource(R.string.saved), fontSize = 10.sp, color = Color(0xFFFEF3C7)) },
@@ -247,9 +247,9 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                 .background(
                     Brush.horizontalGradient(
                         colors = listOf(
-                            Color(0xFF4C1D95),
-                            Color(0xFF6B21A8),
-                            Color(0xFF7E22CE)
+                            Color(0xFF003366),
+                            Color(0xFF004080),
+                            Color(0xFF0055AA)
                         )
                     )
                 )
@@ -283,6 +283,28 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // Premium Badge
+                    if (isPremium) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                painterResource(R.drawable.starimage),
+                                contentDescription = "Premium",
+                                tint = Color(0xFFFCD34D),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                "Premium",
+                                color = Color(0xFFFCD34D),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = sandtitle
+                            )
+                        }
+                    }
+                    
                     Box(
                         modifier = Modifier
                             .graphicsLayer {
@@ -318,8 +340,8 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                     }
                 }
             }
-            // Ad Watch Card (Compact) - Sadece premium değilse ve günlük hak kullanılmamışsa göster
-            if (!isPremium && remainingAdUses == 0 && adsWatchedToday < maxAdsPerDay) {
+            // Reklam sistemi kaldırıldı - Sadece 1 ücretsiz deneme hakkı var
+            if (false) {
                 // Kaç reklam daha izlemesi gerektiğini hesapla
                 val remainingAdsForReward = adsRequiredForReward - (adsWatchedToday % adsRequiredForReward)
                 val displayRemainingAds = if (remainingAdsForReward == adsRequiredForReward) adsRequiredForReward else remainingAdsForReward
@@ -400,18 +422,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             contentDescription ="gift",
                             tint = Color.White
                         )
-                        Text(
-                                "$displayRemainingAds reklam izle, +1 hikaye kazan (Günlük)",
-                                color = Color.White,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = sandtitle
-                            )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            "✨",
-                            fontSize = 16.sp
-                        )
+
                     }
                 }
             }
@@ -449,7 +460,11 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             .background(Color(0xFFFBBF24)),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("✨", fontSize = 14.sp)
+
+                        Image(
+                            painter = painterResource(R.drawable.pencil),
+                            contentDescription = "pencil",
+                        )
                     }
                 }
                 Box(
@@ -462,28 +477,9 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
                             stringResource(R.string.welcome_little_storyteller),
-                            color = Color(0xFF5B21B6),
+                            color = Color(0xFF003366),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = andikabody
-                        )
-                        
-                        // Story Credits Display
-                        val totalCredits = if (isPremium) remainingPremiumUses else remainingAdUses
-                        val creditText = if (isPremium) {
-                            "$totalCredits ${stringResource(R.string.story_credits_remaining)}"
-                        } else {
-                            if (totalCredits > 0) {
-                                "$totalCredits ${stringResource(R.string.story_credits_remaining)} (Günlük)"
-                            } else {
-                                stringResource(R.string.watch_ads_to_create_story)
-                            }
-                        }
-                        
-                        Text(
-                            creditText,
-                            color = Color(0xFF8B5CF6),
-                            fontSize = 13.sp,
                             fontFamily = andikabody
                         )
                     }
@@ -505,9 +501,8 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                     .background(
                         Brush.horizontalGradient(
                             colors = listOf(
-                                Color(0xFFA855F7),
-                                Color(0xFF8B5CF6),
-                                Color(0xFF7C3AED)
+                                Color(0xFF003366),
+                                Color(0xFF0055AA)
                             )
                         )
                     )
@@ -539,7 +534,10 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             tint = Color.White,
                             modifier = Modifier.size(32.dp)
                         )
-                        Text("✨", fontSize = 24.sp)
+                        Image(
+                            painter = painterResource(R.drawable.pencil),
+                            contentDescription = "pencil",
+                        )
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
@@ -580,7 +578,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                     ) {
                         Text(
                             stringResource(R.string.create_magic_story),
-                            color = Color(0xFF5B21B6),
+                            color = Color(0xFF003366),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = sandtitle
@@ -600,7 +598,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                 ) {
                     Text(
                         stringResource(R.string.featured_stories),
-                        color = Color(0xFFE9D5FF),
+                        color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = sandtitle
@@ -1033,8 +1031,16 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(Color(0xFF1E293B))
                                     .clickable { 
-                                        navController.navigate("metin/$id")
-                                        anasayfaViewModel.setFeaturedStory(title, content, storyImage)
+                                        val activity = context as? Activity
+                                        if (activity != null) {
+                                            InterstitialAdHelper.showAdIfNeeded(activity, isPremium) {
+                                                navController.navigate("metin/$id")
+                                                anasayfaViewModel.setFeaturedStory(title, content, storyImage)
+                                            }
+                                        } else {
+                                            navController.navigate("metin/$id")
+                                            anasayfaViewModel.setFeaturedStory(title, content, storyImage)
+                                        }
                                     }
                             ) {
                                 Image(
@@ -1128,7 +1134,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             showLogoutDialog = false
                         },
                         colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFEF4444)
+                            containerColor = Color(0xFF003366)
                         )
                     ) {
                         Text(stringResource(R.string.yes), fontFamily = andikabody)

@@ -22,13 +22,16 @@ android {
             useSupportLibrary = true
         }
         buildConfigField("String", "GEMINI_API_KEY", "\"${project.findProperty("GEMINI_API_KEY") ?: ""}\"")
-        buildConfigField("String", "IMAGE_GENERATION_API_KEY", "\"${project.findProperty("IMAGE_GENERATION_API_KEY") ?: ""}\"")
         buildConfigField("String", "OPENAI_API_KEY", "\"${project.findProperty("OPENAI_API_KEY") ?: ""}\"")
 
     }
 
     buildTypes {
+        debug {
+            buildConfigField("Boolean", "TEST_MODE", "false") // Gerçek API kullanımı için false
+        }
         release {
+            buildConfigField("Boolean", "TEST_MODE", "false")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -98,7 +101,8 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    implementation("com.google.ai.client.generativeai:generativeai:0.7.0")
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation("org.json:json:20210307")
 
     implementation("io.coil-kt:coil-compose:2.0.0")
 

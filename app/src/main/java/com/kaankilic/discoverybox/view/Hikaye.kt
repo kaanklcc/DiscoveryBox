@@ -65,6 +65,8 @@ fun Hikaye(
     var yanKarakterler by remember { mutableStateOf(listOf("")) }
     var selectedTheme by remember { mutableStateOf("") }
     var selectedLength by remember { mutableStateOf("") }
+    var isPremium by remember { mutableStateOf(false) }
+    var usedFreeTrial by remember { mutableStateOf(true) }
 
     var themeExpanded by remember { mutableStateOf(true) }
     var lengthExpanded by remember { mutableStateOf(false) }
@@ -82,8 +84,23 @@ fun Hikaye(
         stringResource(R.string.Medium),
         stringResource(R.string.Long)
     )
+    var availableLengths by remember { mutableStateOf<List<String>>(lengths) }
 
     var selectedTab by remember { mutableStateOf(1) }
+    
+    // Check user access and determine available story lengths
+    LaunchedEffect(Unit) {
+        anasayfaViewModel.checkUserAccess { canCreate, _, premium, trial ->
+            isPremium = premium
+            usedFreeTrial = trial
+            
+            availableLengths = when {
+                premium -> lengths // Premium: all lengths available
+                !trial -> listOf(lengths[0]) // First-time user: only Short available
+                else -> lengths // Post-trial: all visible but can't create
+            }
+        }
+    }
     
     Scaffold(
         topBar = {
@@ -120,13 +137,13 @@ fun Hikaye(
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF4C1D95)
+                    containerColor = Color(0xFF003366)
                 )
             )
         },
         bottomBar = {
             NavigationBar(
-                containerColor = Color(0xFF410D98),
+                containerColor = Color(0xFF003366),
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
@@ -138,14 +155,14 @@ fun Hikaye(
                         Icon(
                             Icons.Default.Home,
                             contentDescription = "Home",
-                            tint = if (selectedTab == 0) Color(0xFFC084FC) else Color(0xFFE9D5FF)
+                            tint = if (selectedTab == 0) Color(0xFFFCD34D) else Color.White
                         )
                     },
-                    label = { Text(stringResource(R.string.home), fontSize = 10.sp, color = Color(0xFFE9D5FF)) },
+                    label = { Text(stringResource(R.string.home), fontSize = 10.sp, color = Color.White) },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFC084FC),
-                        unselectedIconColor = Color(0xFFE9D5FF),
-                        indicatorColor = Color(0xFF7C3AED).copy(alpha = 0.2f)
+                        selectedIconColor = Color(0xFFFCD34D),
+                        unselectedIconColor = Color.White,
+                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
                     )
                 )
                 NavigationBarItem(
@@ -155,14 +172,14 @@ fun Hikaye(
                         Icon(
                             Icons.Default.Create,
                             contentDescription = "Create",
-                            tint = if (selectedTab == 1) Color(0xFFF472B6) else Color(0xFFFCE7F3)
+                            tint = if (selectedTab == 1) Color(0xFFFCD34D) else Color.White
                         )
                     },
                     label = { Text(stringResource(R.string.create), fontSize = 10.sp, color = Color(0xFFFCE7F3)) },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFF472B6),
-                        unselectedIconColor = Color(0xFFFCE7F3),
-                        indicatorColor = Color(0xFFEC4899).copy(alpha = 0.2f)
+                        selectedIconColor = Color(0xFFFCD34D),
+                        unselectedIconColor = Color.White,
+                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
                     )
                 )
                 NavigationBarItem(
@@ -217,9 +234,9 @@ fun Hikaye(
                 .background(
                     Brush.horizontalGradient(
                         colors = listOf(
-                            Color(0xFF4C1D95),
-                            Color(0xFF6B21A8),
-                            Color(0xFF7E22CE)
+                            Color(0xFF003366),
+                            Color(0xFF004080),
+                            Color(0xFF0055AA)
                         )
                     )
                 )
@@ -271,14 +288,14 @@ fun Hikaye(
                 ) {
                     ThemeButton(
                         text = themes[0],
-                        icon = "🏰",
+                        icon = "🚀",
                         color = Color(0xFFEC4899),
                         selected = selectedTheme == themes[0],
                         modifier = Modifier.weight(1f)
                     ) { selectedTheme = themes[0] }
                     ThemeButton(
                         text = themes[1],
-                        icon = "🚀",
+                        icon = "\uD83D\uDC96",
                         color = Color(0xFF06B6D4),
                         selected = selectedTheme == themes[1],
                         modifier = Modifier.weight(1f)
@@ -291,15 +308,15 @@ fun Hikaye(
                 ) {
                     ThemeButton(
                         text = themes[2],
-                        icon = "🌲",
+                        icon = "\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1",
                         color = Color(0xFF10B981),
                         selected = selectedTheme == themes[2],
                         modifier = Modifier.weight(1f)
                     ) { selectedTheme = themes[2] }
                     ThemeButton(
                         text = themes[3],
-                        icon = "👻",
-                        color = Color(0xFF8B5CF6),
+                        icon = "\uD83C\uDFE1",
+                        color = Color(0xFF0055AA),
                         selected = selectedTheme == themes[3],
                         modifier = Modifier.weight(1f)
                     ) { selectedTheme = themes[3] }
@@ -336,17 +353,29 @@ fun Hikaye(
                     lengths.forEachIndexed { index, length ->
                         val colors = listOf(
                             Color(0xFFEC4899),
-                            Color(0xFF8B5CF6),
+                            Color(0xFF0055AA),
                             Color(0xFF06B6D4)
                         )
-                        val icons = listOf("📖", "📚", "📕")
-                        ThemeButton(
+                        val icons = listOf("\uD83D\uDCC4","📕","📚",)
+                        val isAvailable = availableLengths.contains(length)
+                        // Only show lock for first-time users on Medium/Long
+                        val isLocked = !usedFreeTrial && !isAvailable
+                        
+                        LockedThemeButton(
                             text = length,
                             icon = icons.getOrElse(index) { "📖" },
-                            color = colors.getOrElse(index) { Color(0xFF8B5CF6) },
+                            color = colors.getOrElse(index) { Color(0xFF0055AA) },
                             selected = selectedLength == length,
-                            modifier = Modifier.weight(1f)
-                        ) { selectedLength = length }
+                            isLocked = isLocked,
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                if (isAvailable) {
+                                    selectedLength = length
+                                } else {
+                                    navController.navigate("premium")
+                                }
+                            }
+                        )
                     }
                 }
             }
@@ -355,7 +384,7 @@ fun Hikaye(
             InputCard(
                 title = stringResource(R.string.topic),
                 icon = R.drawable.topic,
-                placeholder = "A magical kingdom in the clouds...",
+                placeholder = stringResource(R.string.topic_placeholder),
                 value = konu,
                 onValueChange = { konu = it }
             )
@@ -449,7 +478,7 @@ fun Hikaye(
             InputCard(
                 title = stringResource(R.string.location),
                 icon = R.drawable.location,
-                placeholder = "The Enchanted Forest",
+                placeholder = stringResource(R.string.location_placeholder),
                 value = mekan,
                 onValueChange = { mekan = it }
             )
@@ -477,6 +506,18 @@ fun Hikaye(
                         }
                         // Premium değilse ve hiç hakkı yoksa premium sayfasına yönlendir
                         if (!isPremiumStatus && !canCreateFullStory && !canCreateTextOnly) {
+                            navController.navigate("premium")
+                            return@checkUserAccess
+                        }
+                        
+                        // Non-premium users always go to premium (regardless of story length)
+                        if (!isPremiumStatus) {
+                            navController.navigate("premium")
+                            return@checkUserAccess
+                        }
+                        
+                        // Story length validation for premium users
+                        if (selectedLength.isNotEmpty() && !availableLengths.contains(selectedLength)) {
                             navController.navigate("premium")
                             return@checkUserAccess
                         }
@@ -586,7 +627,7 @@ fun AccordionCard(
             .fillMaxWidth()
             .border(1.dp, Color.White, RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF8B5CF6).copy(alpha = 0.3f)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0055AA).copy(alpha = 0.3f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -675,6 +716,60 @@ fun ThemeButton(
 }
 
 @Composable
+fun LockedThemeButton(
+    text: String,
+    icon: String,
+    color: Color,
+    selected: Boolean,
+    isLocked: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .aspectRatio(1.2f)
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                when {
+                    isLocked -> Color.Gray.copy(alpha = 0.3f)
+                    selected -> color
+                    else -> color.copy(alpha = 0.3f)
+                }
+            )
+            .clickable { onClick() }
+            .padding(8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (isLocked) {
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = "Locked",
+                    tint = Color.White.copy(alpha = 0.7f),
+                    modifier = Modifier.size(20.dp)
+                )
+            } else {
+                Text(icon, fontSize = 20.sp)
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = when {
+                    isLocked -> Color.White.copy(alpha = 0.5f)
+                    selected -> Color.White
+                    else -> Color.White.copy(alpha = 0.9f)
+                }
+            )
+        }
+    }
+}
+
+@Composable
 fun LengthOption(
     text: String,
     selected: Boolean,
@@ -693,14 +788,14 @@ fun LengthOption(
         Text(
             text,
             fontSize = 14.sp,
-            color = if (selected) Color(0xFF7C3AED) else Color(0xFF6B7280),
+            color = if (selected) Color(0xFF0055AA) else Color(0xFF6B7280),
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
         )
         if (selected) {
             Icon(
                 Icons.Default.Check,
                 contentDescription = null,
-                tint = Color(0xFF7C3AED),
+                tint = Color(0xFF0055AA),
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -720,7 +815,7 @@ fun InputCard(
             .fillMaxWidth()
             .border(1.dp, Color.White, RoundedCornerShape(16.dp)),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF8B5CF6).copy(alpha = 0.3f)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF0055AA).copy(alpha = 0.3f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {

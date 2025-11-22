@@ -86,9 +86,9 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                     .background(
                         Brush.horizontalGradient(
                             colors = listOf(
-                                Color(0xFF4C1D95),
-                                Color(0xFF6B21A8),
-                                Color(0xFF7E22CE)
+                                Color(0xFF003366),
+                                Color(0xFF004080),
+                                Color(0xFF0055AA)
                             )
                         )
                     )
@@ -134,7 +134,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
         },
         bottomBar = {
             NavigationBar(
-                containerColor = Color(0xFF410D98),
+                containerColor = Color(0xFF003366),
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
@@ -153,7 +153,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = Color(0xFFC084FC),
                         unselectedIconColor = Color(0xFFE9D5FF),
-                        indicatorColor = Color(0xFF7C3AED).copy(alpha = 0.2f)
+                        indicatorColor = Color(0xFF0055AA).copy(alpha = 0.2f)
                     )
                 )
                 NavigationBarItem(
@@ -312,7 +312,8 @@ fun SwipeToDeleteStoryItem(
             .addOnSuccessListener { document ->
                 val premium = document.getBoolean("premium") ?: false
                 val hasTrial = document.getBoolean("usedFreeTrial") == false
-                isPro = premium || hasTrial
+                val remainingUses = document.getLong("remainingChatgptUses") ?: 0
+                isPro = premium || (!document.getBoolean("usedFreeTrial")!! && remainingUses > 0)
             }
     }
 
@@ -352,16 +353,12 @@ fun SwipeToDeleteStoryItem(
                 .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                 .clickable {
                     val activity = context as? Activity
-                    if (isPro) {
-                        navController.navigate("metin/${hikaye.id}")
-                    } else {
-                        if (activity != null) {
-                            InterstitialAdHelper.showAd(activity) {
-                                navController.navigate("metin/${hikaye.id}")
-                            }
-                        } else {
+                    if (activity != null) {
+                        InterstitialAdHelper.showAdIfNeeded(activity, isPro) {
                             navController.navigate("metin/${hikaye.id}")
                         }
+                    } else {
+                        navController.navigate("metin/${hikaye.id}")
                     }
                 },
             shape = RoundedCornerShape(20.dp),

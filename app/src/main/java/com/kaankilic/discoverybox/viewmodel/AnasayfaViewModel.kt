@@ -48,13 +48,13 @@ class AnasayfaViewModel @Inject constructor(val dbRepo: DiscoveryBoxRepository) 
         }
     }
     /**
-     * Kullanıcı erişim kontrolü - YENİ SİSTEM
+     * User access control - PREMIUM SYSTEM (Ad system removed)
      * @param onResult (canCreateFullStory: Boolean, canCreateTextOnly: Boolean, isPremium: Boolean, usedFreeTrial: Boolean)
      * 
-     * canCreateFullStory: Görsel + Ses + Metin oluşturabilir mi?
-     * canCreateTextOnly: Sadece Metin oluşturabilir mi? (Reklam izleyerek)
-     * isPremium: Premium kullanıcı mı?
-     * usedFreeTrial: Ücretsiz denemeyi kullanmış mı?
+     * canCreateFullStory: Can create Image + Audio + Text story?
+     * canCreateTextOnly: Unused (ad system removed)
+     * isPremium: Is premium user?
+     * usedFreeTrial: Has used free trial?
      */
     fun checkUserAccess(onResult: (Boolean, Boolean, Boolean, Boolean) -> Unit) {
         val user = Firebase.auth.currentUser ?: run {
@@ -68,7 +68,6 @@ class AnasayfaViewModel @Inject constructor(val dbRepo: DiscoveryBoxRepository) 
             val remainingChatgptUses = doc.getLong("remainingChatgptUses") ?: 0
             var isPremium = doc.getBoolean("premium") ?: false
             val usedFreeTrial = doc.getBoolean("usedFreeTrial") ?: true
-            val remainingFreeUses = doc.getLong("remainingFreeUses") ?: 0
             val premiumStartDate = doc.getTimestamp("premiumStartDate")
             val premiumDurationDays = doc.getLong("premiumDurationDays") ?: 0L
 
@@ -99,15 +98,15 @@ class AnasayfaViewModel @Inject constructor(val dbRepo: DiscoveryBoxRepository) 
                 )
             }
 
-            // 4️⃣ TAM ÖZELLİKLİ (Görsel + Ses + Metin) hikaye oluşturabilir mi?
+            // 4️⃣ Can create FULL-FEATURED story (Image + Audio + Text)?
             val canCreateFullStory = when {
-                isPremium && remainingChatgptUses > 0 -> true // Premium ve hakkı var
-                !usedFreeTrial && remainingChatgptUses > 0 -> true // İlk ücretsiz deneme hakkı var
+                isPremium && remainingChatgptUses > 0 -> true // Premium user with tokens
+                !usedFreeTrial && remainingChatgptUses > 0 -> true // First-time trial (only once)
                 else -> false
             }
 
-            // 5️⃣ SADECE METİN hikaye oluşturabilir mi? (Reklam izleyerek)
-            val canCreateTextOnly = !isPremium && remainingFreeUses > 0
+            // 5️⃣ Ad system removed - canCreateTextOnly always false
+            val canCreateTextOnly = false
 
             onResult(canCreateFullStory, canCreateTextOnly, isPremium, usedFreeTrial)
         }.addOnFailureListener {

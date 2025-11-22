@@ -114,7 +114,7 @@ fun KayitSayfa(navController: NavController,kayitSayfaViewModel: KayitSayfaViewM
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.logoyapay),
+                        painter = painterResource(id = R.drawable.applogo),
                         contentDescription = "Profile Image",
                         contentScale = ContentScale.Crop, // Görseli kırpmadan ortalar
                         modifier = Modifier

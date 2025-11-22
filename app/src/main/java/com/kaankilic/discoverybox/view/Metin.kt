@@ -136,13 +136,7 @@ fun Metin(navController: NavController,
         }
     }
     
-    // Sayfa değiştiğinde ses durumunu reset et
-    LaunchedEffect(currentPageIndex) {
-        metinViewModel.stopMediaPlayer()
-        metinViewModel.stop()
-        isPlayingAudio = false
-        isAudioInitialized = false
-    }
+
 
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.saveanimation))
     var isAnimationPlaying by remember { mutableStateOf(false) }
@@ -163,9 +157,9 @@ fun Metin(navController: NavController,
 
     val gradientBackground = Brush.horizontalGradient(
         colors = listOf(
-            Color(0xFF3B0764),
-            Color(0xFF581C87),
-            Color(0xFF6B21A8)
+            Color(0xFF003366),
+            Color(0xFF004080),
+            Color(0xFF0055AA)
         )
     )
 
@@ -236,6 +230,41 @@ fun Metin(navController: NavController,
                     }
                     var currentFeaturedPageIndex by remember { mutableStateOf(0) }
                     
+                    // Sayfa değiştiğinde otomatik ses başlat
+                    LaunchedEffect(currentFeaturedPageIndex, isPlayingAudio) {
+                        if (isPlayingAudio) {
+                            val currentPage = featuredPages.getOrNull(currentFeaturedPageIndex)
+                            if (currentPage != null) {
+                                metinViewModel.stopMediaPlayer()
+                                metinViewModel.stop()
+                                isAudioInitialized = false
+                                
+                                kotlinx.coroutines.delay(100)
+                                
+                                if (canUseGPTTTS) {
+                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
+                                        onDone = { isAudioInitialized = true },
+                                        onComplete = {
+                                            if (currentFeaturedPageIndex < featuredPages.size - 1) {
+                                                currentFeaturedPageIndex++
+                                            } else {
+                                                isPlayingAudio = false
+                                            }
+                                        }
+                                    )
+                                } else {
+                                    metinViewModel.speak(currentPage.content) {
+                                        if (currentFeaturedPageIndex < featuredPages.size - 1) {
+                                            currentFeaturedPageIndex++
+                                        } else {
+                                            isPlayingAudio = false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
                     val storyImages = remember {
                         when(hikayeId) {
                             "featured_1" -> listOf(R.drawable.orman1, R.drawable.orman2, R.drawable.orman3, R.drawable.orman4)
@@ -266,10 +295,10 @@ fun Metin(navController: NavController,
                                             colors = listOf(
                                                 Color.Transparent,
                                                 Color.Transparent,
-                                                Color(0xFF3B0764).copy(alpha = 0.2f),
-                                                Color(0xFF3B0764).copy(alpha = 0.5f),
-                                                Color(0xFF3B0764).copy(alpha = 0.8f),
-                                                Color(0xFF3B0764)
+                                                Color(0xFF003366).copy(alpha = 0.2f),
+                                                Color(0xFF003366).copy(alpha = 0.5f),
+                                                Color(0xFF003366).copy(alpha = 0.8f),
+                                                Color(0xFF003366)
                                             ),
                                             startY = 0f,
                                             endY = 1500f
@@ -292,7 +321,7 @@ fun Metin(navController: NavController,
                                     Icon(
                                         imageVector = Icons.Default.ArrowBack,
                                         contentDescription = stringResource(R.string.back),
-                                        tint = Color(0xFF6B46C1),
+                                        tint = Color(0xFF003366),
                                         modifier = Modifier.size(24.dp)
                                     )
                                 }
@@ -314,15 +343,31 @@ fun Metin(navController: NavController,
                                                     metinViewModel.pause()
                                                 }
                                                 isPlayingAudio = false
-                                            } else {
-                                                if (canUseGPTTTS && !isAudioInitialized) {
-                                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentFeaturedPage.content) {
-                                                        isAudioInitialized = true
-                                                    }
-                                                } else if (canUseGPTTTS && isAudioInitialized) {
+                                            } else if (isAudioInitialized) {
+                                                if (canUseGPTTTS) {
                                                     metinViewModel.resumeMediaPlayer()
                                                 } else {
-                                                    metinViewModel.speak(currentFeaturedPage.content)
+                                                    metinViewModel.resume()
+                                                }
+                                                isPlayingAudio = true
+                                            } else {
+                                                if (canUseGPTTTS) {
+                                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentFeaturedPage.content, 
+                                                        onDone = { isAudioInitialized = true },
+                                                        onComplete = {
+                                                            if (currentFeaturedPageIndex < featuredPages.size - 1) {
+                                                                currentFeaturedPageIndex++
+                                                            }
+                                                            isPlayingAudio = false
+                                                        }
+                                                    )
+                                                } else {
+                                                    metinViewModel.speak(currentFeaturedPage.content) {
+                                                        if (currentFeaturedPageIndex < featuredPages.size - 1) {
+                                                            currentFeaturedPageIndex++
+                                                        }
+                                                        isPlayingAudio = false
+                                                    }
                                                 }
                                                 isPlayingAudio = true
                                             }
@@ -332,7 +377,7 @@ fun Metin(navController: NavController,
                                     Icon(
                                         painter = painterResource(if (isPlayingAudio) R.drawable.pausestory else R.drawable.playstory),
                                         contentDescription = if (isPlayingAudio) "Pause" else "Play",
-                                        tint = Color(0xFF6B46C1),
+                                        tint = Color(0xFF003366),
                                         modifier = Modifier.size(28.dp)
                                     )
                                 }
@@ -376,7 +421,7 @@ fun Metin(navController: NavController,
                                 enabled = currentFeaturedPageIndex > 0,
                                 colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
                             ) {
-                                Text(stringResource(R.string.previous), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                Text(stringResource(R.string.previous), color = Color(0xFF003366), fontFamily = sandtitle)
                             }
                             
                             Button(
@@ -384,7 +429,7 @@ fun Metin(navController: NavController,
                                 enabled = currentFeaturedPageIndex < featuredPages.size - 1,
                                 colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
                             ) {
-                                Text(stringResource(R.string.next), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                Text(stringResource(R.string.next), color = Color(0xFF003366), fontFamily = sandtitle)
                             }
                         }
                         
@@ -397,7 +442,7 @@ fun Metin(navController: NavController,
                                 text = stringResource(R.string.return_home),
                                 fontSize = 22.sp,
                                 fontFamily = sandtitle,
-                                color = Color(0xFF6B46C1)
+                                color = Color(0xFF003366)
                             )
                         }
                     }
@@ -406,6 +451,41 @@ fun Metin(navController: NavController,
                         com.kaankilic.discoverybox.entitiy.StoryPage(index + 1, content.removePrefix("${index + 1}:\n"), "", null)
                     }}
                     var currentSavedPageIndex by remember { mutableStateOf(0) }
+                    
+                    // Sayfa değiştiğinde otomatik ses başlat
+                    LaunchedEffect(currentSavedPageIndex, isPlayingAudio) {
+                        if (isPlayingAudio) {
+                            val currentPage = savedStoryPages.getOrNull(currentSavedPageIndex)
+                            if (currentPage != null) {
+                                metinViewModel.stopMediaPlayer()
+                                metinViewModel.stop()
+                                isAudioInitialized = false
+                                
+                                kotlinx.coroutines.delay(100)
+                                
+                                if (canUseGPTTTS) {
+                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
+                                        onDone = { isAudioInitialized = true },
+                                        onComplete = {
+                                            if (currentSavedPageIndex < savedStoryPages.size - 1) {
+                                                currentSavedPageIndex++
+                                            } else {
+                                                isPlayingAudio = false
+                                            }
+                                        }
+                                    )
+                                } else {
+                                    metinViewModel.speak(currentPage.content) {
+                                        if (currentSavedPageIndex < savedStoryPages.size - 1) {
+                                            currentSavedPageIndex++
+                                        } else {
+                                            isPlayingAudio = false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                     
                     if (savedStoryPages.isNotEmpty()) {
                         val currentSavedPage = savedStoryPages.getOrNull(currentSavedPageIndex) ?: savedStoryPages[0]
@@ -433,10 +513,10 @@ fun Metin(navController: NavController,
                                             colors = listOf(
                                                 Color.Transparent,
                                                 Color.Transparent,
-                                                Color(0xFF3B0764).copy(alpha = 0.2f),
-                                                Color(0xFF3B0764).copy(alpha = 0.5f),
-                                                Color(0xFF3B0764).copy(alpha = 0.8f),
-                                                Color(0xFF3B0764)
+                                                Color(0xFF003366).copy(alpha = 0.2f),
+                                                Color(0xFF003366).copy(alpha = 0.5f),
+                                                Color(0xFF003366).copy(alpha = 0.8f),
+                                                Color(0xFF003366)
                                             ),
                                             startY = 0f,
                                             endY = 1500f
@@ -459,7 +539,7 @@ fun Metin(navController: NavController,
                                     Icon(
                                         imageVector = Icons.Default.ArrowBack,
                                         contentDescription = stringResource(R.string.back),
-                                        tint = Color(0xFF6B46C1),
+                                        tint = Color(0xFF003366),
                                         modifier = Modifier.size(24.dp)
                                     )
                                 }
@@ -481,15 +561,31 @@ fun Metin(navController: NavController,
                                                     metinViewModel.pause()
                                                 }
                                                 isPlayingAudio = false
-                                            } else {
-                                                if (canUseGPTTTS && !isAudioInitialized) {
-                                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentSavedPage.content) {
-                                                        isAudioInitialized = true
-                                                    }
-                                                } else if (canUseGPTTTS && isAudioInitialized) {
+                                            } else if (isAudioInitialized) {
+                                                if (canUseGPTTTS) {
                                                     metinViewModel.resumeMediaPlayer()
                                                 } else {
-                                                    metinViewModel.speak(currentSavedPage.content)
+                                                    metinViewModel.resume()
+                                                }
+                                                isPlayingAudio = true
+                                            } else {
+                                                if (canUseGPTTTS) {
+                                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentSavedPage.content,
+                                                        onDone = { isAudioInitialized = true },
+                                                        onComplete = {
+                                                            if (currentSavedPageIndex < savedStoryPages.size - 1) {
+                                                                currentSavedPageIndex++
+                                                            }
+                                                            isPlayingAudio = false
+                                                        }
+                                                    )
+                                                } else {
+                                                    metinViewModel.speak(currentSavedPage.content) {
+                                                        if (currentSavedPageIndex < savedStoryPages.size - 1) {
+                                                            currentSavedPageIndex++
+                                                        }
+                                                        isPlayingAudio = false
+                                                    }
                                                 }
                                                 isPlayingAudio = true
                                             }
@@ -499,7 +595,7 @@ fun Metin(navController: NavController,
                                     Icon(
                                         painter = painterResource(if (isPlayingAudio) R.drawable.pausestory else R.drawable.playstory),
                                         contentDescription = if (isPlayingAudio) "Pause" else "Play",
-                                        tint = Color(0xFF6B46C1),
+                                        tint = Color(0xFF003366),
                                         modifier = Modifier.size(28.dp)
                                     )
                                 }
@@ -532,7 +628,7 @@ fun Metin(navController: NavController,
                                 enabled = currentSavedPageIndex > 0,
                                 colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
                             ) {
-                                Text(stringResource(R.string.previous), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                Text(stringResource(R.string.previous), color = Color(0xFF003366), fontFamily = sandtitle)
                             }
                             
                             Button(
@@ -540,7 +636,7 @@ fun Metin(navController: NavController,
                                 enabled = currentSavedPageIndex < savedStoryPages.size - 1,
                                 colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
                             ) {
-                                Text(stringResource(R.string.next), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                Text(stringResource(R.string.next), color = Color(0xFF003366), fontFamily = sandtitle)
                             }
                         }
                         
@@ -553,7 +649,7 @@ fun Metin(navController: NavController,
                                 text = stringResource(R.string.MYSTORIES),
                                 fontSize = 22.sp,
                                 fontFamily = sandtitle,
-                                color = Color(0xFF6B46C1)
+                                color = Color(0xFF003366)
                             )
                         }
                     }
@@ -573,6 +669,41 @@ fun Metin(navController: NavController,
 
                         }
                     } else if (storyPages.isNotEmpty()) {
+                        // Sayfa değiştiğinde otomatik ses başlat
+                        LaunchedEffect(currentPageIndex, isPlayingAudio) {
+                            if (isPlayingAudio) {
+                                val currentPage = storyPages.getOrNull(currentPageIndex)
+                                if (currentPage != null) {
+                                    metinViewModel.stopMediaPlayer()
+                                    metinViewModel.stop()
+                                    isAudioInitialized = false
+                                    
+                                    kotlinx.coroutines.delay(100)
+                                    
+                                    if (canUseGPTTTS) {
+                                        metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
+                                            onDone = { isAudioInitialized = true },
+                                            onComplete = {
+                                                if (currentPageIndex < storyPages.size - 1) {
+                                                    currentPageIndex++
+                                                } else {
+                                                    isPlayingAudio = false
+                                                }
+                                            }
+                                        )
+                                    } else {
+                                        metinViewModel.speak(currentPage.content) {
+                                            if (currentPageIndex < storyPages.size - 1) {
+                                                currentPageIndex++
+                                            } else {
+                                                isPlayingAudio = false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
                         val currentPage = storyPages.getOrNull(currentPageIndex)
                         if (currentPage != null) {
                             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
@@ -590,10 +721,10 @@ fun Metin(navController: NavController,
                                                     colors = listOf(
                                                         Color.Transparent,
                                                         Color.Transparent,
-                                                        Color(0xFF3B0764).copy(alpha = 0.2f),
-                                                        Color(0xFF3B0764).copy(alpha = 0.5f),
-                                                        Color(0xFF3B0764).copy(alpha = 0.8f),
-                                                        Color(0xFF3B0764)
+                                                        Color(0xFF003366).copy(alpha = 0.2f),
+                                                        Color(0xFF003366).copy(alpha = 0.5f),
+                                                        Color(0xFF003366).copy(alpha = 0.8f),
+                                                        Color(0xFF003366)
                                                     ),
                                                     startY = 0f,
                                                     endY = 1500f
@@ -618,7 +749,7 @@ fun Metin(navController: NavController,
                                         Icon(
                                             imageVector = Icons.Default.ArrowBack,
                                             contentDescription = stringResource(R.string.back),
-                                            tint = Color(0xFF6B46C1)
+                                            tint = Color(0xFF003366)
                                         )
                                     }
                                     
@@ -640,15 +771,31 @@ fun Metin(navController: NavController,
                                                         metinViewModel.pause()
                                                     }
                                                     isPlayingAudio = false
-                                                } else {
-                                                    if (canUseGPTTTS && !isAudioInitialized) {
-                                                        metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content) {
-                                                            isAudioInitialized = true
-                                                        }
-                                                    } else if (canUseGPTTTS && isAudioInitialized) {
+                                                } else if (isAudioInitialized) {
+                                                    if (canUseGPTTTS) {
                                                         metinViewModel.resumeMediaPlayer()
                                                     } else {
-                                                        metinViewModel.speak(currentPage.content)
+                                                        metinViewModel.resume()
+                                                    }
+                                                    isPlayingAudio = true
+                                                } else {
+                                                    if (canUseGPTTTS) {
+                                                        metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
+                                                            onDone = { isAudioInitialized = true },
+                                                            onComplete = {
+                                                                if (currentPageIndex < storyPages.size - 1) {
+                                                                    currentPageIndex++
+                                                                }
+                                                                isPlayingAudio = false
+                                                            }
+                                                        )
+                                                    } else {
+                                                        metinViewModel.speak(currentPage.content) {
+                                                            if (currentPageIndex < storyPages.size - 1) {
+                                                                currentPageIndex++
+                                                            }
+                                                            isPlayingAudio = false
+                                                        }
                                                     }
                                                     isPlayingAudio = true
                                                 }
@@ -658,7 +805,7 @@ fun Metin(navController: NavController,
                                         Icon(
                                             painter = painterResource(if (isPlayingAudio) R.drawable.pausestory else R.drawable.playstory),
                                             contentDescription = if (isPlayingAudio) "Pause" else "Play",
-                                            tint = Color(0xFF6B46C1),
+                                            tint = Color(0xFF003366),
                                             modifier = Modifier.size(28.dp)
                                         )
                                     }
@@ -691,7 +838,7 @@ fun Metin(navController: NavController,
                                     enabled = currentPageIndex > 0,
                                     colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
                                 ) {
-                                    Text(stringResource(R.string.previous), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                    Text(stringResource(R.string.previous), color = Color(0xFF003366), fontFamily = sandtitle)
                                 }
                                 
                                 Button(
@@ -699,7 +846,7 @@ fun Metin(navController: NavController,
                                     enabled = currentPageIndex < storyPages.size - 1,
                                     colors = ButtonDefaults.buttonColors(Color(0xFFFCD34D))
                                 ) {
-                                    Text(stringResource(R.string.next), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                    Text(stringResource(R.string.next), color = Color(0xFF003366), fontFamily = sandtitle)
                                 }
                             }
                             
@@ -782,11 +929,11 @@ fun Metin(navController: NavController,
                                     if (isSaving) {
                                         CircularProgressIndicator(
                                             modifier = Modifier.size(20.dp),
-                                            color = Color(0xFF6B46C1),
+                                            color = Color(0xFF003366),
                                             strokeWidth = 2.dp
                                         )
                                     } else {
-                                        Text(stringResource(R.string.save), color = Color(0xFF6B46C1), fontFamily = sandtitle)
+                                        Text(stringResource(R.string.save), color = Color(0xFF003366), fontFamily = sandtitle)
                                     }
                                 }
                                 
@@ -798,7 +945,7 @@ fun Metin(navController: NavController,
                                         text = stringResource(R.string.MYSTORIES),
                                         fontSize = 18.sp,
                                         fontFamily = sandtitle,
-                                        color = Color(0xFF6B46C1)
+                                        color = Color(0xFF003366)
                                     )
                                 }
                             }
@@ -854,12 +1001,12 @@ fun Metin(navController: NavController,
                                                         colors = listOf(
                                                             Color.Transparent, // Üst kısım görünür
                                                             Color.Transparent, // Ortalar da görünür
-                                                            Color(0xFF305063).copy(alpha = 0.1f),
-                                                            Color(0xFF305063).copy(alpha = 0.3f),
-                                                            Color(0xFF305063).copy(alpha = 0.9f),
-                                                            Color(0xFF305063).copy(alpha = 0.9f),
-                                                            Color(0xFF305063), // Tamamen arka plana geçiş
-                                                            Color(0xFF305063) // Tamamen arka plana geçiş
+                                                            Color(0xFF003366).copy(alpha = 0.1f),
+                                                            Color(0xFF003366).copy(alpha = 0.3f),
+                                                            Color(0xFF003366).copy(alpha = 0.9f),
+                                                            Color(0xFF003366).copy(alpha = 0.9f),
+                                                            Color(0xFF003366), // Tamamen arka plana geçiş
+                                                            Color(0xFF003366) // Tamamen arka plana geçiş
                                                         ),
                                                         startY = 750f, // Geçiş daha geç başlasın
                                                         endY = 1500f    // Alt kısımda bitiş
@@ -883,7 +1030,7 @@ fun Metin(navController: NavController,
                                         Icon(
                                             painter = painterResource(R.drawable.play),
                                             contentDescription = "Play",
-                                            tint = Color(0xFF6B46C1),
+                                            tint = Color(0xFF003366),
                                             modifier = Modifier.size(28.dp)
                                         )
                                     }
@@ -1021,7 +1168,7 @@ fun Metin(navController: NavController,
                                     text = stringResource(R.string.Rebuild),
                                     fontSize = 22.sp,
                                     fontFamily = sandtitle,
-                                    color = Color(0xFF6B46C1)
+                                    color = Color(0xFF003366)
                                 )
                             }
 
@@ -1034,7 +1181,7 @@ fun Metin(navController: NavController,
                                     text = stringResource(R.string.MYSTORIES),
                                     fontSize = 22.sp,
                                     fontFamily = sandtitle,
-                                    color = Color(0xFF6B46C1)
+                                    color = Color(0xFF003366)
                                 )
                             }
 
@@ -1107,7 +1254,7 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
     val barColors = List(6) {
         infiniteTransition.animateColor(
             initialValue = Color(0xFFFCD34D),
-            targetValue = Color(0xFFA855F7),
+            targetValue = Color(0xFF0055AA),
             animationSpec = infiniteRepeatable(
                 animation = tween(durationMillis = 850, easing = LinearEasing),
                 repeatMode = RepeatMode.Reverse
@@ -1121,7 +1268,7 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
             .clip(RoundedCornerShape(24.dp))
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF8B5CF6), Color(0xFF6B46C1))
+                    colors = listOf(Color(0xFF0055AA), Color(0xFF003366))
                 )
             )
             .padding(16.dp),
@@ -1155,7 +1302,7 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                 Icon(
                     painter = painterResource(R.drawable.baseline_close_24),
                     contentDescription = "Close",
-                    tint = Color(0xFF6B46C1)
+                    tint = Color(0xFF003366)
                 )
             }
         }
@@ -1258,10 +1405,9 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                         metinViewModel.handleTTS(
                             context,
                             BuildConfig.OPENAI_API_KEY,
-                            hikayeyiOlustur
-                        ) {
-                            isAudioLoading = false
-                        }
+                            hikayeyiOlustur,
+                            onDone = { isAudioLoading = false }
+                        )
                         isPlaying = true
                     }
             ) {
@@ -1269,13 +1415,13 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                     CircularProgressIndicator(
                         modifier = Modifier.size(32.dp),
                         strokeWidth = 3.dp,
-                        color = Color(0xFF6B46C1)
+                        color = Color(0xFF003366)
                     )
                 } else {
                     Icon(
                         painter = painterResource(R.drawable.playstory),
                         contentDescription = "play",
-                        tint = Color(0xFF6B46C1),
+                        tint = Color(0xFF003366),
                         modifier = Modifier.size(32.dp)
                     )
                 }
@@ -1304,7 +1450,7 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                 Icon(
                     painter = painterResource(R.drawable.pausestory),
                     contentDescription = "pause",
-                    tint = Color(0xFF6B46C1)
+                    tint = Color(0xFF003366)
                 )
             }
         }
@@ -1336,7 +1482,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
     val barColors = List(6) {
         infiniteTransition.animateColor(
             initialValue = Color(0xFFFCD34D),
-            targetValue = Color(0xFFA855F7),
+            targetValue = Color(0xFF0055AA),
             animationSpec = infiniteRepeatable(
                 animation = tween(durationMillis = 850, easing = LinearEasing),
                 repeatMode = RepeatMode.Reverse
@@ -1350,7 +1496,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
             .clip(RoundedCornerShape(24.dp))
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF8B5CF6), Color(0xFF6B46C1))
+                    colors = listOf(Color(0xFF0055AA), Color(0xFF003366))
                 )
             )
             .padding(16.dp),
@@ -1382,7 +1528,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
                 Icon(
                     painter = painterResource(R.drawable.baseline_close_24),
                     contentDescription = "Close",
-                    tint = Color(0xFF6B46C1)
+                    tint = Color(0xFF003366)
                 )
             }
         }
@@ -1427,7 +1573,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
                 Icon(
                     painter = painterResource(R.drawable.playstory),
                     contentDescription = "Play",
-                    tint = Color(0xFF6B46C1)
+                    tint = Color(0xFF003366)
                 )
             }
 
@@ -1444,7 +1590,7 @@ fun AudioSave(navController: NavController,hikayeViewModel: HikayeViewModel, met
                 Icon(
                     painter = painterResource(R.drawable.pausestory),
                     contentDescription = "Pause",
-                    tint = Color(0xFF6B46C1)
+                    tint = Color(0xFF003366)
                 )
             }
         }
