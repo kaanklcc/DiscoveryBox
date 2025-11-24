@@ -58,33 +58,25 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
      */
     private var currentOnComplete: (() -> Unit)? = null
     
-    fun handleTTS(context: Context, apiKey: String, text: String, onDone: () -> Unit, onComplete: (() -> Unit)? = null) {
+    fun handleTTS(context: Context, apiKey: String, text: String, onDone: () -> Unit, onComplete: (() -> Unit)? = null, useGPTTTS: Boolean = false) {
         currentOnComplete = onComplete
         
         viewModelScope.launch {
-            val (premium, usedFreeTrial, remainingChatgptUses) = dbRepo.isUserPremium()
-            
-            // Premium users OR first-time trial users can use GPT TTS
-            val canUseGPTTTS = (premium && remainingChatgptUses > 0) || (!usedFreeTrial && remainingChatgptUses > 0)
-
-            if (canUseGPTTTS) {
-                // Premium voice - GPT TTS
+            if (useGPTTTS) {
+                // Yeni hikayeler için GPT TTS kullan
                 val result = dbRepo.generateGPTTTS(context, apiKey, text)
                 _ttsState.postValue(result)
-                
-                // Get MediaPlayer and add completion listener
-                kotlinx.coroutines.delay(500)
                 mediaPlayer = dbRepo.getMediaPlayer()
+                
                 mediaPlayer?.setOnCompletionListener {
                     currentOnComplete?.invoke()
                 }
             } else {
-                // Default voice - Google TTS (for saved stories playback)
+                // Kaydedilen ve anasayfadaki hikayeler için Google TTS kullan
                 dbRepo.generateGoogleTTS(context, text) { tts, result ->
                     textToSpeech = tts
                     _ttsState.postValue(result)
                     
-                    // Add TTS completion listener
                     tts?.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
                         override fun onStart(utteranceId: String?) {}
                         override fun onDone(utteranceId: String?) {
@@ -95,7 +87,7 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
                 }
             }
 
-            onDone() // Callback is called in both cases
+            onDone()
         }
     }
 
@@ -204,10 +196,7 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
     
     fun resume() {
         if (isPaused && currentText.isNotEmpty()) {
-            val params = android.os.Bundle()
-            params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "tts_id")
-            textToSpeech?.speak(currentText, TextToSpeech.QUEUE_FLUSH, params, "tts_id")
-            isPaused = false
+            speak(currentText)
         }
     }
     
@@ -234,6 +223,27 @@ class MetinViewModel@Inject constructor (val dbRepo: DiscoveryBoxRepository) : V
                 it.start()
                 isPaused = false
             }
+        }
+    }
+    
+    fun playRawAudio(context: Context, rawResourceId: Int, onComplete: (() -> Unit)? = null) {
+        try {
+            stopMediaPlayer()
+            stop()
+            
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(context.resources.openRawResourceFd(rawResourceId))
+                prepare()
+                setOnCompletionListener {
+                    onComplete?.invoke()
+                }
+                start()
+            }
+            isPaused = false
+        } catch (e: Exception) {
+            android.util.Log.e("MetinViewModel", "Raw audio çalma hatası: ${e.message}", e)
+            // Hata durumunda callback'i çağır
+            onComplete?.invoke()
         }
     }
 

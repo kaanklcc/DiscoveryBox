@@ -16,7 +16,7 @@ data class TTSRequest(
 
     Pronunciation: Clear and smooth articulation, with a light melodic rhythm to engage young listeners.
 
-    Pauses: Add gentle pauses after important moments or scene changes to emphasize story flow and allow imagination to build.
+    Pronunciation: Clear and smooth articulation, with a light melodic rhythm to engage young listeners.
 """.trimIndent()
 )
 

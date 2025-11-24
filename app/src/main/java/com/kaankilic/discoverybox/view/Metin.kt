@@ -111,7 +111,6 @@ fun Metin(navController: NavController,
     var isSaved by remember { mutableStateOf(false) }
     val imageSaved by metinViewModel.imageSaved.observeAsState()
     val imageSavedUrl by metinViewModel.imageSavedUrl.observeAsState()
-    var canUseGPTTTS by remember { mutableStateOf(false) }
     var isAudioInitialized by remember { mutableStateOf(false) }
 
 
@@ -127,12 +126,27 @@ fun Metin(navController: NavController,
         }
     }
 
+    val storyUnlocked by hikayeViewModel.currentStoryUnlocked.observeAsState(false)
+    
     LaunchedEffect(Unit) {
         anasayfaViewModel.checkUserAccess { canCreateFullStory, canCreateTextOnly, isPremiumStatus, usedFreeTrialStatus ->
             hasTrial = canCreateFullStory
             isPremium = isPremiumStatus
-            // Premium veya deneme kullanmamışsa GPT TTS kullanabilir
-            canUseGPTTTS = canCreateFullStory
+        }
+    }
+    
+    // Premium VEYA mevcut hikaye unlock edilmişse GPT TTS kullanabilir
+    // derivedStateOf kullanarak her zaman güncel değer hesaplanır
+    val canUseGPTTTS by remember { 
+        androidx.compose.runtime.derivedStateOf { 
+            storyUnlocked // Sadece yeni oluşturulan hikayeler GPT TTS kullanır
+        } 
+    }
+    
+    // Hikayeden çıkınca flag'i sıfırla
+    DisposableEffect(Unit) {
+        onDispose {
+            hikayeViewModel.resetStoryUnlock()
         }
     }
     
@@ -232,33 +246,49 @@ fun Metin(navController: NavController,
                     
                     // Sayfa değiştiğinde otomatik ses başlat
                     LaunchedEffect(currentFeaturedPageIndex, isPlayingAudio) {
-                        if (isPlayingAudio) {
+                        if (isPlayingAudio && (hikayeId == "featured_1" || hikayeId == "featured_2")) {
+                            metinViewModel.stopMediaPlayer()
+                            metinViewModel.stop()
+                            kotlinx.coroutines.delay(100)
+                            
+                            // Her hikaye ve sayfa için farklı ses dosyası
+                            val audioResource = when(hikayeId) {
+                                "featured_1" -> when(currentFeaturedPageIndex) {
+                                    0 -> R.raw.orman_bir
+                                    1 -> R.raw.orman_iki
+                                    2 -> R.raw.orman_uc
+                                    3 -> R.raw.orman_dort
+                                    else -> R.raw.orman_bir
+                                }
+                                "featured_2" -> when(currentFeaturedPageIndex) {
+                                    0 -> R.raw.uzay_bir
+                                    1 -> R.raw.uzay_iki
+                                    2 -> R.raw.uzay_uc
+                                    3 -> R.raw.uzay_dort
+                                    else -> R.raw.uzay_bir
+                                }
+                                else -> R.raw.orman_bir
+                            }
+                            
+                            metinViewModel.playRawAudio(context, audioResource) {
+                                if (currentFeaturedPageIndex < featuredPages.size - 1) {
+                                    currentFeaturedPageIndex++
+                                } else {
+                                    isPlayingAudio = false
+                                }
+                            }
+                        } else if (isPlayingAudio) {
                             val currentPage = featuredPages.getOrNull(currentFeaturedPageIndex)
                             if (currentPage != null) {
                                 metinViewModel.stopMediaPlayer()
                                 metinViewModel.stop()
                                 isAudioInitialized = false
-                                
                                 kotlinx.coroutines.delay(100)
-                                
-                                if (canUseGPTTTS) {
-                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
-                                        onDone = { isAudioInitialized = true },
-                                        onComplete = {
-                                            if (currentFeaturedPageIndex < featuredPages.size - 1) {
-                                                currentFeaturedPageIndex++
-                                            } else {
-                                                isPlayingAudio = false
-                                            }
-                                        }
-                                    )
-                                } else {
-                                    metinViewModel.speak(currentPage.content) {
-                                        if (currentFeaturedPageIndex < featuredPages.size - 1) {
-                                            currentFeaturedPageIndex++
-                                        } else {
-                                            isPlayingAudio = false
-                                        }
+                                metinViewModel.speak(currentPage.content) {
+                                    if (currentFeaturedPageIndex < featuredPages.size - 1) {
+                                        currentFeaturedPageIndex++
+                                    } else {
+                                        isPlayingAudio = false
                                     }
                                 }
                             }
@@ -336,31 +366,50 @@ fun Metin(navController: NavController,
                                         .clip(CircleShape)
                                         .background(Color(0xFFFCD34D))
                                         .clickable {
-                                            if (isPlayingAudio) {
-                                                if (canUseGPTTTS) {
+                                            if (hikayeId == "featured_1" || hikayeId == "featured_2") {
+                                                if (isPlayingAudio) {
                                                     metinViewModel.pauseMediaPlayer()
-                                                } else {
-                                                    metinViewModel.pause()
-                                                }
-                                                isPlayingAudio = false
-                                            } else if (isAudioInitialized) {
-                                                if (canUseGPTTTS) {
+                                                    isPlayingAudio = false
+                                                } else if (isAudioInitialized) {
                                                     metinViewModel.resumeMediaPlayer()
+                                                    isPlayingAudio = true
                                                 } else {
-                                                    metinViewModel.resume()
-                                                }
-                                                isPlayingAudio = true
-                                            } else {
-                                                if (canUseGPTTTS) {
-                                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentFeaturedPage.content, 
-                                                        onDone = { isAudioInitialized = true },
-                                                        onComplete = {
-                                                            if (currentFeaturedPageIndex < featuredPages.size - 1) {
-                                                                currentFeaturedPageIndex++
-                                                            }
+                                                    // Her hikaye ve sayfa için farklı ses dosyası
+                                                    val audioResource = when(hikayeId) {
+                                                        "featured_1" -> when(currentFeaturedPageIndex) {
+                                                            0 -> R.raw.orman_bir
+                                                            1 -> R.raw.orman_iki
+                                                            2 -> R.raw.orman_uc
+                                                            3 -> R.raw.orman_dort
+                                                            else -> R.raw.orman_bir
+                                                        }
+                                                        "featured_2" -> when(currentFeaturedPageIndex) {
+                                                            0 -> R.raw.uzay_bir
+                                                            1 -> R.raw.uzay_iki
+                                                            2 -> R.raw.uzay_uc
+                                                            3 -> R.raw.uzay_dort
+                                                            else -> R.raw.uzay_bir
+                                                        }
+                                                        else -> R.raw.orman_bir
+                                                    }
+                                                    
+                                                    metinViewModel.playRawAudio(context, audioResource) {
+                                                        if (currentFeaturedPageIndex < featuredPages.size - 1) {
+                                                            currentFeaturedPageIndex++
+                                                        } else {
                                                             isPlayingAudio = false
                                                         }
-                                                    )
+                                                    }
+                                                    isPlayingAudio = true
+                                                    isAudioInitialized = true
+                                                }
+                                            } else {
+                                                if (isPlayingAudio) {
+                                                    metinViewModel.pause()
+                                                    isPlayingAudio = false
+                                                } else if (isAudioInitialized) {
+                                                    metinViewModel.resume()
+                                                    isPlayingAudio = true
                                                 } else {
                                                     metinViewModel.speak(currentFeaturedPage.content) {
                                                         if (currentFeaturedPageIndex < featuredPages.size - 1) {
@@ -368,8 +417,8 @@ fun Metin(navController: NavController,
                                                         }
                                                         isPlayingAudio = false
                                                     }
+                                                    isPlayingAudio = true
                                                 }
-                                                isPlayingAudio = true
                                             }
                                         },
                                     contentAlignment = Alignment.Center
@@ -463,24 +512,12 @@ fun Metin(navController: NavController,
                                 
                                 kotlinx.coroutines.delay(100)
                                 
-                                if (canUseGPTTTS) {
-                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
-                                        onDone = { isAudioInitialized = true },
-                                        onComplete = {
-                                            if (currentSavedPageIndex < savedStoryPages.size - 1) {
-                                                currentSavedPageIndex++
-                                            } else {
-                                                isPlayingAudio = false
-                                            }
-                                        }
-                                    )
-                                } else {
-                                    metinViewModel.speak(currentPage.content) {
-                                        if (currentSavedPageIndex < savedStoryPages.size - 1) {
-                                            currentSavedPageIndex++
-                                        } else {
-                                            isPlayingAudio = false
-                                        }
+                                // Kaydedilen hikayeler Google TTS kullanır
+                                metinViewModel.speak(currentPage.content) {
+                                    if (currentSavedPageIndex < savedStoryPages.size - 1) {
+                                        currentSavedPageIndex++
+                                    } else {
+                                        isPlayingAudio = false
                                     }
                                 }
                             }
@@ -555,37 +592,18 @@ fun Metin(navController: NavController,
                                         .background(Color(0xFFFCD34D))
                                         .clickable {
                                             if (isPlayingAudio) {
-                                                if (canUseGPTTTS) {
-                                                    metinViewModel.pauseMediaPlayer()
-                                                } else {
-                                                    metinViewModel.pause()
-                                                }
+                                                metinViewModel.pause()
                                                 isPlayingAudio = false
                                             } else if (isAudioInitialized) {
-                                                if (canUseGPTTTS) {
-                                                    metinViewModel.resumeMediaPlayer()
-                                                } else {
-                                                    metinViewModel.resume()
-                                                }
+                                                metinViewModel.resume()
                                                 isPlayingAudio = true
                                             } else {
-                                                if (canUseGPTTTS) {
-                                                    metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentSavedPage.content,
-                                                        onDone = { isAudioInitialized = true },
-                                                        onComplete = {
-                                                            if (currentSavedPageIndex < savedStoryPages.size - 1) {
-                                                                currentSavedPageIndex++
-                                                            }
-                                                            isPlayingAudio = false
-                                                        }
-                                                    )
-                                                } else {
-                                                    metinViewModel.speak(currentSavedPage.content) {
-                                                        if (currentSavedPageIndex < savedStoryPages.size - 1) {
-                                                            currentSavedPageIndex++
-                                                        }
-                                                        isPlayingAudio = false
+                                                // Kaydedilen hikayeler Google TTS kullanır
+                                                metinViewModel.speak(currentSavedPage.content) {
+                                                    if (currentSavedPageIndex < savedStoryPages.size - 1) {
+                                                        currentSavedPageIndex++
                                                     }
+                                                    isPlayingAudio = false
                                                 }
                                                 isPlayingAudio = true
                                             }
@@ -669,36 +687,50 @@ fun Metin(navController: NavController,
 
                         }
                     } else if (storyPages.isNotEmpty()) {
-                        // Sayfa değiştiğinde otomatik ses başlat
-                        LaunchedEffect(currentPageIndex, isPlayingAudio) {
-                            if (isPlayingAudio) {
-                                val currentPage = storyPages.getOrNull(currentPageIndex)
-                                if (currentPage != null) {
-                                    metinViewModel.stopMediaPlayer()
-                                    metinViewModel.stop()
-                                    isAudioInitialized = false
-                                    
-                                    kotlinx.coroutines.delay(100)
-                                    
-                                    if (canUseGPTTTS) {
-                                        metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
-                                            onDone = { isAudioInitialized = true },
-                                            onComplete = {
-                                                if (currentPageIndex < storyPages.size - 1) {
-                                                    currentPageIndex++
-                                                } else {
-                                                    isPlayingAudio = false
-                                                }
-                                            }
-                                        )
-                                    } else {
-                                        metinViewModel.speak(currentPage.content) {
-                                            if (currentPageIndex < storyPages.size - 1) {
-                                                currentPageIndex++
+                        // 🎵 Hikaye yüklendikten 2 saniye sonra otomatik ses başlat ve kredi azalt
+                        var hasAutoPlayed by remember { mutableStateOf(false) }
+                        var isConvertingToAudio by remember { mutableStateOf(false) }
+                        
+                        LaunchedEffect(storyPages) {
+                            if (!hasAutoPlayed && storyPages.isNotEmpty()) {
+                                kotlinx.coroutines.delay(2000)
+                                isConvertingToAudio = true
+                                
+                                hikayeViewModel.deductVoiceCredit(context, canUseGPTTTS) { success ->
+                                    if (success) {
+                                        hasAutoPlayed = true
+                                        isPlayingAudio = true
+                                        
+                                        val currentPage = storyPages.getOrNull(currentPageIndex)
+                                        if (currentPage != null) {
+                                            if (canUseGPTTTS) {
+                                                metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
+                                                    onDone = { 
+                                                        isAudioInitialized = true
+                                                        isConvertingToAudio = false
+                                                    },
+                                                    onComplete = {
+                                                        if (currentPageIndex < storyPages.size - 1) {
+                                                            currentPageIndex++
+                                                        } else {
+                                                            isPlayingAudio = false
+                                                        }
+                                                    },
+                                                    useGPTTTS = true
+                                                )
                                             } else {
-                                                isPlayingAudio = false
+                                                metinViewModel.speak(currentPage.content) {
+                                                    if (currentPageIndex < storyPages.size - 1) {
+                                                        currentPageIndex++
+                                                    } else {
+                                                        isPlayingAudio = false
+                                                    }
+                                                }
+                                                isConvertingToAudio = false
                                             }
                                         }
+                                    } else {
+                                        isConvertingToAudio = false
                                     }
                                 }
                             }
@@ -779,25 +811,30 @@ fun Metin(navController: NavController,
                                                     }
                                                     isPlayingAudio = true
                                                 } else {
-                                                    if (canUseGPTTTS) {
-                                                        metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
-                                                            onDone = { isAudioInitialized = true },
-                                                            onComplete = {
-                                                                if (currentPageIndex < storyPages.size - 1) {
-                                                                    currentPageIndex++
+                                                    hikayeViewModel.deductVoiceCredit(context, canUseGPTTTS) { success ->
+                                                        if (success) {
+                                                            if (canUseGPTTTS) {
+                                                                metinViewModel.handleTTS(context, BuildConfig.OPENAI_API_KEY, currentPage.content,
+                                                                    onDone = { isAudioInitialized = true },
+                                                                    onComplete = {
+                                                                        if (currentPageIndex < storyPages.size - 1) {
+                                                                            currentPageIndex++
+                                                                        }
+                                                                        isPlayingAudio = false
+                                                                    },
+                                                                    useGPTTTS = true
+                                                                )
+                                                            } else {
+                                                                metinViewModel.speak(currentPage.content) {
+                                                                    if (currentPageIndex < storyPages.size - 1) {
+                                                                        currentPageIndex++
+                                                                    }
+                                                                    isPlayingAudio = false
                                                                 }
-                                                                isPlayingAudio = false
                                                             }
-                                                        )
-                                                    } else {
-                                                        metinViewModel.speak(currentPage.content) {
-                                                            if (currentPageIndex < storyPages.size - 1) {
-                                                                currentPageIndex++
-                                                            }
-                                                            isPlayingAudio = false
+                                                            isPlayingAudio = true
                                                         }
                                                     }
-                                                    isPlayingAudio = true
                                                 }
                                             },
                                         contentAlignment = Alignment.Center
@@ -970,6 +1007,43 @@ fun Metin(navController: NavController,
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = sandtitle
+                                    )
+                                }
+                            }
+                        }
+                        
+                        // Sese dönüştürme overlay'i
+                        if (isConvertingToAudio) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color(0xFF003366).copy(alpha = 0.95f))
+                                    .clickable(enabled = false) { },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(64.dp),
+                                        color = Color(0xFFFCD34D),
+                                        strokeWidth = 6.dp
+                                    )
+                                    Text(
+                                        text ="sese dönüştürülüyor",
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White,
+                                        fontFamily = sandtitle,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Text(
+                                        text = "lütfen bekleyin",
+                                        fontSize = 16.sp,
+                                        color = Color.White.copy(alpha = 0.8f),
+                                        fontFamily = andikabody,
+                                        textAlign = TextAlign.Center
                                     )
                                 }
                             }
@@ -1206,7 +1280,7 @@ fun Metin(navController: NavController,
 
 
                 ){
-                Audio(navController, hikayeViewModel,metinViewModel, onClose = { audioVisible = false })
+                Audio(navController, hikayeViewModel,metinViewModel, canUseGPTTTS = canUseGPTTTS, onClose = { audioVisible = false })
             }
         }
 
@@ -1226,14 +1300,12 @@ fun Metin(navController: NavController,
 
 
 @Composable
-fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinViewModel: MetinViewModel,  onClose: () -> Unit) {
+fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinViewModel: MetinViewModel, canUseGPTTTS: Boolean, onClose: () -> Unit) {
     val hikayeyiOlustur by hikayeViewModel.hikayeOlustur.observeAsState("")
-    val dbRepo = hikayeViewModel.dbRepo
     val context = LocalContext.current
     val generatedImage by metinViewModel.imageBitmap.observeAsState(null)
     var isPlaying by remember { mutableStateOf(false) }
     var isStopped by remember { mutableStateOf(false) }
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     var isAudioLoading by remember { mutableStateOf(false) }
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -1400,15 +1472,36 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                     .size(56.dp)
                     .clip(CircleShape)
                     .background(Color(0xFFFCD34D))
-                    .clickable(enabled = !isPlaying && !isStopped) {
-                        isAudioLoading = true
-                        metinViewModel.handleTTS(
-                            context,
-                            BuildConfig.OPENAI_API_KEY,
-                            hikayeyiOlustur,
-                            onDone = { isAudioLoading = false }
-                        )
-                        isPlaying = true
+                    .clickable {
+                        if (isPlaying) {
+                            if (canUseGPTTTS) {
+                                metinViewModel.pauseMediaPlayer()
+                            } else {
+                                metinViewModel.pause()
+                            }
+                            isPlaying = false
+                        } else if (isStopped) {
+                            if (canUseGPTTTS) {
+                                metinViewModel.resumeMediaPlayer()
+                            } else {
+                                metinViewModel.resume()
+                            }
+                            isPlaying = true
+                            isStopped = false
+                        } else {
+                            isAudioLoading = true
+                            metinViewModel.handleTTS(
+                                context,
+                                BuildConfig.OPENAI_API_KEY,
+                                hikayeyiOlustur,
+                                onDone = { 
+                                    isAudioLoading = false
+                                    isStopped = true
+                                },
+                                useGPTTTS = canUseGPTTTS
+                            )
+                            isPlaying = true
+                        }
                     }
             ) {
                 if (isAudioLoading) {
@@ -1419,8 +1512,8 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                     )
                 } else {
                     Icon(
-                        painter = painterResource(R.drawable.playstory),
-                        contentDescription = "play",
+                        painter = painterResource(if (isPlaying) R.drawable.pausestory else R.drawable.playstory),
+                        contentDescription = if (isPlaying) "pause" else "play",
                         tint = Color(0xFF003366),
                         modifier = Modifier.size(32.dp)
                     )
@@ -1433,24 +1526,6 @@ fun Audio(navController: NavController,hikayeViewModel: HikayeViewModel, metinVi
                     fontSize = 13.sp,
                     color = Color.White,
                     fontWeight = FontWeight.Medium
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    metinViewModel.stopMediaPlayer()
-                    metinViewModel.stop()
-                    isStopped = true
-                },
-                enabled = isPlaying && !isStopped,
-                modifier = Modifier
-                    .size(56.dp)
-                    .background(Color.White.copy(if (isStopped) 0.3f else 0.9f), CircleShape)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.pausestory),
-                    contentDescription = "pause",
-                    tint = Color(0xFF003366)
                 )
             }
         }

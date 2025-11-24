@@ -185,5 +185,8 @@
     <string name="premium_required_message">More story creation requires premium membership.</string>
     <string name="premium_features_unlocked">Premium features unlocked!</string>
     <string name="tokens_remaining">tokens remaining</string>
+    <string name="trial_short_only">First-time trial users can only create Short stories. Upgrade to Premium for Medium and Long stories!</string>
+    <string name="converting_to_audio">Converting to Audio...</string>
+    <string name="please_wait">Please wait</string>
 
 </resources>

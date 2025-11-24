@@ -451,9 +451,9 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
                     "ad" to ad,
                     "soyad" to soyad,
                     "email" to email,
-                    "usedFreeTrial" to deviceUsedTrial, // Cihaz kullanılmışsa true
+                    "usedFreeTrial" to deviceUsedTrial, // İlk kullanıcı: false, diğerleri: true
                     "premium" to false,
-                    "remainingChatgptUses" to if (deviceUsedTrial) 0 else 1, // Cihaz yeniyse 1 hak
+                    "remainingChatgptUses" to if (!deviceUsedTrial) 1 else 0, // İlk kullanıcı: 1, diğerleri: 0
                     "premiumStartDate" to null,
                     "premiumDurationDays" to 0L,
                     "remainingFreeUses" to 0, // Başlangıçta reklam hakkı yok
@@ -467,9 +467,19 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
                     .set(user)
                     .await()
                 
-                // Cihazı kaydet (henüz kullanılmış olarak işaretleme)
+                // İlk kullanıcı için device_trials kaydı oluştur (used=true olarak işaretle)
                 if (!deviceUsedTrial) {
-                    deviceTrialManager.registerDeviceForUser(userId, isFirstTime = true)
+                    val deviceId = deviceTrialManager.getDeviceId()
+                    val trialData = hashMapOf(
+                        "device_id" to deviceId,
+                        "user_id" to userId,
+                        "used" to true,
+                        "registered_at" to com.google.firebase.Timestamp.now()
+                    )
+                    firestore.collection("device_trials")
+                        .document(deviceId)
+                        .set(trialData)
+                        .await()
                 }
                 
                 withContext(Dispatchers.Main) {
@@ -509,9 +519,9 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
                                         "ad" to (user.displayName ?: ""),
                                         "soyad" to "",
                                         "email" to (user.email ?: ""),
-                                        "usedFreeTrial" to deviceUsedTrial, // Cihaz kullanılmışsa true
+                                        "usedFreeTrial" to deviceUsedTrial, // İlk kullanıcı: false, diğerleri: true
                                         "premium" to false,
-                                        "remainingChatgptUses" to if (deviceUsedTrial) 0 else 1, // Cihaz yeniyse 1 hak
+                                        "remainingChatgptUses" to if (!deviceUsedTrial) 1 else 0, // İlk kullanıcı: 1, diğerleri: 0
                                         "premiumStartDate" to null,
                                         "premiumDurationDays" to 0L,
                                         "remainingFreeUses" to 0, // Başlangıçta reklam hakkı yok
@@ -523,9 +533,19 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
 
                                     userRef.set(userData).await()
                                     
-                                    // Yeni kullanıcıyı cihaza kaydet (henüz kullanılmış olarak işaretleme)
+                                    // İlk kullanıcı için device_trials kaydı oluştur (used=true olarak işaretle)
                                     if (!deviceUsedTrial) {
-                                        deviceTrialManager.registerDeviceForUser(user.uid, isFirstTime = true)
+                                        val deviceId = deviceTrialManager.getDeviceId()
+                                        val trialData = hashMapOf(
+                                            "device_id" to deviceId,
+                                            "user_id" to user.uid,
+                                            "used" to true,
+                                            "registered_at" to com.google.firebase.Timestamp.now()
+                                        )
+                                        firestore.collection("device_trials")
+                                            .document(deviceId)
+                                            .set(trialData)
+                                            .await()
                                     }
                                     
                                     withContext(Dispatchers.Main) {

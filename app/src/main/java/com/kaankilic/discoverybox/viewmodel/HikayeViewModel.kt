@@ -22,6 +22,12 @@ class HikayeViewModel @Inject constructor (val dbRepo: DiscoveryBoxRepository) :
     val hikaye = MutableLiveData<Hikaye>()
     val storyPages = MutableLiveData<List<com.kaankilic.discoverybox.entitiy.StoryPage>>()
     
+    // 🔓 Current story unlock flag - hikaye oluşturulunca true olur, hikayeden çıkınca false
+    val currentStoryUnlocked = MutableLiveData<Boolean>(false)
+    
+    // 🎵 Voice credit deduction flag - ses çalınca true olur, hikayeden çıkınca false
+    private var voiceCreditDeducted = false
+    
     // 💰 Maliyet takibi
     private var textCostInfo: ApiCostTracker.CostInfo? = null
     private val imageCostInfoList = mutableListOf<ApiCostTracker.CostInfo>()
@@ -32,30 +38,51 @@ class HikayeViewModel @Inject constructor (val dbRepo: DiscoveryBoxRepository) :
     
     fun generateStoryWithImages(prompt: String, storyLength: String, context: android.content.Context, canCreateFullStory: Boolean) {
         CoroutineScope(Dispatchers.Main).launch {
-            // 💰 Maliyet takibini sıfırla
             imageCostInfoList.clear()
             
-            // 🔒 Hikaye oluşturmadan önce hak azalt
-            val userId = com.google.firebase.Firebase.auth.currentUser?.uid
-            if (userId != null) {
-                // Hak azaltma işlemi
-                dbRepo.decrementChatGptUseIfNotPro(userId, canCreateFullStory) { status ->
-                    when (status) {
-                        com.kaankilic.discoverybox.util.UseStatus.SUCCESS -> {
-                            // Başarılı, hikaye oluşturmaya devam et
-                            CoroutineScope(Dispatchers.Main).launch {
-                                generateStoryInternal(prompt, storyLength, context, canCreateFullStory)
-                            }
-                        }
-                        com.kaankilic.discoverybox.util.UseStatus.NO_FREE_USES -> {
-                            android.widget.Toast.makeText(context, "Hikaye oluşturma hakkınız kalmadı!", android.widget.Toast.LENGTH_SHORT).show()
-                        }
-                        com.kaankilic.discoverybox.util.UseStatus.ERROR -> {
-                            android.widget.Toast.makeText(context, "Bir hata oluştu!", android.widget.Toast.LENGTH_SHORT).show()
-                        }
+            // 🎵 Hikaye oluşturma artık hak azaltmıyor - ses çalınca azaltılacak
+            // Hikayeyi doğrudan oluştur
+            currentStoryUnlocked.value = true
+            Log.d("STORY_DEBUG", "🔓 Hikaye oluşturuluyor: storyUnlocked=true (ses çalınca hak azalacak)")
+            generateStoryInternal(prompt, storyLength, context, canCreateFullStory)
+        }
+    }
+    
+    // Hikayeden çıkınca flag'i sıfırla
+    fun resetStoryUnlock() {
+        currentStoryUnlocked.value = false
+        voiceCreditDeducted = false
+    }
+    
+    // Ses için kredi azaltma fonksiyonu
+    fun deductVoiceCredit(context: android.content.Context, canCreateFullStory: Boolean, onComplete: (Boolean) -> Unit) {
+        // Eğer bu hikaye için daha önce kredi azaltıldıysa, tekrar azaltma
+        if (voiceCreditDeducted) {
+            onComplete(true)
+            return
+        }
+        
+        val userId = com.google.firebase.Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            dbRepo.decrementChatGptUseIfNotPro(userId, canCreateFullStory) { status ->
+                when (status) {
+                    com.kaankilic.discoverybox.util.UseStatus.SUCCESS -> {
+                        voiceCreditDeducted = true
+                        Log.d("STORY_DEBUG", "🎵 Ses için kredi azaltıldı")
+                        onComplete(true)
+                    }
+                    com.kaankilic.discoverybox.util.UseStatus.NO_FREE_USES -> {
+                        android.widget.Toast.makeText(context, "Hikaye oluşturma hakkınız kalmadı!", android.widget.Toast.LENGTH_SHORT).show()
+                        onComplete(false)
+                    }
+                    com.kaankilic.discoverybox.util.UseStatus.ERROR -> {
+                        android.widget.Toast.makeText(context, "Bir hata oluştu!", android.widget.Toast.LENGTH_SHORT).show()
+                        onComplete(false)
                     }
                 }
             }
+        } else {
+            onComplete(false)
         }
     }
     
@@ -82,10 +109,10 @@ class HikayeViewModel @Inject constructor (val dbRepo: DiscoveryBoxRepository) :
             )
         }
         
+        // Görseller bu hikaye için ücretsiz (currentStoryUnlocked = true)
         storyPagesList.forEachIndexed { index, page ->
             val consistentPrompt = "Professional children's book illustration, vibrant fantasy art. Main character $storyMainCharacter (same appearance throughout) in $storySetting. Scene: ${page.content.take(100)}. IMPORTANT: NO book pages, NO text overlays, NO page borders, pure scene illustration only. Consistent character design."
             val bitmap = withContext(Dispatchers.IO) {
-                // Artık hak azaltma yapmıyoruz, sadece görsel oluşturuyoruz
                 dbRepo.queryTextToImage(consistentPrompt, canCreateFullStory, context, decrementUsage = false)
             }
             page.imageBitmap = bitmap

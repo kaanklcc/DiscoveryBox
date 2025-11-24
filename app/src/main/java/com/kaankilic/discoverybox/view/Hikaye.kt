@@ -497,32 +497,25 @@ fun Hikaye(
             // Generate Button
             Button(
                 onClick = {
-                    // Önce kullanıcı erişim kontrolü yap
-                    anasayfaViewModel.checkUserAccess { canCreateFullStory, canCreateTextOnly, isPremiumStatus, _ ->
-                        // Premium ise ve hakkı bitmişse premium sayfasına yönlendir
-                        if (isPremiumStatus && !canCreateFullStory && !canCreateTextOnly) {
-                            navController.navigate("premium")
-                            return@checkUserAccess
-                        }
-                        // Premium değilse ve hiç hakkı yoksa premium sayfasına yönlendir
-                        if (!isPremiumStatus && !canCreateFullStory && !canCreateTextOnly) {
+                    // Check user access
+                    anasayfaViewModel.checkUserAccess { canCreateFullStory, canCreateTextOnly, isPremiumStatus, usedTrialStatus ->
+                        // If user has NO access at all (premium expired or trial used), redirect to premium
+                        if (!canCreateFullStory && !canCreateTextOnly) {
                             navController.navigate("premium")
                             return@checkUserAccess
                         }
                         
-                        // Non-premium users always go to premium (regardless of story length)
-                        if (!isPremiumStatus) {
-                            navController.navigate("premium")
+                        // Story length validation: first-time users can only create Short stories
+                        if (!usedTrialStatus && !isPremiumStatus && selectedLength != lengths[0]) {
+                            android.widget.Toast.makeText(
+                                context,
+                                context.getString(R.string.trial_short_only),
+                                android.widget.Toast.LENGTH_LONG
+                            ).show()
                             return@checkUserAccess
                         }
                         
-                        // Story length validation for premium users
-                        if (selectedLength.isNotEmpty() && !availableLengths.contains(selectedLength)) {
-                            navController.navigate("premium")
-                            return@checkUserAccess
-                        }
-                        
-                        // Hakkı varsa hikaye oluştur
+                        // User has access - create story
                         val yanKarakterlerText = yanKarakterler.filter { it.isNotBlank() }.joinToString(", ")
                         
                         val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)

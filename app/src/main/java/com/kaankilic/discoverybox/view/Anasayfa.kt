@@ -507,18 +507,9 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                         )
                     )
                     .clickable {
-                        // Premium ise ve hakkı bitmişse premium sayfasına yönlendir
-                        if (isPremium && remainingPremiumUses <= 0) {
-                            navController.navigate("premium")
-                        }
-                        // Premium değilse ve hakkı yoksa premium sayfasına yönlendir
-                        else if (!isPremium && remainingAdUses <= 0) {
-                            navController.navigate("premium")
-                        }
-                        // Hakkı varsa hikaye sayfasına git
-                        else {
-                            navController.navigate("hikaye")
-                        }
+                        // Always navigate to story creation screen
+                        // Premium check will happen when user clicks "Create Story" button
+                        navController.navigate("hikaye")
                     }
                     .padding(20.dp)
             ) {
@@ -560,18 +551,9 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             .clip(RoundedCornerShape(16.dp))
                             .background(Color(0xFFFBBF24))
                             .clickable {
-                                // Premium ise ve hakkı bitmişse premium sayfasına yönlendir
-                                if (isPremium && remainingPremiumUses <= 0) {
-                                    navController.navigate("premium")
-                                }
-                                // Premium değilse ve hakkı yoksa premium sayfasına yönlendir
-                                else if (!isPremium && remainingAdUses <= 0) {
-                                    navController.navigate("premium")
-                                }
-                                // Hakkı varsa hikaye sayfasına git
-                                else {
-                                    navController.navigate("hikaye")
-                                }
+                                // Always navigate to story creation screen
+                                // Premium check will happen when user clicks "Create Story" button
+                                navController.navigate("hikaye")
                             }
                             .padding(vertical = 14.dp),
                         contentAlignment = Alignment.Center
@@ -825,7 +807,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                                 "\n" +
                                 "\uD83C\uDF08 Eve Dönüş\n" +
                                 "\n" +
-                                "Elif veda ederken Lila ona sarılmış:\n" +
+                                "Elif veda ederken Lila ona :\n" +
                                 "\n" +
                                 "“Orman seni asla unutmayacak Elif. Artık sen de Sihirli Orman’ın bir kahramanısın.”\n" +
                                 "\n" +
