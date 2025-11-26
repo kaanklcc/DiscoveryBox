@@ -55,7 +55,6 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.kaankilic.discoverybox.R
 import com.kaankilic.discoverybox.entitiy.Hikaye
-import com.kaankilic.discoverybox.util.InterstitialAdHelper
 import com.kaankilic.discoverybox.viewmodel.HikayeViewModel
 import com.kaankilic.discoverybox.viewmodel.SaveSayfaViewModel
 import kotlinx.coroutines.launch
@@ -70,7 +69,6 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
     val sandtitle = FontFamily(Font(R.font.sandtitle))
     val andikabody = FontFamily(Font(R.font.andikabody))
     var selectedTab by remember { mutableStateOf(2) }
-    var showLogoutDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -133,86 +131,11 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
             }
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = Color(0xFF003366),
-            ) {
-                NavigationBarItem(
-                    selected = selectedTab == 0,
-                    onClick = { 
-                        selectedTab = 0
-                        navController.navigate("anasayfa")
-                    },
-                    icon = {
-                        Icon(
-                            Icons.Default.Home,
-                            contentDescription = "Home",
-                            tint = if (selectedTab == 0) Color(0xFFC084FC) else Color(0xFFE9D5FF)
-                        )
-                    },
-                    label = { Text(stringResource(R.string.home), fontSize = 10.sp, color = Color(0xFFE9D5FF)) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFC084FC),
-                        unselectedIconColor = Color(0xFFE9D5FF),
-                        indicatorColor = Color(0xFF0055AA).copy(alpha = 0.2f)
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 1,
-                    onClick = {
-                        selectedTab = 1
-                        navController.navigate("hikaye")
-                    },
-                    icon = {
-                        Icon(
-                            Icons.Default.Create,
-                            contentDescription = "Create",
-                            tint = if (selectedTab == 1) Color(0xFFF472B6) else Color(0xFFFCE7F3)
-                        )
-                    },
-                    label = { Text(stringResource(R.string.create), fontSize = 10.sp, color = Color(0xFFFCE7F3)) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFF472B6),
-                        unselectedIconColor = Color(0xFFFCE7F3),
-                        indicatorColor = Color(0xFFEC4899).copy(alpha = 0.2f)
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 2,
-                    onClick = { selectedTab = 2 },
-                    icon = {
-                        Icon(
-                            Icons.Default.Favorite,
-                            contentDescription = "Saved",
-                            tint = if (selectedTab == 2) Color(0xFFFBBF24) else Color(0xFFFEF3C7)
-                        )
-                    },
-                    label = { Text(stringResource(R.string.saved), fontSize = 10.sp, color = Color(0xFFFEF3C7)) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFFBBF24),
-                        unselectedIconColor = Color(0xFFFEF3C7),
-                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 3,
-                    onClick = {
-                        showLogoutDialog = true
-                    },
-                    icon = {
-                        Icon(
-                            Icons.Default.ExitToApp,
-                            contentDescription = "Logout",
-                            tint = if (selectedTab == 3) Color(0xFF22D3EE) else Color(0xFFCFFAFE)
-                        )
-                    },
-                    label = { Text(stringResource(R.string.logout), fontSize = 10.sp, color = Color(0xFFCFFAFE)) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF22D3EE),
-                        unselectedIconColor = Color(0xFFCFFAFE),
-                        indicatorColor = Color(0xFF06B6D4).copy(alpha = 0.2f)
-                    )
-                )
-            }
+            CommonBottomBar(
+                navController = navController,
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it }
+            )
         }
     ) { paddingValues ->
         LazyColumn(
@@ -239,50 +162,7 @@ fun SaveSayfa(navController: NavController, saveSayfaViewModel: SaveSayfaViewMod
                 )
             }
         }
-        
-        // Çıkış onay dialog'u
-        if (showLogoutDialog) {
-            AlertDialog(
-                onDismissRequest = { showLogoutDialog = false },
-                title = {
-                    Text(
-                        stringResource(R.string.logout_confirmation_title),
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = sandtitle
-                    )
-                },
-                text = {
-                    Text(
-                        stringResource(R.string.logout_confirmation_message),
-                        fontFamily = andikabody
-                    )
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            selectedTab = 3
-                            Firebase.auth.signOut()
-                            navController.navigate("girisSayfa") {
-                                popUpTo(0) { inclusive = true }
-                            }
-                            showLogoutDialog = false
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFEF4444)
-                        )
-                    ) {
-                        Text(stringResource(R.string.yes), fontFamily = andikabody)
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = { showLogoutDialog = false }
-                    ) {
-                        Text(stringResource(R.string.no), fontFamily = andikabody)
-                    }
-                }
-            )
-        }
+
     }
 }
 
@@ -352,14 +232,7 @@ fun SwipeToDeleteStoryItem(
                 .fillMaxWidth()
                 .offset { IntOffset(swipeableState.offset.value.roundToInt(), 0) }
                 .clickable {
-                    val activity = context as? Activity
-                    if (activity != null) {
-                        InterstitialAdHelper.showAdIfNeeded(activity, isPro) {
-                            navController.navigate("metin/${hikaye.id}")
-                        }
-                    } else {
-                        navController.navigate("metin/${hikaye.id}")
-                    }
+                    navController.navigate("metin/${hikaye.id}")
                 },
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(

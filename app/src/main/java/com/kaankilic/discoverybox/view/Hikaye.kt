@@ -142,90 +142,11 @@ fun Hikaye(
             )
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = Color(0xFF003366),
-            ) {
-                NavigationBarItem(
-                    selected = selectedTab == 0,
-                    onClick = { 
-                        selectedTab = 0
-                        navController.navigate("anasayfa")
-                    },
-                    icon = {
-                        Icon(
-                            Icons.Default.Home,
-                            contentDescription = "Home",
-                            tint = if (selectedTab == 0) Color(0xFFFCD34D) else Color.White
-                        )
-                    },
-                    label = { Text(stringResource(R.string.home), fontSize = 10.sp, color = Color.White) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFFCD34D),
-                        unselectedIconColor = Color.White,
-                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    icon = {
-                        Icon(
-                            Icons.Default.Create,
-                            contentDescription = "Create",
-                            tint = if (selectedTab == 1) Color(0xFFFCD34D) else Color.White
-                        )
-                    },
-                    label = { Text(stringResource(R.string.create), fontSize = 10.sp, color = Color(0xFFFCE7F3)) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFFCD34D),
-                        unselectedIconColor = Color.White,
-                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 2,
-                    onClick = {
-                        selectedTab = 2
-                        navController.navigate("saveSayfa")
-                    },
-                    icon = {
-                        Icon(
-                            Icons.Default.Favorite,
-                            contentDescription = "Saved",
-                            tint = if (selectedTab == 2) Color(0xFFFBBF24) else Color(0xFFFEF3C7)
-                        )
-                    },
-                    label = { Text(stringResource(R.string.saved), fontSize = 10.sp, color = Color(0xFFFEF3C7)) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFFBBF24),
-                        unselectedIconColor = Color(0xFFFEF3C7),
-                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 3,
-                    onClick = {
-                        selectedTab = 3
-                        Firebase.auth.signOut()
-                        navController.navigate("girisSayfa") {
-                            popUpTo(0) { inclusive = true }
-                        }
-                    },
-                    icon = {
-                        Icon(
-                            Icons.Default.ExitToApp,
-                            contentDescription = "Logout",
-                            tint = if (selectedTab == 3) Color(0xFF22D3EE) else Color(0xFFCFFAFE)
-                        )
-                    },
-                    label = { Text(stringResource(R.string.logout), fontSize = 10.sp, color = Color(0xFFCFFAFE)) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF22D3EE),
-                        unselectedIconColor = Color(0xFFCFFAFE),
-                        indicatorColor = Color(0xFF06B6D4).copy(alpha = 0.2f)
-                    )
-                )
-            }
+            CommonBottomBar(
+                navController = navController,
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it }
+            )
         }
     ) {
         Column(
@@ -497,10 +418,10 @@ fun Hikaye(
             // Generate Button
             Button(
                 onClick = {
-                    // Check user access
+                    // Check user access - SADECE PREMIUM KULLANICILAR HİKAYE OLUŞTURABİLİR
                     anasayfaViewModel.checkUserAccess { canCreateFullStory, canCreateTextOnly, isPremiumStatus, usedTrialStatus ->
-                        // If user has NO access at all (premium expired or trial used), redirect to premium
-                        if (!canCreateFullStory && !canCreateTextOnly) {
+                        // Premium değilse premium sayfasına yönlendir
+                        if (!isPremiumStatus) {
                             navController.navigate("premium")
                             return@checkUserAccess
                         }

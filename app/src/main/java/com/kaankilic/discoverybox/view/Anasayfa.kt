@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.icons.Icons
@@ -36,6 +37,7 @@ import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -84,15 +86,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import androidx.room.util.TableInfo
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.AdSize
-import com.google.android.gms.ads.AdView
 import com.google.firebase.Firebase
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.kaankilic.discoverybox.R
-import com.kaankilic.discoverybox.util.InterstitialAdHelper
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import kotlinx.coroutines.launch
 
@@ -108,8 +106,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
     // 🧪 DEBUG MENU
     var showDebugMenu by remember { mutableStateOf(false) }
     
-    // Çıkış onay dialog'u
-    var showLogoutDialog by remember { mutableStateOf(false) }
+
     
     // Kullanıcı durumu state'leri
     var canCreateFullStory by remember { mutableStateOf(false) }
@@ -157,87 +154,11 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
 
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                containerColor = Color(0xFF003366),
-
-            ) {
-                NavigationBarItem(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    icon = {
-                        Icon(
-                            Icons.Default.Home,
-                            contentDescription = "Home",
-                            tint = if (selectedTab == 0) Color(0xFFFCD34D) else Color.White
-                        )
-                    },
-                    label = { Text(stringResource(R.string.home), fontSize = 10.sp, color = Color.White) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFFCD34D),
-                        unselectedIconColor = Color.White,
-                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 1,
-                    onClick = {
-                        selectedTab = 1
-                        navController.navigate("hikaye")
-                    },
-                    icon = {
-                        Icon(
-                            Icons.Default.Create,
-                            contentDescription = "Create",
-                            tint = if (selectedTab == 1) Color(0xFFFCD34D) else Color.White
-                        )
-                    },
-                    label = { Text(stringResource(R.string.create), fontSize = 10.sp, color = Color.White) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFFCD34D),
-                        unselectedIconColor = Color.White,
-                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 2,
-                    onClick = {
-                        selectedTab = 2
-                        navController.navigate("saveSayfa")
-                    },
-                    icon = {
-                        Icon(
-                            Icons.Default.Favorite,
-                            contentDescription = "Saved",
-                            tint = if (selectedTab == 2) Color(0xFFFCD34D) else  Color.White
-                        )
-                    },
-                    label = { Text(stringResource(R.string.saved), fontSize = 10.sp, color = Color(0xFFFEF3C7)) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFFFBBF24),
-                        unselectedIconColor = Color(0xFFFEF3C7),
-                        indicatorColor = Color(0xFFF59E0B).copy(alpha = 0.2f)
-                    )
-                )
-                NavigationBarItem(
-                    selected = selectedTab == 3,
-                    onClick = {
-                        showLogoutDialog = true
-                    },
-                    icon = {
-                        Icon(
-                            Icons.Default.ExitToApp,
-                            contentDescription = "Logout",
-                            tint = if (selectedTab == 3) Color(0xFF22D3EE) else Color(0xFFCFFAFE)
-                        )
-                    },
-                    label = { Text(stringResource(R.string.logout), fontSize = 10.sp, color = Color(0xFFCFFAFE)) },
-                    colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Color(0xFF22D3EE),
-                        unselectedIconColor = Color(0xFFCFFAFE),
-                        indicatorColor = Color(0xFF06B6D4).copy(alpha = 0.2f)
-                    )
-                )
-            }
+            CommonBottomBar(
+                navController = navController,
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it }
+            )
         }
     ) { paddingValues ->
         Column(
@@ -360,53 +281,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                             val activity = context as? Activity ?: return@clickable
                             val userId = Firebase.auth.currentUser?.uid
                             if (userId != null) {
-                                // Reklamı göster, kapatıldığında krediyi ver
-                                InterstitialAdHelper.showAd(activity) {
-                                    Firebase.firestore.collection("users").document(userId).get()
-                                        .addOnSuccessListener { doc ->
-                                            val today = com.kaankilic.discoverybox.util.getTodayDateString()
-                                            val lastReset = doc.getString("lastFreeUseReset") ?: ""
-                                            var currentAdsWatched = (doc.getLong("adsWatchedToday") ?: 0).toInt()
-                                            var currentRemainingFreeUses = (doc.getLong("remainingFreeUses") ?: 0).toInt()
-                                            val currentAdsRequired = (doc.getLong("adsRequiredForReward") ?: 3).toInt()
 
-                                            if (lastReset != today) {
-                                                currentAdsWatched = 0
-                                                currentRemainingFreeUses = 0
-                                            }
-
-                                            if (currentAdsWatched < maxAdsPerDay && currentRemainingFreeUses == 0) {
-                                                val newAdsWatched = currentAdsWatched + 1
-                                                val newFreeUses = if (newAdsWatched % currentAdsRequired == 0) {
-                                                    1 // Günde sadece 1 hak
-                                                } else {
-                                                    0
-                                                }
-
-                                                Firebase.firestore.collection("users").document(userId).update(
-                                                    mapOf(
-                                                        "adsWatchedToday" to newAdsWatched,
-                                                        "remainingFreeUses" to newFreeUses,
-                                                        "lastFreeUseReset" to today
-                                                    )
-                                                ).addOnSuccessListener {
-                                                    if (newAdsWatched % currentAdsRequired == 0) {
-                                                        Toast.makeText(context, "🎉 1 hikaye hakkı kazandınız! (Günlük)", Toast.LENGTH_SHORT).show()
-                                                        remainingAdUses = newFreeUses
-                                                        adsWatchedToday = newAdsWatched
-                                                    } else {
-                                                        val remaining = currentAdsRequired - (newAdsWatched % currentAdsRequired)
-                                                        Toast.makeText(context, "✅ Reklam izlendi! $remaining reklam daha izleyin.", Toast.LENGTH_SHORT).show()
-                                                        adsWatchedToday = newAdsWatched
-                                                    }
-                                                }
-                                            } else if (currentRemainingFreeUses > 0) {
-                                                Toast.makeText(context, "Bugünlük hikaye hakkınızı zaten kazandınız!", Toast.LENGTH_SHORT).show()
-                                            } else {
-                                                Toast.makeText(context, "Bugün tüm reklamları izlediniz!", Toast.LENGTH_SHORT).show()
-                                            }
-                                        }
-                                }
                             }
                         }
                         .padding(12.dp)
@@ -604,92 +479,92 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                                     "But this forest had a secret:\n" +
                                     "Only those with pure hearts could see the magical side of the forest.\n\n" +
                                     "🌿 One Day...\n\n" +
-                                    "In a small village lived a curious girl named Elif. Elif was eight years old, with big brown eyes and two braids, and had won everyone's love. She loved reading adventure books most of all. Every night she would look at the stars and say, \"I wish I could go on an adventure someday.\"\n\n" +
-                                    "One morning, when the sun had just risen from behind the mountains, Elif found a bright feather in front of her house. The feather shone so brightly it seemed to have fallen from inside a rainbow. When Elif picked it up, the feather suddenly glowed and a tiny voice was heard:\n\n" +
+                                    "In a small village lived a curious girl named Amy. Amy was eight years old, with big brown eyes and two braids, and had won everyone's love. She loved reading adventure books most of all. Every night she would look at the stars and say, \"I wish I could go on an adventure someday.\"\n\n" +
+                                    "One morning, when the sun had just risen from behind the mountains, Amy found a bright feather in front of her house. The feather shone so brightly it seemed to have fallen from inside a rainbow. When Amy picked it up, the feather suddenly glowed and a tiny voice was heard:\n\n" +
                                     "\"Help me! The Magical Forest is in danger!\"\n\n" +
-                                    "Elif was surprised but not scared. She bravely asked:\n" +
+                                    "Amy was surprised but not scared. She bravely asked:\n" +
                                     "— Who's talking?\n\n" +
                                     "A tiny fairy emerged from inside the feather! Her name was Lila.\n" +
                                     "Lila was one of the guardians of the Magical Forest. Since the Light Stone of the forest had been stolen, the forest's magic was beginning to weaken. Trees were fading, flowers losing their light.\n\n" +
-                                    "\"Elif, only you can save us,\" said Lila.\n\n" +
-                                    "Without thinking, Elif said:\n" +
+                                    "\"Amy, only you can save us,\" said Lila.\n\n" +
+                                    "Without thinking, Amy said:\n" +
                                     "— \"Okay! Let's go!\"\n\n" +
                                     "And so the magical adventure began.\n\n" +
                                     "🌲 At the Forest Gate\n\n" +
-                                    "Lila held Elif's hand, the feather suddenly grew and lifted them into the sky. Passing through the wind and gliding among the lights, Elif felt her heart beating fast.\n" +
+                                    "Lila held Amy's hand, the feather suddenly grew and lifted them into the sky. Passing through the wind and gliding among the lights, Amy felt her heart beating fast.\n" +
                                     "When she opened her eyes, there was a huge, shining forest gate in front of her. The gate was made of crystals with this shining inscription:\n\n" +
                                     "\"Enter with courage, find your way with your heart.\"\n\n" +
-                                    "Elif pushed the gate and entered.\n" +
+                                    "Amy pushed the gate and entered.\n" +
                                     "Suddenly everything became colorful: butterflies were singing, trees whispering, rivers laughing.\n\n" +
                                     "But Lila looked sad:\n\n" +
                                     "\"The Light Stone is in the Shadow Cave to the north. To get there, we must pass three obstacles.\"\n\n" +
-                                    "Elif was determined:\n" +
+                                    "Amy was determined:\n" +
                                     "— \"Three obstacles? Let's go then!\"\n\n" +
-                                    "And with courage, friendship, and wisdom, Elif overcame every challenge, defeated the Dark Shadow, and restored light to the Magical Forest. She returned home as a hero, knowing that true magic lies within the heart. 🌈✨"),
-                            Triple("featured_2", "Space Journey", "Once upon a time, in a small town lived a curious boy named Kaan. Every night before bed, Kaan would look out his window at the sky and say, \"One day I'll go there, among the stars!\"\n\n" +
-                                    "One evening, the sky was different than usual. The moon was bright, stars seemed to be dancing. As Kaan watched the brightest star through his telescope, he suddenly saw a point of light shining like a rainbow next to the star. The light grew bigger and bigger and whoooosh! A tiny spaceship appeared in the middle of his room!\n\n" +
+                                    "And with courage, friendship, and wisdom, Amy overcame every challenge, defeated the Dark Shadow, and restored light to the Magical Forest. She returned home as a hero, knowing that true magic lies within the heart. 🌈✨"),
+                            Triple("featured_2", "Space Journey", "Once upon a time, in a small town lived a curious boy named John. Every night before bed, John would look out his window at the sky and say, \"One day I'll go there, among the stars!\"\n\n" +
+                                    "One evening, the sky was different than usual. The moon was bright, stars seemed to be dancing. As John watched the brightest star through his telescope, he suddenly saw a point of light shining like a rainbow next to the star. The light grew bigger and bigger and whoooosh! A tiny spaceship appeared in the middle of his room!\n\n" +
                                     "The ship's hatch opened, and out came a blue, sparkling alien.\n" +
-                                    "\"Hello Kaan! I'm Zuzu, captain of the Stardust Ship!\" he said.\n" +
-                                    "Kaan asked in amazement, \"Did you really come from space?\"\n" +
+                                    "\"Hello John! I'm Zuzu, captain of the Stardust Ship!\" he said.\n" +
+                                    "John asked in amazement, \"Did you really come from space?\"\n" +
                                     "Zuzu smiled: \"Yes! While traveling the universe, I picked up your curiosity signals. So you want to go to space?\"\n\n" +
-                                    "Kaan nodded excitedly.\n" +
-                                    "\"But I can't go alone,\" he said, \"my friends Anıl and Miralp must come too!\"\n\n" +
-                                    "Zuzu smiled, waved his magic antenna, and suddenly Anıl and Miralp appeared in Kaan's room too!\n" +
-                                    "\"What's happening here?\" said Anıl in amazement.\n" +
-                                    "\"We're going to space!\" said Kaan excitedly.\n\n" +
+                                    "John nodded excitedly.\n" +
+                                    "\"But I can't go alone,\" he said, \"my friends Jack and Michael must come too!\"\n\n" +
+                                    "Zuzu smiled, waved his magic antenna, and suddenly Jack and Michael appeared in John's room too!\n" +
+                                    "\"What's happening here?\" said Jack in amazement.\n" +
+                                    "\"We're going to space!\" said John excitedly.\n\n" +
                                     "The three friends jumped into the ship. The ship sparkled brightly and suddenly shot through the window into the sky! 🚀\n\n" +
                                     "They explored the Moon's craters, flew through Saturn's rings, visited the Dream Cloud Galaxy with purple and orange skies, and saw giant star butterflies gliding through space.\n\n" +
                                     "When they returned home, a small bottle of glowing stardust was beside the telescope.\n\n" +
-                                    "Kaan whispered:\n" +
+                                    "John whispered:\n" +
                                     "\"So it was all real...\"\n\n" +
-                                    "And from that day on, every night Kaan, Anıl, and Miralp looked at the sky together and sent a new signal — hoping that maybe one day Zuzu would return."),
-                            Triple("featured_3", "Underwater Kingdom", "Once upon a time, in a small fishing village by the deep blue sea, lived a curious girl named Alya. Alya's favorite thing was to listen to the sound of waves every morning and imagine the mysteries beneath the sea.\n\n" +
-                                    "One day while walking on the beach, Alya found a sparkling blue seashell among the sand. When she put the shell to her ear, she heard a thin voice:\n\n" +
-                                    "\"Alya... help... the Underwater Kingdom is in danger!\"\n\n" +
-                                    "Alya was scared at first, then gathered her courage and asked, \"How can I help you?\" A light rose from inside the shell and suddenly Alya found herself underwater, able to breathe!\n\n" +
+                                    "And from that day on, every night John, Jack, and Michael looked at the sky together and sent a new signal — hoping that maybe one day Zuzu would return."),
+                            Triple("featured_3", "Underwater Kingdom", "Once upon a time, in a small fishing village by the deep blue sea, lived a curious girl named Abbey. Abbey's favorite thing was to listen to the sound of waves every morning and imagine the mysteries beneath the sea.\n\n" +
+                                    "One day while walking on the beach, Abbey found a sparkling blue seashell among the sand. When she put the shell to her ear, she heard a thin voice:\n\n" +
+                                    "\"Abbey... help... the Underwater Kingdom is in danger!\"\n\n" +
+                                    "Abbey was scared at first, then gathered her courage and asked, \"How can I help you?\" A light rose from inside the shell and suddenly Abbey found herself underwater, able to breathe!\n\n" +
                                     "🐚 Coral City\n\n" +
-                                    "When Alya opened her eyes, she was surrounded by colorful corals, starfish, and gliding fish. A graceful mermaid with silver scales appeared before her.\n\n" +
+                                    "When Abbey opened her eyes, she was surrounded by colorful corals, starfish, and gliding fish. A graceful mermaid with silver scales appeared before her.\n\n" +
                                     "\"I am Mira, guardian of the Underwater Kingdom,\" she said. \"King Triton's light pearl has been stolen! That pearl gives light and life to our sea. Without it, everything will darken.\"\n\n" +
-                                    "Alya immediately said, \"I'll help you find that pearl!\"\n\n" +
+                                    "Abbey immediately said, \"I'll help you find that pearl!\"\n\n" +
                                     "Together with Mira and a cheerful octopus named Pippo, they ventured to the Dark Cave, outsmarted a moray eel, and retrieved the light pearl. The kingdom celebrated with songs and dances.\n\n" +
-                                    "When Alya bid farewell, Mira smiled:\n\n" +
+                                    "When Abbey bid farewell, Mira smiled:\n\n" +
                                     "\"Whenever you put the seashell to your ear, we will hear you.\"\n\n" +
-                                    "Alya suddenly found herself back on the beach. She still had that blue seashell in her hand. When she put it to her ear, she heard a voice from the depths:\n\n" +
-                                    "\"Thank you, Alya, hero of the Sea Kingdom!\" 🌊✨"),
-                            Triple("featured_4", "Dream World", "Once upon a time, in a small town lived a curious girl: Necla. Necla loved to daydream. Sometimes she would look at the clouds in the sky, changing their shapes and making up stories. But one night, something different happened...\n\n" +
-                                    "That night, as soon as Necla put her head on her pillow, her eyelids grew heavy. Suddenly bright lights appeared around her. When she opened her eyes, she found herself in a place made of soft cotton. Around her floated clouds in shades of blue, pink, and purple like the sky.\n\n" +
+                                    "Abbey suddenly found herself back on the beach. She still had that blue seashell in her hand. When she put it to her ear, she heard a voice from the depths:\n\n" +
+                                    "\"Thank you, Abbey, hero of the Sea Kingdom!\" 🌊✨"),
+                            Triple("featured_4", "Dream World", "Once upon a time, in a small town lived a curious girl: Camelia. Camelia loved to daydream. Sometimes she would look at the clouds in the sky, changing their shapes and making up stories. But one night, something different happened...\n\n" +
+                                    "That night, as soon as Camelia put her head on her pillow, her eyelids grew heavy. Suddenly bright lights appeared around her. When she opened her eyes, she found herself in a place made of soft cotton. Around her floated clouds in shades of blue, pink, and purple like the sky.\n\n" +
                                     "\"Where is this?\" she asked herself.\n\n" +
                                     "Just then, a tiny bird with golden yellow wings came to her.\n" +
-                                    "\"Welcome to Dream World, Necla!\" it chirped. \"I'm Luma! Here everyone lives their own dreams.\"\n\n" +
-                                    "Necla looked around in amazement. In the sky were flying ice creams, talking pillows, and flowers dancing and changing colors. \"This is wonderful!\" she said.\n\n" +
+                                    "\"Welcome to Dream World, Camelia!\" it chirped. \"I'm Luma! Here everyone lives their own dreams.\"\n\n" +
+                                    "Camelia looked around in amazement. In the sky were flying ice creams, talking pillows, and flowers dancing and changing colors. \"This is wonderful!\" she said.\n\n" +
                                     "But Luma's face suddenly became serious.\n" +
-                                    "\"Dream World is in danger, Necla! The Dark Shadow is gaining power from people's nightmares. If we don't stop it, beautiful dreams will disappear!\"\n\n" +
-                                    "Necla bravely said, \"Then let's go right away!\"\n\n" +
-                                    "Using the light from her heart and thinking of beautiful things, Necla defeated the Dark Shadow and saved Dream World. From that day on, every night before falling asleep, Necla made a wish:\n" +
+                                    "\"Dream World is in danger, Camelia! The Dark Shadow is gaining power from people's nightmares. If we don't stop it, beautiful dreams will disappear!\"\n\n" +
+                                    "Camelia bravely said, \"Then let's go right away!\"\n\n" +
+                                    "Using the light from her heart and thinking of beautiful things, Camelia defeated the Dark Shadow and saved Dream World. From that day on, every night before falling asleep, Camelia made a wish:\n" +
                                     "\"I wish everyone has a beautiful dream today.\"\n\n" +
                                     "And that wish added one more light to Dream World every night. 💫"),
-                            Triple("featured_5", "Dragon Friendship", "Once upon a time, in a small village shadowed by clouds, lived a brave girl named Elif. Every day Elif would go to the edge of the forest and look at the distant mountains. Beyond those mountains was Dragon Valley, where no one dared to go. Villagers believed a terrible dragon lived there and were afraid to go near.\n\n" +
-                                    "But Elif was different. Instead of being afraid of dragons, she was curious about them.\n" +
+                            Triple("featured_5", "Dragon Friendship", "Once upon a time, in a small village shadowed by clouds, lived a brave girl named Gwen. Every day Gwen would go to the edge of the forest and look at the distant mountains. Beyond those mountains was Dragon Valley, where no one dared to go. Villagers believed a terrible dragon lived there and were afraid to go near.\n\n" +
+                                    "But Gwen was different. Instead of being afraid of dragons, she was curious about them.\n" +
                                     "One day she gathered her courage, packed some bread, water, and her favorite stuffed toy in her small backpack, and set off toward the forest.\n\n" +
-                                    "At the end of a long walk, she saw a huge cave among the mists. In front of the cave lay an injured, tiny dragon! Its scales were green, eyes sparkling like emeralds. Elif was scared at first but then realized the dragon was in pain.\n\n" +
-                                    "\"Hello... I won't hurt you,\" said Elif, slowly approaching.\n" +
+                                    "At the end of a long walk, she saw a huge cave among the mists. In front of the cave lay an injured, tiny dragon! Its scales were green, eyes sparkling like emeralds. Gwen was scared at first but then realized the dragon was in pain.\n\n" +
+                                    "\"Hello... I won't hurt you,\" said Gwen, slowly approaching.\n" +
                                     "The dragon also lifted its head with a slight moan. A stone was stuck in its foot!\n\n" +
-                                    "Elif immediately carefully removed the stone with a small stick, then cleaned the wound with water from her bag. The dragon gratefully puffed warm steam from its nose — almost like a thank you.\n\n" +
-                                    "Elif named the dragon \"Spark.\" From that day on, she secretly visited her friend in the valley every day. She brought food, they played games, and sometimes Elif even rode on its back and flew above the clouds! ☁️\n\n" +
-                                    "Through Elif's courage and kindness, she showed the villagers that the dragon wasn't terrible, and Dragon Valley became known as the valley of friendship and courage. Elif and Spark flew in the sky every day, waving to the villagers from afar.\n\n" +
+                                    "Gwen immediately carefully removed the stone with a small stick, then cleaned the wound with water from her bag. The dragon gratefully puffed warm steam from its nose — almost like a thank you.\n\n" +
+                                    "Gwen named the dragon \"Spark.\" From that day on, she secretly visited her friend in the valley every day. She brought food, they played games, and sometimes Gwen even rode on its back and flew above the clouds! ☁️\n\n" +
+                                    "Through Gwen's courage and kindness, she showed the villagers that the dragon wasn't terrible, and Dragon Valley became known as the valley of friendship and courage. Gwen and Spark flew in the sky every day, waving to the villagers from afar.\n\n" +
                                     "And so a little girl's courage changed the heart of an entire village. 💖"),
-                            Triple("featured_6", "Time Traveler", "Once upon a time, in a small town lived a curious child. His name was Zeki. Unlike other children, Zeki loved working with old things more than playing games. In his father's repair workshop, he would dismantle broken clocks and try to understand how the gears inside worked.\n\n" +
-                                    "One day, he entered the old antique shop at the edge of town. While browsing among the shelves, his eyes caught a dusty pocket watch. On the watch's cover it said \"Time is waiting for you.\" Zeki immediately took the watch curiously and wound it. At that moment, a bright light appeared and Zeki suddenly found himself somewhere completely different!\n\n" +
+                            Triple("featured_6", "Time Traveler", "Once upon a time, in a small town lived a curious child. His name was Michael . Unlike other children, Michael loved working with old things more than playing games. In his father's repair workshop, he would dismantle broken clocks and try to understand how the gears inside worked.\n\n" +
+                                    "One day, he entered the old antique shop at the edge of town. While browsing among the shelves, his eyes caught a dusty pocket watch. On the watch's cover it said \"Time is waiting for you.\" Michael  immediately took the watch curiously and wound it. At that moment, a bright light appeared and Michael  suddenly found himself somewhere completely different!\n\n" +
                                     "Looking around, he was in a square where people wore fez hats and traveled in horse carriages, where there weren't even electric poles. A sign read \"Year 1890 – Town Square.\"\n" +
-                                    "Zeki said to himself in wonder, \"So I really traveled through time!\"\n\n" +
-                                    "At first he was scared, but then his curiosity won. In the square he met a boy named Hasan. Hasan was amazed at Zeki's clothes:\n" +
+                                    "Michael  said to himself in wonder, \"So I really traveled through time!\"\n\n" +
+                                    "At first he was scared, but then his curiosity won. In the square he met a boy named Dwight. Hasan was amazed at Michael 's clothes:\n" +
                                     "— What kind of clothes are these? Even the fabric is different! Where did you come from?\n" +
-                                    "Zeki laughed and said, \"From a faraway place...\" without explaining further.\n\n" +
-                                    "The two immediately became friends. Hasan showed Zeki around the town, the water mill, the old school building, and the village market. Zeki admiringly watched how different life was in the past. But in the evening he noticed something:\n" +
+                                    "Michael  laughed and said, \"From a faraway place...\" without explaining further.\n\n" +
+                                    "The two immediately became friends. Hasan showed Michael  around the town, the water mill, the old school building, and the village market. Michael  admiringly watched how different life was in the past. But in the evening he noticed something:\n" +
                                     "The watch in his pocket was vibrating and its hands were turning backward!\n\n" +
-                                    "Saying goodbye to Hasan, Zeki said, \"We'll meet again someday.\" The lights flashed again and Zeki found himself back in his own room. Looking at the watch, the hand had stopped but the writing underneath had changed:\n" +
+                                    "Saying goodbye to Dwight, Michael  said, \"We'll meet again someday.\" The lights flashed again and Michael found himself back in his own room. Looking at the watch, the hand had stopped but the writing underneath had changed:\n" +
                                     "\"Time has become your friend.\"\n\n" +
-                                    "From that day on, Zeki became a traveler not only of the past but also of knowledge. He started studying harder to understand history, science, and time. Because now he knew that anyone who is curious is a bit of a time traveler.\n\n" +
+                                    "From that day on, Michael  became a traveler not only of the past but also of knowledge. He started studying harder to understand history, science, and time. Because now he knew that anyone who is curious is a bit of a time traveler.\n\n" +
                                     "🌟 The End.")
                         )
                     } else {
@@ -943,25 +818,25 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                                 "“Bugün herkesin güzel bir rüya görmesini dilerim.”\n" +
                                 "\n" +
                                 "Ve o dilek, her gece Rüya Dünyası’na bir ışık daha ekledi. \uD83D\uDCAB"),
-                        Triple("featured_5", "Ejderha Dostluğu", "Bir zamanlar, bulutların gölgesinde kalan küçük bir köyde Elif adında cesur bir kız yaşarmış. Elif, her gün ormanın kenarına gidip uzaklardaki dağlara bakarmış. Çünkü o dağların ardında, kimsenin cesaret edip gitmediği Ejderha Vadisi varmış. Köylüler orada korkunç bir ejderhanın yaşadığına inanır, oraya yaklaşmaktan bile çekinirlermiş.\n" +
+                        Triple("featured_5", "Ejderha Dostluğu", "Bir zamanlar, bulutların gölgesinde kalan küçük bir köyde Deniz adında cesur bir kız yaşarmış. Deniz, her gün ormanın kenarına gidip uzaklardaki dağlara bakarmış. Çünkü o dağların ardında, kimsenin cesaret edip gitmediği Ejderha Vadisi varmış. Köylüler orada korkunç bir ejderhanın yaşadığına inanır, oraya yaklaşmaktan bile çekinirlermiş.\n" +
                                 "\n" +
-                                "Ama Elif farklıymış. O, ejderhalardan korkmak yerine onları merak edermiş.\n" +
+                                "Ama Deniz farklıymış. O, ejderhalardan korkmak yerine onları merak edermiş.\n" +
                                 "Bir gün cesaretini toplamış ve küçük sırt çantasına biraz ekmek, su ve sevdiği pelüş oyuncağını koyarak ormana doğru yola çıkmış.\n" +
                                 "\n" +
-                                "Uzun yürüyüşün sonunda sislerin arasında kocaman bir mağara görmüş. Mağaranın önünde ise yaralı, minik bir ejderha yatıyormuş! Tüyleri yeşil, gözleri parlayan zümrüt gibiymiş. Elif önce korkmuş ama sonra ejderhanın acı çektiğini fark etmiş.\n" +
+                                "Uzun yürüyüşün sonunda sislerin arasında kocaman bir mağara görmüş. Mağaranın önünde ise yaralı, minik bir ejderha yatıyormuş! Tüyleri yeşil, gözleri parlayan zümrüt gibiymiş. Deniz önce korkmuş ama sonra ejderhanın acı çektiğini fark etmiş.\n" +
                                 "\n" +
-                                "“Merhaba… Sana zarar vermeyeceğim,” demiş Elif yavaşça yaklaşarak.\n" +
+                                "“Merhaba… Sana zarar vermeyeceğim,” demiş Deniz yavaşça yaklaşarak.\n" +
                                 "Ejderha da hafif bir iniltiyle başını kaldırmış. Ayağına bir taş saplanmış!\n" +
                                 "\n" +
-                                "Elif hemen küçük bir sopayla taşı dikkatlice çıkarmış, sonra çantasındaki suyla yaranın üstünü temizlemiş. Ejderha minnettarlıkla burnundan sıcak bir buhar üflemiş — neredeyse bir teşekkür gibiymiş.\n" +
+                                "Deniz hemen küçük bir sopayla taşı dikkatlice çıkarmış, sonra çantasındaki suyla yaranın üstünü temizlemiş. Ejderha minnettarlıkla burnundan sıcak bir buhar üflemiş — neredeyse bir teşekkür gibiymiş.\n" +
                                 "\n" +
-                                "Elif, ejderhaya “Kıvılcım” adını vermiş. O günden sonra her gün gizlice vadideki dostunu ziyaret etmiş. Ona yemek getirmiş, oyunlar oynamışlar, hatta Elif bazen sırtına binip bulutların üzerine kadar uçmuş! \uD83C\uDF24\uFE0F\n" +
+                                "Deniz, ejderhaya “Kıvılcım” adını vermiş. O günden sonra her gün gizlice vadideki dostunu ziyaret etmiş. Ona yemek getirmiş, oyunlar oynamışlar, hatta Deniz bazen sırtına binip bulutların üzerine kadar uçmuş! \uD83C\uDF24\uFE0F\n" +
                                 "\n" +
-                                "Fakat bir gün köylüler gökyüzünde ejderhayı görünce çok korkmuşlar. Ellerine meşaleler alıp vadinin yolunu tutmuşlar. Elif hemen Kıvılcım’ı saklamış. Köylülere, “O kötü değil! O benim dostum! Benim hayatımı kurtardı!” diye bağırmış.\n" +
+                                "Fakat bir gün köylüler gökyüzünde ejderhayı görünce çok korkmuşlar. Ellerine meşaleler alıp vadinin yolunu tutmuşlar. Deniz hemen Kıvılcım’ı saklamış. Köylülere, “O kötü değil! O benim dostum! Benim hayatımı kurtardı!” diye bağırmış.\n" +
                                 "\n" +
                                 "Kıvılcım da gökyüzüne yükselmiş, kuyruğuyla kalp şeklinde bir duman çizmiş. Köylüler o an anlamışlar ki bu ejderha zararsızmış.\n" +
                                 "\n" +
-                                "O günden sonra Ejderha Vadisi korku değil, dostluğun ve cesaretin vadisi olarak anılmış. Elif ve Kıvılcım her gün gökyüzünde dolaşmış, köylülere uzaktan el sallamışlar.\n" +
+                                "O günden sonra Ejderha Vadisi korku değil, dostluğun ve cesaretin vadisi olarak anılmış. Deniz ve Kıvılcım her gün gökyüzünde dolaşmış, köylülere uzaktan el sallamışlar.\n" +
                                 "\n" +
                                 "Ve böylece küçük bir kızın cesareti, koca bir köyün kalbini değiştirmiş. \uD83D\uDC96"),
                         Triple("featured_6", "Zaman Yolcusu", "Bir zamanlar, küçük bir kasabada yaşayan meraklı bir çocuk varmış. Adı Zeki’ymiş. Zeki, diğer çocuklardan farklı olarak oyun oynamaktan çok eski eşyalarla uğraşmayı severmiş. Babasının tamir atölyesinde bozulmuş saatleri söker, içlerindeki dişlilerin nasıl çalıştığını anlamaya çalışırmış.\n" +
@@ -1013,16 +888,8 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
                                     .clip(RoundedCornerShape(12.dp))
                                     .background(Color(0xFF1E293B))
                                     .clickable { 
-                                        val activity = context as? Activity
-                                        if (activity != null) {
-                                            InterstitialAdHelper.showAdIfNeeded(activity, isPremium) {
-                                                navController.navigate("metin/$id")
-                                                anasayfaViewModel.setFeaturedStory(title, content, storyImage)
-                                            }
-                                        } else {
-                                            navController.navigate("metin/$id")
-                                            anasayfaViewModel.setFeaturedStory(title, content, storyImage)
-                                        }
+                                        navController.navigate("metin/$id")
+                                        anasayfaViewModel.setFeaturedStory(title, content, storyImage)
                                     }
                             ) {
                                 Image(
@@ -1088,49 +955,7 @@ fun Anasayfa(navController: NavController, anasayfaViewModel: AnasayfaViewModel)
             DebugMenu(onDismiss = { showDebugMenu = false })
         }
         
-        // Çıkış onay dialog'u
-        if (showLogoutDialog) {
-            AlertDialog(
-                onDismissRequest = { showLogoutDialog = false },
-                title = {
-                    Text(
-                        stringResource(R.string.logout_confirmation_title),
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = sandtitle
-                    )
-                },
-                text = {
-                    Text(
-                        stringResource(R.string.logout_confirmation_message),
-                        fontFamily = andikabody
-                    )
-                },
-                confirmButton = {
-                    Button(
-                        onClick = {
-                            selectedTab = 3
-                            Firebase.auth.signOut()
-                            navController.navigate("girisSayfa") {
-                                popUpTo(0) { inclusive = true }
-                            }
-                            showLogoutDialog = false
-                        },
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF003366)
-                        )
-                    ) {
-                        Text(stringResource(R.string.yes), fontFamily = andikabody)
-                    }
-                },
-                dismissButton = {
-                    androidx.compose.material3.TextButton(
-                        onClick = { showLogoutDialog = false }
-                    ) {
-                        Text(stringResource(R.string.no), fontFamily = andikabody)
-                    }
-                }
-            )
-        }
+
     }
 }
 

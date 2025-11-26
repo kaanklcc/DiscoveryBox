@@ -76,6 +76,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.with
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.tween
+import androidx.compose.material.icons.filled.Warning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -246,28 +247,109 @@ fun Metin(navController: NavController,
                     
                     // Sayfa değiştiğinde otomatik ses başlat
                     LaunchedEffect(currentFeaturedPageIndex, isPlayingAudio) {
-                        if (isPlayingAudio && (hikayeId == "featured_1" || hikayeId == "featured_2")) {
+                        val hasFeaturedAudio = hikayeId in listOf("featured_1", "featured_2", "featured_3", "featured_4", "featured_5", "featured_6")
+                        
+                        if (isPlayingAudio && hasFeaturedAudio) {
                             metinViewModel.stopMediaPlayer()
                             metinViewModel.stop()
                             kotlinx.coroutines.delay(100)
                             
+                            // Dil kontrolü
+                            val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                            val currentLanguage = prefs.getString("language_code", "tr") ?: "tr"
+                            val isEnglish = currentLanguage == "en"
+                            
                             // Her hikaye ve sayfa için farklı ses dosyası
-                            val audioResource = when(hikayeId) {
-                                "featured_1" -> when(currentFeaturedPageIndex) {
-                                    0 -> R.raw.orman_bir
-                                    1 -> R.raw.orman_iki
-                                    2 -> R.raw.orman_uc
-                                    3 -> R.raw.orman_dort
+                            val audioResource = if (isEnglish) {
+                                when(hikayeId) {
+                                    "featured_1" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.magic_one
+                                        1 -> R.raw.magic_two
+                                        2 -> R.raw.magic_three
+                                        3 -> R.raw.magic_four
+                                        else -> R.raw.magic_one
+                                    }
+                                    "featured_2" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.space_one
+                                        1 -> R.raw.space_two
+                                        2 -> R.raw.space_three
+                                        3 -> R.raw.space_four
+                                        else -> R.raw.space_one
+                                    }
+                                    "featured_3" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.water_one
+                                        1 -> R.raw.water_two
+                                        2 -> R.raw.water_three
+                                        3 -> R.raw.water_four
+                                        else -> R.raw.water_one
+                                    }
+                                    "featured_4" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.dream_one
+                                        1 -> R.raw.dream_two
+                                        2 -> R.raw.dream_three
+                                        else -> R.raw.dream_one
+                                    }
+                                    "featured_5" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.dragon_one
+                                        1 -> R.raw.dragon_two
+                                        2 -> R.raw.dragon_three
+                                        else -> R.raw.dragon_one
+                                    }
+                                    "featured_6" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.time_one
+                                        1 -> R.raw.time_two
+                                        2 -> R.raw.time_three
+                                        3 -> R.raw.time_four
+                                        else -> R.raw.time_one
+                                    }
+                                    else -> R.raw.magic_one
+                                }
+                            } else {
+                                when(hikayeId) {
+                                    "featured_1" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.orman_bir
+                                        1 -> R.raw.orman_iki
+                                        2 -> R.raw.orman_uc
+                                        3 -> R.raw.orman_dort
+                                        else -> R.raw.orman_bir
+                                    }
+                                    "featured_2" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.uzay_bir
+                                        1 -> R.raw.uzay_iki
+                                        2 -> R.raw.uzay_uc
+                                        3 -> R.raw.uzay_dort
+                                        else -> R.raw.uzay_bir
+                                    }
+                                    "featured_3" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.deniz_bir
+                                        1 -> R.raw.deniz_iki
+                                        2 -> R.raw.deniz_uc
+                                        3 -> R.raw.deniz_dort
+                                        else -> R.raw.deniz_bir
+                                    }
+                                    "featured_4" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.ruya_bir
+                                        1 -> R.raw.ruya_iki
+                                        2 -> R.raw.ruya_uc
+                                        3 -> R.raw.ruya_dort
+                                        else -> R.raw.ruya_bir
+                                    }
+                                    "featured_5" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.dost_bir
+                                        1 -> R.raw.dost_iki
+                                        2 -> R.raw.dost_uc
+                                        3 -> R.raw.dost_dort
+                                        else -> R.raw.dost_bir
+                                    }
+                                    "featured_6" -> when(currentFeaturedPageIndex) {
+                                        0 -> R.raw.zaman_bir
+                                        1 -> R.raw.zaman_iki
+                                        2 -> R.raw.zaman_uc
+                                        3 -> R.raw.zaman_dort
+                                        else -> R.raw.zaman_bir
+                                    }
                                     else -> R.raw.orman_bir
                                 }
-                                "featured_2" -> when(currentFeaturedPageIndex) {
-                                    0 -> R.raw.uzay_bir
-                                    1 -> R.raw.uzay_iki
-                                    2 -> R.raw.uzay_uc
-                                    3 -> R.raw.uzay_dort
-                                    else -> R.raw.uzay_bir
-                                }
-                                else -> R.raw.orman_bir
                             }
                             
                             metinViewModel.playRawAudio(context, audioResource) {
@@ -366,7 +448,9 @@ fun Metin(navController: NavController,
                                         .clip(CircleShape)
                                         .background(Color(0xFFFCD34D))
                                         .clickable {
-                                            if (hikayeId == "featured_1" || hikayeId == "featured_2") {
+                                            val hasFeaturedAudio = hikayeId in listOf("featured_1", "featured_2", "featured_3", "featured_4", "featured_5", "featured_6")
+                                            
+                                            if (hasFeaturedAudio) {
                                                 if (isPlayingAudio) {
                                                     metinViewModel.pauseMediaPlayer()
                                                     isPlayingAudio = false
@@ -374,23 +458,102 @@ fun Metin(navController: NavController,
                                                     metinViewModel.resumeMediaPlayer()
                                                     isPlayingAudio = true
                                                 } else {
+                                                    // Dil kontrolü
+                                                    val prefs = context.getSharedPreferences("app_prefs", android.content.Context.MODE_PRIVATE)
+                                                    val currentLanguage = prefs.getString("language_code", "tr") ?: "tr"
+                                                    val isEnglish = currentLanguage == "en"
+                                                    
                                                     // Her hikaye ve sayfa için farklı ses dosyası
-                                                    val audioResource = when(hikayeId) {
-                                                        "featured_1" -> when(currentFeaturedPageIndex) {
-                                                            0 -> R.raw.orman_bir
-                                                            1 -> R.raw.orman_iki
-                                                            2 -> R.raw.orman_uc
-                                                            3 -> R.raw.orman_dort
+                                                    val audioResource = if (isEnglish) {
+                                                        when(hikayeId) {
+                                                            "featured_1" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.magic_one
+                                                                1 -> R.raw.magic_two
+                                                                2 -> R.raw.magic_three
+                                                                3 -> R.raw.magic_four
+                                                                else -> R.raw.magic_one
+                                                            }
+                                                            "featured_2" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.space_one
+                                                                1 -> R.raw.space_two
+                                                                2 -> R.raw.space_three
+                                                                3 -> R.raw.space_four
+                                                                else -> R.raw.space_one
+                                                            }
+                                                            "featured_3" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.water_one
+                                                                1 -> R.raw.water_two
+                                                                2 -> R.raw.water_three
+                                                                3 -> R.raw.water_four
+                                                                else -> R.raw.water_one
+                                                            }
+                                                            "featured_4" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.dream_one
+                                                                1 -> R.raw.dream_two
+                                                                2 -> R.raw.dream_three
+                                                                else -> R.raw.dream_one
+                                                            }
+                                                            "featured_5" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.dragon_one
+                                                                1 -> R.raw.dragon_two
+                                                                2 -> R.raw.dragon_three
+                                                                else -> R.raw.dragon_one
+                                                            }
+                                                            "featured_6" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.time_one
+                                                                1 -> R.raw.time_two
+                                                                2 -> R.raw.time_three
+                                                                3 -> R.raw.time_four
+                                                                else -> R.raw.time_one
+                                                            }
+                                                            else -> R.raw.magic_one
+                                                        }
+                                                    } else {
+                                                        when(hikayeId) {
+                                                            "featured_1" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.orman_bir
+                                                                1 -> R.raw.orman_iki
+                                                                2 -> R.raw.orman_uc
+                                                                3 -> R.raw.orman_dort
+                                                                else -> R.raw.orman_bir
+                                                            }
+                                                            "featured_2" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.uzay_bir
+                                                                1 -> R.raw.uzay_iki
+                                                                2 -> R.raw.uzay_uc
+                                                                3 -> R.raw.uzay_dort
+                                                                else -> R.raw.uzay_bir
+                                                            }
+                                                            "featured_3" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.deniz_bir
+                                                                1 -> R.raw.deniz_iki
+                                                                2 -> R.raw.deniz_uc
+                                                                3 -> R.raw.deniz_dort
+                                                                else -> R.raw.deniz_bir
+                                                            }
+                                                            "featured_4" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.ruya_bir
+                                                                1 -> R.raw.ruya_iki
+                                                                2 -> R.raw.ruya_uc
+                                                                3 -> R.raw.ruya_dort
+                                                                else -> R.raw.ruya_bir
+                                                            }
+                                                            "featured_5" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.dost_bir
+                                                                1 -> R.raw.dost_iki
+                                                                2 -> R.raw.dost_uc
+                                                                3 -> R.raw.dost_dort
+                                                                else -> R.raw.dost_bir
+                                                            }
+                                                            "featured_6" -> when(currentFeaturedPageIndex) {
+                                                                0 -> R.raw.zaman_bir
+                                                                1 -> R.raw.zaman_iki
+                                                                2 -> R.raw.zaman_uc
+                                                                3 -> R.raw.zaman_dort
+                                                                else -> R.raw.zaman_bir
+                                                            }
                                                             else -> R.raw.orman_bir
                                                         }
-                                                        "featured_2" -> when(currentFeaturedPageIndex) {
-                                                            0 -> R.raw.uzay_bir
-                                                            1 -> R.raw.uzay_iki
-                                                            2 -> R.raw.uzay_uc
-                                                            3 -> R.raw.uzay_dort
-                                                            else -> R.raw.uzay_bir
-                                                        }
-                                                        else -> R.raw.orman_bir
                                                     }
                                                     
                                                     metinViewModel.playRawAudio(context, audioResource) {
@@ -893,6 +1056,7 @@ fun Metin(navController: NavController,
                             ) {
                                 val coroutineScope = rememberCoroutineScope()
                                 var isSaving by remember { mutableStateOf(false) }
+                                var feedbackGiven by remember { mutableStateOf(false) }
                                 
                                 Button(
                                     onClick = {
@@ -983,6 +1147,31 @@ fun Metin(navController: NavController,
                                         fontSize = 18.sp,
                                         fontFamily = sandtitle,
                                         color = Color(0xFF003366)
+                                    )
+                                }
+                                
+                                IconButton(
+                                    onClick = {
+                                        if (!feedbackGiven) {
+                                            feedbackGiven = true
+                                            Toast.makeText(
+                                                context,
+                                                "Geri bildirim alındı",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .background(
+                                            if (feedbackGiven) Color.Gray else Color(0xFFFCD34D),
+                                            CircleShape
+                                        )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Warning,
+                                        contentDescription = "Beğenmedim",
+                                        tint = Color(0xFF003366)
                                     )
                                 }
                             }
@@ -1102,7 +1291,7 @@ fun Metin(navController: NavController,
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Icon(
-                                            painter = painterResource(R.drawable.play),
+                                            painter = painterResource(R.drawable.playstory),
                                             contentDescription = "Play",
                                             tint = Color(0xFF003366),
                                             modifier = Modifier.size(28.dp)

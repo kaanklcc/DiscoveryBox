@@ -181,5 +181,20 @@
     <string name="trial_short_only">İlk deneme kullanıcıları sadece Kısa hikaye oluşturabilir. Orta ve Uzun hikayeler için Premiuma geçin!</string>
     <string name="converting_to_audio">Sese Dönüştürülüyor...</string>
     <string name="please_wait">Lütfen bekleyin</string>
+    
+    <!-- Profil Sayfası -->
+    <string name="profile">Profil</string>
+    <string name="account_status">Hesap Durumu</string>
+    <string name="premium_member">Premium Üye</string>
+    <string name="free_member">Ücretsiz Üye</string>
+    <string name="upgrade">Yükselt</string>
+    <string name="privacy_policy">Gizlilik Politikası</string>
+    <string name="terms_of_use">Kullanım Şartları</string>
+    <string name="delete_account">Hesabı Sil</string>
+    <string name="delete_account_title">Hesabı Sil</string>
+    <string name="delete_account_message">Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve tüm verileriniz kalıcı olarak silinecektir.</string>
+    <string name="cancel">İptal</string>
+    <string name="ai_disclosure_title">Yapay Zeka İçeriği</string>
+    <string name="ai_disclosure_message">Bu uygulama hikaye, görsel ve ses oluşturmak için yapay zeka modelleri (OpenAI GPT, Google Gemini) kullanır. İçerik otomatik oluşturulur ve her zaman çocuklar için uygun olmayabilir. Lütfen paylaşmadan önce gözden geçirin.</string>
 
 </resources>

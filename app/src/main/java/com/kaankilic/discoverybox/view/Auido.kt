@@ -122,7 +122,7 @@ fun Audio() {
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                 Image(
-                    painter = painterResource(id = R.drawable.play),
+                    painter = painterResource(id = R.drawable.playstory),
                     contentDescription = "play icon",
                     modifier = Modifier
                         .size(40.dp) // İkonun boyutunu ayarlamak için
@@ -133,7 +133,7 @@ fun Audio() {
 
 
                 Image(
-                    painter = painterResource(id = R.drawable.pause),
+                    painter = painterResource(id = R.drawable.pausestory),
                     contentDescription = "play icon",
                     modifier = Modifier
                         .size(40.dp) // İkonun boyutunu ayarlamak için

@@ -442,59 +442,25 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
     }*/
 
     fun saveUserData(userId: String, ad: String, soyad: String, email: String, onResult: (Boolean, String?) -> Unit) {
-        // Yeni kayıt için cihaz kontrolü
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val deviceUsedTrial = deviceTrialManager.hasDeviceUsedTrial()
-                
-                val user = hashMapOf(
-                    "ad" to ad,
-                    "soyad" to soyad,
-                    "email" to email,
-                    "usedFreeTrial" to deviceUsedTrial, // İlk kullanıcı: false, diğerleri: true
-                    "premium" to false,
-                    "remainingChatgptUses" to if (!deviceUsedTrial) 1 else 0, // İlk kullanıcı: 1, diğerleri: 0
-                    "premiumStartDate" to null,
-                    "premiumDurationDays" to 0L,
-                    "remainingFreeUses" to 0, // Başlangıçta reklam hakkı yok
-                    "adsWatchedToday" to 0,
-                    "maxAdsPerDay" to 2,
-                    "lastFreeUseReset" to getTodayDateString(),
-                    "deviceId" to deviceTrialManager.getDeviceId()
-                )
+        val user = hashMapOf(
+            "ad" to ad,
+            "soyad" to soyad,
+            "email" to email,
+            "usedFreeTrial" to true,
+            "premium" to false,
+            "remainingChatgptUses" to 0,
+            "premiumStartDate" to null,
+            "premiumDurationDays" to 0L
+        )
 
-                firestore.collection("users").document(userId)
-                    .set(user)
-                    .await()
-                
-                // İlk kullanıcı için device_trials kaydı oluştur (used=true olarak işaretle)
-                if (!deviceUsedTrial) {
-                    val deviceId = deviceTrialManager.getDeviceId()
-                    val trialData = hashMapOf(
-                        "device_id" to deviceId,
-                        "user_id" to userId,
-                        "used" to true,
-                        "registered_at" to com.google.firebase.Timestamp.now()
-                    )
-                    firestore.collection("device_trials")
-                        .document(deviceId)
-                        .set(trialData)
-                        .await()
-                }
-                
-                withContext(Dispatchers.Main) {
-                    if (deviceUsedTrial) {
-                        onResult(true, "Kayıt başarılı. Bu cihazdan daha önce deneme hakkı kullanılmış.")
-                    } else {
-                        onResult(true, "Kayıt başarılı! 1 ücretsiz deneme hakkınız var.")
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    onResult(false, e.message)
-                }
+        firestore.collection("users").document(userId)
+            .set(user)
+            .addOnSuccessListener {
+                onResult(true, "Kayıt başarılı")
             }
-        }
+            .addOnFailureListener { e ->
+                onResult(false, e.message)
+            }
     }
 
     fun signInWithGoogle(
@@ -509,61 +475,26 @@ class DiscoveryBoxDataSource(var firestore : FirebaseFirestore, var auth: Fireba
 
                     userRef.get().addOnSuccessListener { document ->
                         if (!document.exists()) {
-                            // Yeni kullanıcı - cihaz kontrolü yap
-                            CoroutineScope(Dispatchers.IO).launch {
-                                try {
-                                    // Cihazın daha önce kullanılıp kullanılmadığını kontrol et
-                                    val deviceUsedTrial = deviceTrialManager.hasDeviceUsedTrial()
-                                    
-                                    val userData = hashMapOf(
-                                        "ad" to (user.displayName ?: ""),
-                                        "soyad" to "",
-                                        "email" to (user.email ?: ""),
-                                        "usedFreeTrial" to deviceUsedTrial, // İlk kullanıcı: false, diğerleri: true
-                                        "premium" to false,
-                                        "remainingChatgptUses" to if (!deviceUsedTrial) 1 else 0, // İlk kullanıcı: 1, diğerleri: 0
-                                        "premiumStartDate" to null,
-                                        "premiumDurationDays" to 0L,
-                                        "remainingFreeUses" to 0, // Başlangıçta reklam hakkı yok
-                                        "adsWatchedToday" to 0,
-                                        "maxAdsPerDay" to 2,
-                                        "lastFreeUseReset" to getTodayDateString(),
-                                        "deviceId" to deviceTrialManager.getDeviceId() // Device ID'yi kaydet
-                                    )
+                            val userData = hashMapOf(
+                                "ad" to (user.displayName ?: ""),
+                                "soyad" to "",
+                                "email" to (user.email ?: ""),
+                                "usedFreeTrial" to true,
+                                "premium" to false,
+                                "remainingChatgptUses" to 0,
+                                "premiumStartDate" to null,
+                                "premiumDurationDays" to 0L
+                            )
 
-                                    userRef.set(userData).await()
-                                    
-                                    // İlk kullanıcı için device_trials kaydı oluştur (used=true olarak işaretle)
-                                    if (!deviceUsedTrial) {
-                                        val deviceId = deviceTrialManager.getDeviceId()
-                                        val trialData = hashMapOf(
-                                            "device_id" to deviceId,
-                                            "user_id" to user.uid,
-                                            "used" to true,
-                                            "registered_at" to com.google.firebase.Timestamp.now()
-                                        )
-                                        firestore.collection("device_trials")
-                                            .document(deviceId)
-                                            .set(trialData)
-                                            .await()
-                                    }
-                                    
-                                    withContext(Dispatchers.Main) {
-                                        if (deviceUsedTrial) {
-                                            onResult(true, "Giriş başarılı. Bu cihazdan daha önce deneme hakkı kullanılmış.")
-                                        } else {
-                                            onResult(true, "Google ile giriş başarılı! 1 ücretsiz deneme hakkınız var.")
-                                        }
-                                    }
-                                } catch (e: Exception) {
-                                    withContext(Dispatchers.Main) {
-                                        onResult(false, "Kullanıcı kaydedilemedi: ${e.message}")
-                                    }
+                            userRef.set(userData)
+                                .addOnSuccessListener {
+                                    onResult(true, "Google ile giriş başarılı")
                                 }
-                            }
+                                .addOnFailureListener { e ->
+                                    onResult(false, "Kullanıcı kaydedilemedi: ${e.message}")
+                                }
                         } else {
-                            // Mevcut kullanıcı - giriş başarılı
-                            onResult(true, "Google ile giriş başarılı (kayıtlı kullanıcı)")
+                            onResult(true, "Google ile giriş başarılı")
                         }
                     }.addOnFailureListener {
                         onResult(false, "Kullanıcı bilgisi alınamadı: ${it.message}")

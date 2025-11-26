@@ -10,10 +10,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.ads.MobileAds
 import com.google.firebase.auth.FirebaseAuth
 import com.kaankilic.discoverybox.ui.theme.DiscoveryBoxTheme
-import com.kaankilic.discoverybox.util.InterstitialAdHelper
 import com.kaankilic.discoverybox.view.SayfaGecisleri
 import com.kaankilic.discoverybox.viewmodel.AnasayfaViewModel
 import com.kaankilic.discoverybox.viewmodel.DilViewModel
@@ -44,8 +42,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MobileAds.initialize(this){}
-        InterstitialAdHelper.loadAd(this)
+
         enableEdgeToEdge()
         setContent {
            DiscoveryBoxTheme {

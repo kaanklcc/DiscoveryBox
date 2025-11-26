@@ -188,5 +188,20 @@
     <string name="trial_short_only">First-time trial users can only create Short stories. Upgrade to Premium for Medium and Long stories!</string>
     <string name="converting_to_audio">Converting to Audio...</string>
     <string name="please_wait">Please wait</string>
+    
+    <!-- Profile Page -->
+    <string name="profile">Profile</string>
+    <string name="account_status">Account Status</string>
+    <string name="premium_member">Premium Member</string>
+    <string name="free_member">Free Member</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="terms_of_use">Terms of Use</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="delete_account_title">Delete Account</string>
+    <string name="delete_account_message">Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.</string>
+    <string name="cancel">Cancel</string>
+    <string name="ai_disclosure_title">AI-Generated Content</string>
+    <string name="ai_disclosure_message">This app uses artificial intelligence models (OpenAI GPT, Google Gemini) to generate stories, images, and audio. Content is automatically generated and may not always be appropriate for children. Please review before sharing.</string>
 
 </resources>

@@ -206,7 +206,7 @@ fun MainPage() {
                 }*/
 
                 Image(
-                    painter = painterResource(R.drawable.robot),
+                    painter = painterResource(R.drawable.pencil),
                     contentDescription = "Kaan Image",
                     contentScale = ContentScale.Crop,
 
@@ -240,7 +240,7 @@ fun MainPage() {
                             modifier = Modifier.fillMaxWidth() // Text'in genişliğini doldurması için
                         )
                         Image(
-                            painter = painterResource(R.drawable.parent),
+                            painter = painterResource(R.drawable.anne),
                             contentDescription = "Kaan Image",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -277,7 +277,7 @@ fun MainPage() {
                     horizontalArrangement = Arrangement.Absolute.Center)
                 {
                     Image(
-                        painter = painterResource(R.drawable.img),
+                        painter = painterResource(R.drawable.topic),
                         contentDescription = "Kaan Image",
                         contentScale = ContentScale.Crop,
 

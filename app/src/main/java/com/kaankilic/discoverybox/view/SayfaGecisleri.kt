@@ -92,6 +92,9 @@ fun SayfaGecisleri(
             composable("premium"){
                 PremiumSayfa(navController = navController)
             }
+            composable("profil"){
+                ProfilSayfa(navController = navController)
+            }
         }
 
 
